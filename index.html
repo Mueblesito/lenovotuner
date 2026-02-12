@@ -321,11 +321,11 @@
     if(!isApp){
         document.getElementById('blockScreen').style.display = 'flex';
         document.getElementById('loader').style.display = 'none';
-        return;
+        // NO return — las funciones de descarga necesitan cargarse
+    } else {
+        document.getElementById('blockScreen').style.display = 'none';
+        document.getElementById('loader').style.display = 'flex';
     }
-
-    document.getElementById('blockScreen').style.display = 'none';
-    document.getElementById('loader').style.display = 'flex';
 
     document.addEventListener('contextmenu', e => e.preventDefault());
     document.addEventListener('keydown', e => {
@@ -343,110 +343,113 @@ function blockDlFile(name,content){const b=new Blob([content],{type:'text/plain'
 function blockDlHTML(){const b=new Blob([document.documentElement.outerHTML],{type:'text/html'}),u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download='index.html';document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(u);blockNotify('✅ index.html descargado');}
 function blockDlPS1(){blockDlFile('Crear_EXE.ps1',getPS1Content());blockNotify('✅ Crear_EXE.ps1 descargado');}
 function blockDlAll(){blockDlPS1();setTimeout(()=>blockDlHTML(),500);}
-function getPS1Content(){return `# ============================================
-# PCTuner Pro v6 — Instalador Automatico
-# Solo ejecuta este archivo con PowerShell
-# ============================================
-
-Write-Host ""
-Write-Host "  ╔══════════════════════════════════════╗" -ForegroundColor Cyan
-Write-Host "  ║     PCTuner Pro v6 — Instalador      ║" -ForegroundColor Cyan
-Write-Host "  ╚══════════════════════════════════════╝" -ForegroundColor Cyan
-Write-Host ""
-
-$scriptDir = $PSScriptRoot
-$htmlFile = Join-Path $scriptDir "index.html"
-
-if (-not (Test-Path $htmlFile)) {
-    Write-Host "  [ERROR] index.html no encontrado!" -ForegroundColor Red
-    Write-Host "  Coloca index.html junto a este archivo." -ForegroundColor Yellow
-    Read-Host "  Presiona Enter para cerrar"
-    exit
+function getPS1Content(){
+var ps = [];
+ps.push('# ============================================');
+ps.push('# PCTuner Pro v6 — Instalador Automatico');
+ps.push('# Solo ejecuta este archivo con PowerShell');
+ps.push('# ============================================');
+ps.push('');
+ps.push('Write-Host ""');
+ps.push('Write-Host "  ╔══════════════════════════════════════╗" -ForegroundColor Cyan');
+ps.push('Write-Host "  ║     PCTuner Pro v6 — Instalador      ║" -ForegroundColor Cyan');
+ps.push('Write-Host "  ╚══════════════════════════════════════╝" -ForegroundColor Cyan');
+ps.push('Write-Host ""');
+ps.push('');
+ps.push('$scriptDir = $PSScriptRoot');
+ps.push('$htmlFile = Join-Path $scriptDir "index.html"');
+ps.push('');
+ps.push('if (-not (Test-Path $htmlFile)) {');
+ps.push('    Write-Host "  [ERROR] index.html no encontrado!" -ForegroundColor Red');
+ps.push('    Write-Host "  Coloca index.html junto a este archivo." -ForegroundColor Yellow');
+ps.push('    Read-Host "  Presiona Enter para cerrar"');
+ps.push('    exit');
+ps.push('}');
+ps.push('');
+ps.push('Write-Host "  [1/5] Creando carpeta de instalacion..." -ForegroundColor Yellow');
+ps.push('$installDir = Join-Path $env:LOCALAPPDATA "PCTuner"');
+ps.push('if (-not (Test-Path $installDir)) { New-Item -Path $installDir -ItemType Directory -Force | Out-Null }');
+ps.push('');
+ps.push('Write-Host "  [2/5] Copiando archivos..." -ForegroundColor Yellow');
+ps.push('Copy-Item $htmlFile (Join-Path $installDir "index.html") -Force');
+ps.push('');
+ps.push('Write-Host "  [3/5] Compilando PCTuner.exe..." -ForegroundColor Yellow');
+ps.push('');
+ps.push('$exeSrc = @"');
+ps.push('using System;');
+ps.push('using System.Diagnostics;');
+ps.push('using System.IO;');
+ps.push('using System.Runtime.InteropServices;');
+ps.push('');
+ps.push('class PCTuner {');
+ps.push('    [DllImport("kernel32.dll")] static extern IntPtr GetConsoleWindow();');
+ps.push('    [DllImport("user32.dll")] static extern bool ShowWindow(IntPtr h, int s);');
+ps.push('');
+ps.push('    static void Main() {');
+ps.push('        ShowWindow(GetConsoleWindow(), 0);');
+ps.push('        string dir = AppDomain.CurrentDomain.BaseDirectory;');
+ps.push('        string html = Path.Combine(dir, "index.html");');
+ps.push('        if (!File.Exists(html)) { return; }');
+ps.push('        string url = "file:///" + html.Replace("\\\\", "/");');
+ps.push('        string[] browsers = { "chrome", "msedge" };');
+ps.push('        foreach (var b in browsers) {');
+ps.push('            try {');
+ps.push('                var psi = new ProcessStartInfo(b);');
+ps.push('                psi.Arguments = "--app=\\"" + url + "\\" --window-size=1300,850 --disable-extensions --disable-sync --no-first-run --disable-default-apps";');
+ps.push('                psi.UseShellExecute = false;');
+ps.push('                psi.CreateNoWindow = true;');
+ps.push('                Process.Start(psi);');
+ps.push('                return;');
+ps.push('            } catch {}');
+ps.push('        }');
+ps.push('        Process.Start(html);');
+ps.push('    }');
+ps.push('}');
+ps.push('"@');
+ps.push('');
+ps.push('try {');
+ps.push('    Add-Type -TypeDefinition $exeSrc -OutputAssembly (Join-Path $installDir "PCTuner.exe") -OutputType ConsoleApplication -ErrorAction Stop');
+ps.push('    Write-Host "  [3/5] PCTuner.exe compilado OK!" -ForegroundColor Green');
+ps.push('} catch {');
+ps.push('    Write-Host "  [3/5] Usando launcher alternativo..." -ForegroundColor Yellow');
+ps.push('    $bat = "@echo off`nstart /b `"`" chrome --app=`"file:///$($installDir.Replace(\'\\',\'/\'))/index.html`" --window-size=1300,850 2>nul || start /b `"`" msedge --app=`"file:///$($installDir.Replace(\'\\',\'/\'))/index.html`" --window-size=1300,850"');
+ps.push('    Set-Content (Join-Path $installDir "PCTuner.bat") $bat');
+ps.push('}');
+ps.push('');
+ps.push('Write-Host "  [4/5] Creando acceso directo en Escritorio..." -ForegroundColor Yellow');
+ps.push('$desktop = [Environment]::GetFolderPath("Desktop")');
+ps.push('$exePath = Join-Path $installDir "PCTuner.exe"');
+ps.push('if (-not (Test-Path $exePath)) { $exePath = Join-Path $installDir "PCTuner.bat" }');
+ps.push('');
+ps.push('$shell = New-Object -ComObject WScript.Shell');
+ps.push('$shortcut = $shell.CreateShortcut((Join-Path $desktop "PCTuner Pro.lnk"))');
+ps.push('$shortcut.TargetPath = $exePath');
+ps.push('$shortcut.WorkingDirectory = $installDir');
+ps.push('$shortcut.Description = "PCTuner Pro v6"');
+ps.push('$shortcut.Save()');
+ps.push('');
+ps.push('Write-Host "  [5/5] Creando acceso en Menu Inicio..." -ForegroundColor Yellow');
+ps.push('$startMenu = Join-Path $env:APPDATA "Microsoft\\Windows\\Start Menu\\Programs"');
+ps.push('$shortcut2 = $shell.CreateShortcut((Join-Path $startMenu "PCTuner Pro.lnk"))');
+ps.push('$shortcut2.TargetPath = $exePath');
+ps.push('$shortcut2.WorkingDirectory = $installDir');
+ps.push('$shortcut2.Description = "PCTuner Pro v6"');
+ps.push('$shortcut2.Save()');
+ps.push('');
+ps.push('Write-Host ""');
+ps.push('Write-Host "  ╔══════════════════════════════════════╗" -ForegroundColor Green');
+ps.push('Write-Host "  ║  INSTALACION COMPLETADA!             ║" -ForegroundColor Green');
+ps.push('Write-Host "  ║  Acceso directo en Escritorio        ║" -ForegroundColor Green');
+ps.push('Write-Host "  ║  Acceso en Menu Inicio               ║" -ForegroundColor Green');
+ps.push('Write-Host "  ╚══════════════════════════════════════╝" -ForegroundColor Green');
+ps.push('Write-Host ""');
+ps.push('');
+ps.push('Write-Host "  Abriendo PCTuner Pro..." -ForegroundColor Cyan');
+ps.push('Start-Process $exePath -WorkingDirectory $installDir');
+ps.push('');
+ps.push('Start-Sleep -Seconds 3');
+return ps.join('\n');
 }
-
-Write-Host "  [1/5] Creando carpeta de instalacion..." -ForegroundColor Yellow
-$installDir = Join-Path $env:LOCALAPPDATA "PCTuner"
-if (-not (Test-Path $installDir)) { New-Item -Path $installDir -ItemType Directory -Force | Out-Null }
-
-Write-Host "  [2/5] Copiando archivos..." -ForegroundColor Yellow
-Copy-Item $htmlFile (Join-Path $installDir "index.html") -Force
-
-Write-Host "  [3/5] Compilando PCTuner.exe..." -ForegroundColor Yellow
-
-$exeSrc = @"
-using System;
-using System.Diagnostics;
-using System.IO;
-using System.Runtime.InteropServices;
-
-class PCTuner {
-    [DllImport("kernel32.dll")] static extern IntPtr GetConsoleWindow();
-    [DllImport("user32.dll")] static extern bool ShowWindow(IntPtr h, int s);
-
-    static void Main() {
-        ShowWindow(GetConsoleWindow(), 0);
-        string dir = AppDomain.CurrentDomain.BaseDirectory;
-        string html = Path.Combine(dir, "index.html");
-        if (!File.Exists(html)) { return; }
-        string url = "file:///" + html.Replace("\\\\", "/");
-        string[] browsers = { "chrome", "msedge" };
-        foreach (var b in browsers) {
-            try {
-                var psi = new ProcessStartInfo(b);
-                psi.Arguments = "--app=\\"" + url + "\\" --window-size=1300,850 --disable-extensions --disable-sync --no-first-run --disable-default-apps";
-                psi.UseShellExecute = false;
-                psi.CreateNoWindow = true;
-                Process.Start(psi);
-                return;
-            } catch {}
-        }
-        Process.Start(html);
-    }
-}
-"@
-
-try {
-    Add-Type -TypeDefinition $exeSrc -OutputAssembly (Join-Path $installDir "PCTuner.exe") -OutputType ConsoleApplication -ErrorAction Stop
-    Write-Host "  [3/5] PCTuner.exe compilado OK!" -ForegroundColor Green
-} catch {
-    Write-Host "  [3/5] Usando launcher alternativo..." -ForegroundColor Yellow
-    $bat = "@echo off`nstart /b """" chrome --app=""file:///$($installDir.Replace('\\','/'))/index.html"" --window-size=1300,850 2>nul || start /b """" msedge --app=""file:///$($installDir.Replace('\\','/'))/index.html"" --window-size=1300,850"
-    Set-Content (Join-Path $installDir "PCTuner.bat") $bat
-}
-
-Write-Host "  [4/5] Creando acceso directo en Escritorio..." -ForegroundColor Yellow
-$desktop = [Environment]::GetFolderPath("Desktop")
-$exePath = Join-Path $installDir "PCTuner.exe"
-if (-not (Test-Path $exePath)) { $exePath = Join-Path $installDir "PCTuner.bat" }
-
-$shell = New-Object -ComObject WScript.Shell
-$shortcut = $shell.CreateShortcut((Join-Path $desktop "PCTuner Pro.lnk"))
-$shortcut.TargetPath = $exePath
-$shortcut.WorkingDirectory = $installDir
-$shortcut.Description = "PCTuner Pro v6"
-$shortcut.Save()
-
-Write-Host "  [5/5] Creando acceso en Menu Inicio..." -ForegroundColor Yellow
-$startMenu = Join-Path $env:APPDATA "Microsoft\\Windows\\Start Menu\\Programs"
-$shortcut2 = $shell.CreateShortcut((Join-Path $startMenu "PCTuner Pro.lnk"))
-$shortcut2.TargetPath = $exePath
-$shortcut2.WorkingDirectory = $installDir
-$shortcut2.Description = "PCTuner Pro v6"
-$shortcut2.Save()
-
-Write-Host ""
-Write-Host "  ╔══════════════════════════════════════╗" -ForegroundColor Green
-Write-Host "  ║  INSTALACION COMPLETADA!             ║" -ForegroundColor Green
-Write-Host "  ║  Acceso directo en Escritorio        ║" -ForegroundColor Green
-Write-Host "  ║  Acceso en Menu Inicio               ║" -ForegroundColor Green
-Write-Host "  ╚══════════════════════════════════════╝" -ForegroundColor Green
-Write-Host ""
-
-Write-Host "  Abriendo PCTuner Pro..." -ForegroundColor Cyan
-Start-Process $exePath -WorkingDirectory $installDir
-
-Start-Sleep -Seconds 3
-`;}
 
 // ==================== ESTADO GLOBAL ====================
 const S={page:'dashboard',hw:{},toggles:{},sliders:{},selects:{},keybinds:{},fan:{profiles:{silent:{curve:[{t:30,s:8},{t:45,s:18},{t:60,s:30},{t:75,s:50},{t:90,s:65}],min:5,max:70},balanced:{curve:[{t:30,s:10},{t:45,s:25},{t:60,s:50},{t:75,s:80},{t:90,s:100}],min:10,max:100},performance:{curve:[{t:30,s:30},{t:45,s:50},{t:60,s:70},{t:75,s:90},{t:90,s:100}],min:25,max:100},custom:{curve:[{t:30,s:10},{t:45,s:25},{t:60,s:50},{t:75,s:80},{t:90,s:100}],min:10,max:100}},profile:'balanced',get curve(){return this.profiles[this.profile].curve},set curve(v){this.profiles[this.profile].curve=v}},changes:{},mon:{cpu:0,ram:0,temp:0,rpm:0,disk:0,up:'0h 0m',net:0},hist:{cpu:[],ram:[],temp:[]}};

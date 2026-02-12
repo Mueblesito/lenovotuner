@@ -3,1475 +3,1098 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LenovoTuner Pro — Centro de Optimización Integral</title>
+    <title>PCTuner Pro v5 — Optimizador Universal</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;500;600;700;800;900&display=swap');
+        *{box-sizing:border-box;margin:0;padding:0}
+        body{font-family:'Inter',sans-serif;background:#050810;min-height:100vh;overflow-x:hidden;color:#cbd5e1}
+        .code-font{font-family:'JetBrains Mono',monospace}
+        ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:#1e3a5f;border-radius:3px}
 
-        * { box-sizing: border-box; }
-        body {
-            font-family: 'Inter', sans-serif;
-            background: #0a0e1a;
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
-        .code-font { font-family: 'JetBrains Mono', monospace; }
-
-        /* Animated background */
-        .bg-grid {
-            background-image: 
-                linear-gradient(rgba(59,130,246,0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(59,130,246,0.03) 1px, transparent 1px);
-            background-size: 50px 50px;
-        }
+        .bg-grid{background-image:radial-gradient(rgba(59,130,246,0.03) 1px,transparent 1px);background-size:20px 20px}
+        .glass{background:rgba(12,20,35,0.7);backdrop-filter:blur(20px);border:1px solid rgba(59,130,246,0.08)}
+        .glass-heavy{background:rgba(8,12,24,0.9);backdrop-filter:blur(30px);border:1px solid rgba(59,130,246,0.1)}
 
         /* Sidebar */
-        .sidebar {
-            background: linear-gradient(180deg, #0f1629 0%, #0a0e1a 100%);
-            border-right: 1px solid rgba(59,130,246,0.15);
-            width: 280px;
-            transition: transform 0.3s ease;
-        }
-        .sidebar-item {
-            transition: all 0.2s ease;
-            border-left: 3px solid transparent;
-        }
-        .sidebar-item:hover {
-            background: rgba(59,130,246,0.08);
-            border-left-color: rgba(59,130,246,0.3);
-        }
-        .sidebar-item.active {
-            background: rgba(59,130,246,0.12);
-            border-left-color: #3b82f6;
-            color: #60a5fa;
-        }
+        .sidebar{width:68px;transition:width 0.3s cubic-bezier(0.4,0,0.2,1)}
+        .sidebar:hover,.sidebar.expanded{width:230px}
+        .sidebar:hover .nav-label,.sidebar.expanded .nav-label{opacity:1;width:auto;max-width:200px}
+        .sidebar:hover .nav-icon,.sidebar.expanded .nav-icon{margin-right:10px}
+        .nav-label{opacity:0;width:0;max-width:0;overflow:hidden;white-space:nowrap;transition:all 0.3s}
+        .nav-icon{transition:margin 0.3s;flex-shrink:0}
+        .nav-item{transition:all 0.15s;border-left:3px solid transparent;cursor:pointer}
+        .nav-item:hover{background:rgba(59,130,246,0.06);border-left-color:rgba(59,130,246,0.3)}
+        .nav-item.active{background:rgba(59,130,246,0.1);border-left-color:#3b82f6}
+        .nav-item.active .nav-icon{color:#60a5fa}
 
         /* Cards */
-        .opt-card {
-            background: linear-gradient(135deg, rgba(15,23,42,0.9), rgba(30,41,59,0.6));
-            border: 1px solid rgba(59,130,246,0.1);
-            transition: all 0.3s ease;
-        }
-        .opt-card:hover {
-            border-color: rgba(59,130,246,0.3);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 30px rgba(59,130,246,0.1);
-        }
-        .opt-card.selected {
-            border-color: rgba(59,130,246,0.5);
-            background: linear-gradient(135deg, rgba(15,23,42,0.95), rgba(30,58,138,0.2));
+        .card{background:linear-gradient(135deg,rgba(12,20,35,0.8),rgba(25,35,55,0.4));border:1px solid rgba(59,130,246,0.08);border-radius:14px;transition:all 0.2s}
+        .card:hover{border-color:rgba(59,130,246,0.18)}
+        .card.active-card{border-color:rgba(59,130,246,0.4);background:linear-gradient(135deg,rgba(12,20,35,0.9),rgba(25,50,120,0.12))}
+
+        /* Toggles */
+        .toggle-wrap{position:relative;width:42px;height:22px;flex-shrink:0}
+        .toggle-wrap input{display:none}
+        .toggle-track{position:absolute;inset:0;background:#1e293b;border-radius:11px;transition:all 0.3s;cursor:pointer;border:1px solid rgba(100,116,139,0.2)}
+        .toggle-wrap input:checked+.toggle-track{background:#2563eb;border-color:#3b82f6}
+        .toggle-knob{position:absolute;top:2px;left:2px;width:18px;height:18px;background:#e2e8f0;border-radius:50%;transition:all 0.3s;pointer-events:none;box-shadow:0 1px 3px rgba(0,0,0,0.3)}
+        .toggle-wrap input:checked~.toggle-knob{left:22px;background:#fff}
+
+        .custom-select{background:rgba(12,20,35,0.8);border:1px solid rgba(59,130,246,0.15);color:#e2e8f0;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%2360a5fa' d='M5 7L1 3h8z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px}
+        input[type="range"]{-webkit-appearance:none;height:4px;background:#1e293b;border-radius:2px;outline:none}
+        input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;background:#3b82f6;border-radius:50%;cursor:pointer;box-shadow:0 0 8px rgba(59,130,246,0.4)}
+
+        .keybind-field{background:rgba(8,12,24,0.8);border:1px solid rgba(59,130,246,0.15);cursor:pointer;min-width:100px;text-align:center;transition:all 0.2s}
+        .keybind-field:focus,.keybind-field.recording{border-color:#f59e0b;box-shadow:0 0 10px rgba(245,158,11,0.2);outline:none}
+
+        @keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+        .fan-slow{animation:spin 3s linear infinite}
+        .fan-med{animation:spin 1.5s linear infinite}
+        .fan-fast{animation:spin 0.5s linear infinite}
+        @keyframes pulse-dot{0%,100%{opacity:1}50%{opacity:0.4}}
+        .pulse-dot{animation:pulse-dot 2s infinite}
+        @keyframes slideUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+        .slide-up{animation:slideUp 0.25s ease}
+        .gauge-ring{fill:none;stroke-linecap:round;transition:stroke-dashoffset 0.8s ease}
+
+        .terminal{background:#080c14;border:1px solid rgba(59,130,246,0.12);border-radius:12px;font-family:'JetBrains Mono',monospace;font-size:11px;overflow:hidden}
+        .terminal-header{background:rgba(12,20,35,0.8);padding:8px 12px;display:flex;align-items:center;gap:6px;border-bottom:1px solid rgba(59,130,246,0.08)}
+        .terminal-body{padding:12px;max-height:320px;overflow-y:auto;line-height:1.7}
+        .terminal-line{opacity:0;animation:slideUp 0.15s ease forwards}
+
+        .btn{font-weight:600;cursor:pointer;transition:all 0.2s;border-radius:10px;border:none;color:white}
+        .btn:hover{transform:translateY(-1px)}
+        .btn-blue{background:linear-gradient(135deg,#2563eb,#1d4ed8)}.btn-blue:hover{box-shadow:0 4px 16px rgba(37,99,235,0.3)}
+        .btn-red{background:linear-gradient(135deg,#dc2626,#b91c1c)}.btn-red:hover{box-shadow:0 4px 16px rgba(220,38,38,0.3)}
+        .btn-green{background:linear-gradient(135deg,#16a34a,#15803d)}.btn-green:hover{box-shadow:0 4px 16px rgba(22,163,74,0.3)}
+        .btn-amber{background:linear-gradient(135deg,#d97706,#b45309)}.btn-amber:hover{box-shadow:0 4px 16px rgba(217,119,6,0.3)}
+        .btn-purple{background:linear-gradient(135deg,#7c3aed,#6d28d9)}.btn-purple:hover{box-shadow:0 4px 16px rgba(124,58,237,0.3)}
+
+        .risk-low{color:#4ade80;background:rgba(74,222,128,0.08);border:1px solid rgba(74,222,128,0.15)}
+        .risk-med{color:#fbbf24;background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.15)}
+        .risk-high{color:#f87171;background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.15)}
+
+        .stat-box{background:rgba(12,20,35,0.5);border:1px solid rgba(59,130,246,0.06);border-radius:12px}
+        .modal-bg{background:rgba(0,0,0,0.6);backdrop-filter:blur(8px)}
+        .fan-canvas-box{background:rgba(5,8,16,0.9);border:1px solid rgba(59,130,246,0.1);border-radius:12px}
+
+        /* HW detection badge */
+        .hw-badge{background:linear-gradient(135deg,rgba(59,130,246,0.12),rgba(139,92,246,0.08));border:1px solid rgba(59,130,246,0.2);border-radius:12px}
+
+        pre{white-space:pre-wrap;word-wrap:break-word}
+        @media(max-width:768px){
+            .sidebar{position:fixed;z-index:50;height:100vh;transform:translateX(-100%)}
+            .sidebar.mobile-open{transform:translateX(0);width:230px}
+            .sidebar.mobile-open .nav-label{opacity:1;width:auto;max-width:200px}
         }
 
-        /* Toggle */
-        .toggle { position: relative; width: 44px; height: 24px; }
-        .toggle input { display: none; }
-        .toggle-track {
-            position: absolute; inset: 0;
-            background: #334155;
-            border-radius: 12px;
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-        .toggle input:checked + .toggle-track { background: #3b82f6; }
-        .toggle-knob {
-            position: absolute; top: 2px; left: 2px;
-            width: 20px; height: 20px;
-            background: white;
-            border-radius: 50%;
-            transition: all 0.3s ease;
-            pointer-events: none;
-        }
-        .toggle input:checked ~ .toggle-knob { left: 22px; }
+        /* Execution progress */
+        .exec-progress{background:rgba(8,12,24,0.95);border:1px solid rgba(59,130,246,0.15);border-radius:14px}
+        .progress-bar{height:6px;background:#1e293b;border-radius:3px;overflow:hidden}
+        .progress-fill{height:100%;background:linear-gradient(90deg,#2563eb,#06b6d4);border-radius:3px;transition:width 0.5s ease}
 
-        /* Keybind input */
-        .keybind-input {
-            background: rgba(15,23,42,0.8);
-            border: 1px solid rgba(59,130,246,0.2);
-            transition: all 0.2s ease;
-            cursor: pointer;
-            min-width: 120px;
-            text-align: center;
-        }
-        .keybind-input:focus, .keybind-input.recording {
-            border-color: #f59e0b;
-            box-shadow: 0 0 15px rgba(245,158,11,0.3);
-            outline: none;
-        }
-
-        /* Slider */
-        input[type="range"] {
-            -webkit-appearance: none;
-            appearance: none;
-            height: 6px;
-            background: #334155;
-            border-radius: 3px;
-            outline: none;
-        }
-        input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 18px; height: 18px;
-            background: #3b82f6;
-            border-radius: 50%;
-            cursor: pointer;
-            box-shadow: 0 0 10px rgba(59,130,246,0.5);
-        }
-
-        /* Select */
-        .custom-select {
-            background: rgba(15,23,42,0.8);
-            border: 1px solid rgba(59,130,246,0.2);
-            color: #e2e8f0;
-            appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2360a5fa' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 12px center;
-        }
-
-        /* Tabs */
-        .tab-btn.active {
-            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-            color: white;
-            box-shadow: 0 0 15px rgba(59,130,246,0.3);
-        }
-
-        /* Scrollbar */
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #1e3a5f; border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: #3b82f6; }
-
-        /* Export modal */
-        .modal-overlay {
-            background: rgba(0,0,0,0.7);
-            backdrop-filter: blur(8px);
-        }
-
-        /* Glow effects */
-        .glow-blue { box-shadow: 0 0 30px rgba(59,130,246,0.2); }
-        .glow-green { box-shadow: 0 0 20px rgba(34,197,94,0.2); }
-        .glow-amber { box-shadow: 0 0 20px rgba(245,158,11,0.2); }
-
-        /* Pulse */
-        @keyframes pulse-dot { 0%,100%{ opacity:1; } 50%{ opacity:0.4; } }
-        .pulse-dot { animation: pulse-dot 2s infinite; }
-
-        /* Stats counter */
-        .stat-card {
-            background: linear-gradient(135deg, rgba(15,23,42,0.8), rgba(30,41,59,0.4));
-            border: 1px solid rgba(59,130,246,0.1);
-        }
-
-        /* Mobile sidebar */
-        @media (max-width: 1024px) {
-            .sidebar { 
-                position: fixed; 
-                z-index: 50; 
-                height: 100vh;
-                transform: translateX(-100%); 
-            }
-            .sidebar.open { transform: translateX(0); }
-        }
-
-        /* Profile badge */
-        .profile-badge {
-            background: linear-gradient(135deg, #1e3a5f, #172554);
-            border: 1px solid rgba(59,130,246,0.2);
-        }
-
-        pre { white-space: pre-wrap; word-wrap: break-word; }
-
-        /* Color picker */
-        input[type="color"] {
-            -webkit-appearance: none;
-            border: 2px solid rgba(59,130,246,0.3);
-            border-radius: 8px;
-            cursor: pointer;
-            width: 40px;
-            height: 40px;
-            padding: 2px;
-        }
-        input[type="color"]::-webkit-color-swatch-wrapper { padding: 2px; }
-        input[type="color"]::-webkit-color-swatch { border-radius: 4px; border: none; }
+        @keyframes scanning{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+        .scanning-bg{background:linear-gradient(270deg,rgba(59,130,246,0.05),rgba(59,130,246,0.15),rgba(59,130,246,0.05));background-size:200% 200%;animation:scanning 2s ease infinite}
     </style>
 </head>
-<body class="text-gray-300 bg-grid">
+<body class="bg-grid">
 
-<!-- Mobile Menu Button -->
-<button id="mobileMenuBtn" class="lg:hidden fixed top-4 left-4 z-[60] bg-slate-800 p-2.5 rounded-xl border border-slate-700 text-white" onclick="toggleSidebar()">
-    <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+<!-- Mobile -->
+<button id="mobBtn" class="md:hidden fixed top-3 left-3 z-[60] bg-slate-800/90 p-2 rounded-xl border border-slate-700 text-white" onclick="document.getElementById('sidebar').classList.toggle('mobile-open')">
+    <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11h18M3 6h18M3 16h18"/></svg>
 </button>
 
-<!-- Sidebar Overlay -->
-<div id="sidebarOverlay" class="fixed inset-0 bg-black/50 z-40 hidden lg:hidden" onclick="toggleSidebar()"></div>
-
 <!-- Sidebar -->
-<aside id="sidebar" class="sidebar fixed top-0 left-0 h-screen flex flex-col z-50">
-    <!-- Logo -->
-    <div class="p-6 border-b border-slate-800">
-        <div class="flex items-center gap-3">
-            <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-xl flex items-center justify-center text-lg font-black text-white">L</div>
-            <div>
-                <h1 class="font-extrabold text-white text-lg leading-tight">LenovoTuner</h1>
-                <span class="text-[10px] font-bold text-blue-400 tracking-widest uppercase">Pro Edition</span>
-            </div>
+<aside id="sidebar" class="sidebar fixed top-0 left-0 h-screen flex flex-col z-50 glass-heavy">
+    <div class="p-4 flex items-center gap-3 border-b border-slate-800/50 min-h-[60px]">
+        <div class="w-9 h-9 bg-gradient-to-br from-blue-500 to-violet-500 rounded-xl flex items-center justify-center text-sm font-black text-white flex-shrink-0">PC</div>
+        <div class="nav-label">
+            <h1 class="font-extrabold text-white text-sm leading-tight">PCTuner</h1>
+            <span class="text-[9px] font-bold text-blue-400 tracking-widest">PRO v5 · UNIVERSAL</span>
         </div>
     </div>
-
-    <!-- Device Info -->
-    <div class="p-4">
-        <div class="profile-badge rounded-xl p-3">
-            <div class="flex items-center gap-2 text-xs text-gray-400 mb-1">
-                <span class="w-1.5 h-1.5 bg-green-400 rounded-full pulse-dot"></span>
-                Dispositivo detectado
-            </div>
-            <p class="font-bold text-white text-sm">Lenovo IdeaPad</p>
-            <p class="text-xs text-gray-500">Intel Core i3 • Windows 10/11</p>
+    <nav class="flex-1 overflow-y-auto py-2 px-1.5 space-y-0.5" id="navContainer"></nav>
+    <div class="p-3 border-t border-slate-800/50">
+        <div class="flex items-center gap-2 px-2">
+            <span class="w-2 h-2 bg-green-400 rounded-full pulse-dot flex-shrink-0"></span>
+            <span class="nav-label text-[10px] text-gray-500" id="sidebarStatus">Detectando sistema...</span>
         </div>
-    </div>
-
-    <!-- Nav -->
-    <nav class="flex-1 overflow-y-auto px-3 py-2 space-y-1">
-        <p class="text-[10px] font-bold text-gray-600 tracking-widest uppercase px-3 mb-2 mt-2">Sistema</p>
-        <button class="sidebar-item active w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-left" onclick="showSection('dashboard')">
-            <span class="text-lg">📊</span> Dashboard
-        </button>
-        <button class="sidebar-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-left" onclick="showSection('performance')">
-            <span class="text-lg">⚡</span> Rendimiento
-        </button>
-        <button class="sidebar-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-left" onclick="showSection('cleanup')">
-            <span class="text-lg">🧹</span> Limpieza
-        </button>
-        <button class="sidebar-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-left" onclick="showSection('network')">
-            <span class="text-lg">🌐</span> Red e Internet
-        </button>
-        <button class="sidebar-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-left" onclick="showSection('power')">
-            <span class="text-lg">🔋</span> Energía
-        </button>
-
-        <p class="text-[10px] font-bold text-gray-600 tracking-widest uppercase px-3 mb-2 mt-4">Personalización</p>
-        <button class="sidebar-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-left" onclick="showSection('keybinds')">
-            <span class="text-lg">⌨️</span> Atajos de teclado
-        </button>
-        <button class="sidebar-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-left" onclick="showSection('visual')">
-            <span class="text-lg">🎨</span> Visual y UI
-        </button>
-        <button class="sidebar-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-left" onclick="showSection('taskbar')">
-            <span class="text-lg">📌</span> Barra de tareas
-        </button>
-        <button class="sidebar-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-left" onclick="showSection('explorer')">
-            <span class="text-lg">📁</span> Explorador
-        </button>
-
-        <p class="text-[10px] font-bold text-gray-600 tracking-widest uppercase px-3 mb-2 mt-4">Avanzado</p>
-        <button class="sidebar-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-left" onclick="showSection('privacy')">
-            <span class="text-lg">🛡️</span> Privacidad
-        </button>
-        <button class="sidebar-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-left" onclick="showSection('services')">
-            <span class="text-lg">⚙️</span> Servicios Windows
-        </button>
-        <button class="sidebar-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-left" onclick="showSection('gaming')">
-            <span class="text-lg">🎮</span> Gaming
-        </button>
-        <button class="sidebar-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-left" onclick="showSection('maintenance')">
-            <span class="text-lg">🔧</span> Mantenimiento
-        </button>
-
-        <p class="text-[10px] font-bold text-gray-600 tracking-widest uppercase px-3 mb-2 mt-4">Exportar</p>
-        <button class="sidebar-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-left" onclick="showSection('export')">
-            <span class="text-lg">📦</span> Exportar Scripts
-        </button>
-        <button class="sidebar-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-left" onclick="showSection('profiles')">
-            <span class="text-lg">💾</span> Perfiles
-        </button>
-    </nav>
-
-    <!-- Version -->
-    <div class="p-4 border-t border-slate-800">
-        <p class="text-[10px] text-gray-600 text-center">LenovoTuner Pro v2.0</p>
     </div>
 </aside>
 
-<!-- Main Content -->
-<main id="mainContent" class="lg:ml-[280px] min-h-screen">
-    <!-- Top Bar -->
-    <div class="sticky top-0 z-30 bg-[#0a0e1a]/90 backdrop-blur-xl border-b border-slate-800/50 px-6 py-3">
-        <div class="flex items-center justify-between">
-            <div class="flex items-center gap-3 ml-10 lg:ml-0">
-                <h2 id="sectionTitle" class="text-lg font-bold text-white">Dashboard</h2>
-                <span class="text-xs bg-blue-900/40 text-blue-400 px-2 py-0.5 rounded-full border border-blue-800/50" id="sectionBadge">Vista General</span>
+<!-- Main -->
+<main id="mainArea" class="ml-[68px] md:ml-[68px] min-h-screen transition-all">
+    <header class="sticky top-0 z-30 glass-heavy px-5 py-3 flex items-center justify-between">
+        <div class="flex items-center gap-3 ml-8 md:ml-0">
+            <h2 id="pageTitle" class="text-base font-bold text-white">Detectando Sistema...</h2>
+            <span id="pageBadge" class="text-[10px] bg-blue-900/40 text-blue-400 px-2 py-0.5 rounded-full border border-blue-800/40">Analizando</span>
+        </div>
+        <div class="flex items-center gap-2">
+            <span id="changesBadge" class="text-[10px] code-font text-amber-400 bg-amber-900/30 px-2 py-1 rounded-full border border-amber-800/40 hidden">0</span>
+            <button onclick="openExec()" class="btn btn-green px-4 py-2 text-xs flex items-center gap-2" id="execBtn">
+                <span>▶</span><span>Ejecutar</span>
+            </button>
+            <button onclick="openExport()" class="btn btn-blue px-4 py-2 text-xs flex items-center gap-2">
+                <span>📦</span><span class="hidden sm:inline">Exportar</span>
+            </button>
+        </div>
+    </header>
+    <div class="p-4 max-w-7xl mx-auto pb-20" id="content"></div>
+</main>
+
+<!-- Execution Modal -->
+<div id="execModal" class="fixed inset-0 z-[100] hidden">
+    <div class="modal-bg absolute inset-0" onclick="closeExec()"></div>
+    <div class="relative z-10 flex items-center justify-center min-h-screen p-4">
+        <div class="glass-heavy rounded-2xl w-full max-w-2xl slide-up overflow-hidden">
+            <div class="flex items-center justify-between px-5 py-4 border-b border-slate-800/50">
+                <div class="flex items-center gap-3">
+                    <div class="flex gap-1.5"><div class="w-3 h-3 bg-red-500 rounded-full cursor-pointer" onclick="closeExec()"></div><div class="w-3 h-3 bg-yellow-500 rounded-full"></div><div class="w-3 h-3 bg-green-500 rounded-full"></div></div>
+                    <span class="text-sm text-gray-300 font-semibold" id="execTitle">Ejecutar Optimizaciones</span>
+                </div>
             </div>
-            <div class="flex items-center gap-3">
-                <span id="changeCounter" class="text-xs code-font text-amber-400 bg-amber-900/30 px-3 py-1 rounded-full border border-amber-800/50 hidden">0 cambios pendientes</span>
-                <button onclick="showSection('export')" class="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white font-semibold text-sm px-4 py-2 rounded-xl transition-all cursor-pointer flex items-center gap-2">
-                    📦 Exportar
-                </button>
-            </div>
+            <div id="execBody" class="p-5 max-h-[70vh] overflow-y-auto"></div>
         </div>
     </div>
-
-    <!-- Content Container -->
-    <div class="p-6 max-w-7xl mx-auto" id="contentArea">
-        <!-- Sections will be rendered here by JS -->
-    </div>
-</main>
+</div>
 
 <!-- Export Modal -->
 <div id="exportModal" class="fixed inset-0 z-[100] hidden">
-    <div class="modal-overlay absolute inset-0" onclick="closeExportModal()"></div>
+    <div class="modal-bg absolute inset-0" onclick="closeExport()"></div>
     <div class="relative z-10 flex items-center justify-center min-h-screen p-4">
-        <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-4xl max-h-[85vh] overflow-hidden flex flex-col">
-            <div class="flex items-center justify-between px-6 py-4 border-b border-slate-800">
+        <div class="glass-heavy rounded-2xl w-full max-w-3xl max-h-[85vh] overflow-hidden flex flex-col slide-up">
+            <div class="flex items-center justify-between px-5 py-4 border-b border-slate-800/50">
                 <div class="flex items-center gap-3">
-                    <div class="flex gap-1.5">
-                        <div class="w-3 h-3 bg-red-500 rounded-full cursor-pointer" onclick="closeExportModal()"></div>
-                        <div class="w-3 h-3 bg-yellow-500 rounded-full"></div>
-                        <div class="w-3 h-3 bg-green-500 rounded-full"></div>
-                    </div>
-                    <span class="text-sm text-gray-400 code-font" id="modalFileName">script.bat</span>
+                    <div class="flex gap-1.5"><div class="w-3 h-3 bg-red-500 rounded-full cursor-pointer" onclick="closeExport()"></div><div class="w-3 h-3 bg-yellow-500 rounded-full"></div><div class="w-3 h-3 bg-green-500 rounded-full"></div></div>
+                    <span class="text-sm text-gray-300 font-semibold" id="exportTitle">Exportar Script</span>
                 </div>
                 <div class="flex gap-2">
-                    <button onclick="copyModalCode()" id="modalCopyBtn" class="bg-blue-600 hover:bg-blue-500 px-4 py-1.5 rounded-lg text-sm font-semibold transition-all cursor-pointer">📋 Copiar</button>
-                    <button onclick="downloadModalCode()" class="bg-green-600 hover:bg-green-500 px-4 py-1.5 rounded-lg text-sm font-semibold transition-all cursor-pointer">⬇️ Descargar</button>
+                    <select id="exportFmt" class="custom-select rounded-lg px-3 py-1.5 text-xs"><option value="bat">.BAT</option><option value="ps1">.PS1</option><option value="reg">.REG</option><option value="ahk">.AHK</option></select>
+                    <button onclick="genScript()" class="btn btn-blue px-3 py-1.5 text-xs">⚡ Generar</button>
                 </div>
             </div>
-            <pre id="modalCode" class="flex-1 p-6 text-sm text-green-400 code-font overflow-auto"></pre>
+            <div id="exportBody" class="flex-1 overflow-auto"><div class="p-6 text-center text-gray-500"><p class="text-3xl mb-2">📦</p><p class="text-sm">Selecciona formato y clic en <strong class="text-blue-400">Generar</strong></p></div></div>
+            <div id="exportFooter" class="px-5 py-3 border-t border-slate-800/50 flex justify-between items-center hidden">
+                <span class="text-xs text-gray-500 code-font" id="exportInfo"></span>
+                <div class="flex gap-2">
+                    <button onclick="copyCode()" id="copyBtn" class="btn btn-blue px-4 py-2 text-xs">📋 Copiar</button>
+                    <button onclick="dlCode()" class="btn btn-green px-4 py-2 text-xs">⬇ Descargar</button>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
 <script>
-// ==========================================
-// STATE MANAGEMENT
-// ==========================================
-const state = {
-    currentSection: 'dashboard',
-    changes: {},
-    profiles: {},
-    keybinds: {},
-    toggles: {},
-    sliders: {},
-    selects: {},
-    colors: {}
+// ======================== STATE ========================
+const S = {
+    page:'dashboard',
+    hw:{
+        platform:'',os:'',osVer:'',arch:'',cores:0,ram:0,gpu:'',brand:'',model:'',
+        battery:false,batteryLevel:0,charging:false,
+        connection:'',screenW:0,screenH:0,dpr:1,lang:'',
+        userAgent:'',touchscreen:false,darkMode:false
+    },
+    toggles:{},sliders:{},selects:{},keybinds:{},
+    fanCurve:[{t:30,s:10},{t:45,s:25},{t:60,s:50},{t:75,s:80},{t:90,s:100}],
+    fanProfile:'balanced',
+    changes:{},
+    monitor:{cpu:0,ram:0,temp:0,fanRPM:0,disk:0,uptime:'0h 0m',network:0}
 };
+let changeCount=0, _code='', _fn='';
 
-let changeCount = 0;
+// ======================== HW DETECTION ========================
+async function detectHW(){
+    const ua = navigator.userAgent;
+    S.hw.userAgent = ua;
+    S.hw.lang = navigator.language;
+    S.hw.screenW = screen.width;
+    S.hw.screenH = screen.height;
+    S.hw.dpr = window.devicePixelRatio || 1;
+    S.hw.touchscreen = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    S.hw.darkMode = window.matchMedia('(prefers-color-scheme:dark)').matches;
+    S.hw.cores = navigator.hardwareConcurrency || 1;
+    S.hw.ram = navigator.deviceMemory || 0;
 
-function trackChange(key, value) {
-    state.changes[key] = value;
-    changeCount = Object.keys(state.changes).length;
-    const counter = document.getElementById('changeCounter');
-    if (changeCount > 0) {
-        counter.classList.remove('hidden');
-        counter.textContent = `${changeCount} cambios pendientes`;
-    } else {
-        counter.classList.add('hidden');
+    // OS Detection
+    if(ua.includes('Windows NT 10.0')){
+        S.hw.os='Windows';
+        S.hw.osVer=ua.includes('Windows NT 10.0; Win64')? (ua.includes('Edg/')? '10/11 (64-bit)':'10/11') : '10/11';
+        if(navigator.userAgentData){
+            try{
+                const d=await navigator.userAgentData.getHighEntropyValues(['platformVersion','architecture','model','platform']);
+                S.hw.platform=d.platform||'Windows';
+                S.hw.arch=d.architecture||'x86';
+                if(d.platformVersion){
+                    const major=parseInt(d.platformVersion.split('.')[0]);
+                    S.hw.osVer=major>=13?'Windows 11':'Windows 10';
+                }
+                if(d.model)S.hw.model=d.model;
+            }catch(e){}
+        }
+    } else if(ua.includes('Windows NT 6.3'))S.hw.os='Windows',S.hw.osVer='8.1';
+    else if(ua.includes('Windows NT 6.1'))S.hw.os='Windows',S.hw.osVer='7';
+    else if(ua.includes('Mac OS'))S.hw.os='macOS',S.hw.osVer=ua.match(/Mac OS X ([\d_]+)/)?.[1]?.replace(/_/g,'.')||'';
+    else if(ua.includes('Linux'))S.hw.os='Linux',S.hw.osVer=ua.match(/Linux ([\w.]+)/)?.[1]||'';
+    else if(ua.includes('Android'))S.hw.os='Android',S.hw.osVer=ua.match(/Android ([\d.]+)/)?.[1]||'';
+    else if(ua.includes('iPhone')||ua.includes('iPad'))S.hw.os='iOS',S.hw.osVer=ua.match(/OS ([\d_]+)/)?.[1]?.replace(/_/g,'.')||'';
+    else S.hw.os='Desconocido';
+
+    // Arch
+    if(ua.includes('Win64')||ua.includes('x64')||ua.includes('WOW64'))S.hw.arch='x64';
+    else if(ua.includes('ARM'))S.hw.arch='ARM';
+    else if(!S.hw.arch)S.hw.arch='x86';
+
+    // Brand detection from UA
+    const brands = [
+        [/Lenovo/i,'Lenovo'],[/ASUS|ROG/i,'ASUS'],[/Acer/i,'Acer'],[/Dell/i,'Dell'],
+        [/HP|Hewlett/i,'HP'],[/MSI/i,'MSI'],[/Samsung/i,'Samsung'],[/Apple/i,'Apple'],
+        [/Huawei|HUAWEI/i,'Huawei'],[/Surface/i,'Microsoft Surface'],[/Razer/i,'Razer'],
+        [/Toshiba/i,'Toshiba'],[/Sony|VAIO/i,'Sony/VAIO'],[/Xiaomi/i,'Xiaomi']
+    ];
+    for(const [r,n] of brands){if(r.test(ua)){S.hw.brand=n;break;}}
+    if(!S.hw.brand)S.hw.brand='PC Genérico';
+
+    // GPU via WebGL
+    try{
+        const c=document.createElement('canvas'),gl=c.getContext('webgl')||c.getContext('experimental-webgl');
+        if(gl){
+            const ext=gl.getExtension('WEBGL_debug_renderer_info');
+            if(ext){
+                S.hw.gpu=gl.getParameter(ext.UNMASKED_RENDERER_WEBGL)||'';
+                const vendor=gl.getParameter(ext.UNMASKED_VENDOR_WEBGL)||'';
+                // Better brand detection from GPU
+                if(!S.hw.brand||S.hw.brand==='PC Genérico'){
+                    for(const [r,n] of brands){if(r.test(S.hw.gpu)||r.test(vendor)){S.hw.brand=n;break;}}
+                }
+            }
+        }
+    }catch(e){}
+
+    // Battery
+    if(navigator.getBattery){
+        try{
+            const b=await navigator.getBattery();
+            S.hw.battery=true;
+            S.hw.batteryLevel=Math.round(b.level*100);
+            S.hw.charging=b.charging;
+            b.addEventListener('levelchange',()=>{S.hw.batteryLevel=Math.round(b.level*100);});
+            b.addEventListener('chargingchange',()=>{S.hw.charging=b.charging;});
+        }catch(e){}
     }
+
+    // Connection
+    if(navigator.connection){
+        const c=navigator.connection;
+        S.hw.connection=c.effectiveType||'unknown';
+    }
+
+    // Performance memory
+    if(performance.memory)S.hw.jsHeap=Math.round(performance.memory.usedJSHeapSize/1024/1024);
+
+    // Update UI
+    document.getElementById('sidebarStatus').textContent=S.hw.brand+' · '+S.hw.os;
+    return S.hw;
 }
 
-// ==========================================
-// NAVIGATION
-// ==========================================
-function toggleSidebar() {
-    const sb = document.getElementById('sidebar');
-    const ov = document.getElementById('sidebarOverlay');
-    sb.classList.toggle('open');
-    ov.classList.toggle('hidden');
-}
-
-function showSection(id) {
-    state.currentSection = id;
-    // Update sidebar
-    document.querySelectorAll('.sidebar-item').forEach(btn => btn.classList.remove('active'));
-    document.querySelectorAll('.sidebar-item').forEach(btn => {
-        if (btn.textContent.trim().includes(sectionNames[id]?.nav || '---')) btn.classList.add('active');
-    });
-    // Update title
-    const info = sectionNames[id] || { title: id, badge: '' };
-    document.getElementById('sectionTitle').textContent = info.title;
-    document.getElementById('sectionBadge').textContent = info.badge;
-    // Render
-    renderSection(id);
-    // Mobile close
-    document.getElementById('sidebar').classList.remove('open');
-    document.getElementById('sidebarOverlay').classList.add('hidden');
-    window.scrollTo({ top: 0 });
-}
-
-const sectionNames = {
-    dashboard: { title: 'Dashboard', badge: 'Vista General', nav: 'Dashboard' },
-    performance: { title: 'Rendimiento', badge: 'CPU · RAM · Disco', nav: 'Rendimiento' },
-    cleanup: { title: 'Limpieza del Sistema', badge: 'Archivos · Caché · Bloatware', nav: 'Limpieza' },
-    network: { title: 'Red e Internet', badge: 'DNS · WiFi · TCP/IP', nav: 'Red e Internet' },
-    power: { title: 'Energía y Batería', badge: 'Plan · Hibernación · Sleep', nav: 'Energía' },
-    keybinds: { title: 'Atajos de Teclado', badge: 'Personalizar Keybinds', nav: 'Atajos de teclado' },
-    visual: { title: 'Visual y Apariencia', badge: 'Temas · Colores · Efectos', nav: 'Visual y UI' },
-    taskbar: { title: 'Barra de Tareas', badge: 'Iconos · Posición · Búsqueda', nav: 'Barra de tareas' },
-    explorer: { title: 'Explorador de Archivos', badge: 'Vistas · Opciones · Menú', nav: 'Explorador' },
-    privacy: { title: 'Privacidad', badge: 'Telemetría · Tracking · Datos', nav: 'Privacidad' },
-    services: { title: 'Servicios de Windows', badge: 'Activar · Desactivar · Configurar', nav: 'Servicios Windows' },
-    gaming: { title: 'Optimización Gaming', badge: 'FPS · Input Lag · GPU', nav: 'Gaming' },
-    maintenance: { title: 'Mantenimiento', badge: 'SFC · DISM · Registro', nav: 'Mantenimiento' },
-    export: { title: 'Exportar Scripts', badge: 'BAT · REG · PS1', nav: 'Exportar Scripts' },
-    profiles: { title: 'Perfiles de Configuración', badge: 'Guardar · Cargar', nav: 'Perfiles' }
+// ======================== NAV ========================
+const NAV=[
+    {cat:'Principal',items:[
+        {id:'dashboard',icon:'🏠',name:'Dashboard'},
+        {id:'monitor',icon:'📊',name:'Monitor'},
+        {id:'fans',icon:'🌀',name:'Ventiladores'},
+    ]},
+    {cat:'Optimización',items:[
+        {id:'performance',icon:'⚡',name:'Rendimiento'},
+        {id:'cleanup',icon:'🧹',name:'Limpieza'},
+        {id:'network',icon:'🌐',name:'Red'},
+        {id:'power',icon:'🔋',name:'Energía'},
+        {id:'startup',icon:'🚀',name:'Arranque'},
+        {id:'gaming',icon:'🎮',name:'Gaming'},
+    ]},
+    {cat:'Personalización',items:[
+        {id:'keybinds',icon:'⌨️',name:'Keybinds'},
+        {id:'visual',icon:'🎨',name:'Visual'},
+        {id:'taskbar',icon:'📌',name:'Taskbar'},
+        {id:'explorer',icon:'📁',name:'Explorador'},
+        {id:'sound',icon:'🔊',name:'Sonido'},
+    ]},
+    {cat:'Sistema',items:[
+        {id:'privacy',icon:'🛡️',name:'Privacidad'},
+        {id:'services',icon:'⚙️',name:'Servicios'},
+        {id:'updates',icon:'🔄',name:'Updates'},
+        {id:'security',icon:'🔒',name:'Seguridad'},
+        {id:'maintenance',icon:'🔧',name:'Mantenimiento'},
+    ]},
+    {cat:'Herramientas',items:[
+        {id:'terminal',icon:'💻',name:'Terminal'},
+        {id:'profiles',icon:'💾',name:'Perfiles'},
+        {id:'about',icon:'ℹ️',name:'Acerca de'},
+    ]}
+];
+const META={
+    dashboard:{t:'Dashboard',b:'Centro de control'},monitor:{t:'Monitor del Sistema',b:'Tiempo real'},
+    fans:{t:'Ventiladores',b:'Control · RPM'},performance:{t:'Rendimiento',b:'CPU · RAM · Disco'},
+    cleanup:{t:'Limpieza',b:'Temp · Caché'},network:{t:'Red',b:'DNS · WiFi'},
+    power:{t:'Energía',b:'Plan · Batería'},startup:{t:'Arranque',b:'Inicio'},
+    gaming:{t:'Gaming',b:'FPS · Latencia'},keybinds:{t:'Keybinds',b:'Atajos'},
+    visual:{t:'Visual',b:'Tema · UI'},taskbar:{t:'Barra de Tareas',b:'Config'},
+    explorer:{t:'Explorador',b:'Archivos'},sound:{t:'Sonido',b:'Audio'},
+    privacy:{t:'Privacidad',b:'Telemetría'},services:{t:'Servicios',b:'Windows'},
+    updates:{t:'Windows Update',b:'Config'},security:{t:'Seguridad',b:'Red · Firewall'},
+    maintenance:{t:'Mantenimiento',b:'Reparar'},terminal:{t:'Terminal',b:'Comandos'},
+    profiles:{t:'Perfiles',b:'Guardar'},about:{t:'Acerca de',b:'Info'}
 };
 
-// ==========================================
-// RENDER HELPERS
-// ==========================================
-function makeToggle(id, label, desc, defaultOn = false, risk = 'bajo') {
-    const checked = state.toggles[id] !== undefined ? state.toggles[id] : defaultOn;
-    if (state.toggles[id] === undefined) state.toggles[id] = defaultOn;
-    const riskColors = { bajo: 'text-green-400 bg-green-900/40 border-green-800/50', medio: 'text-yellow-400 bg-yellow-900/40 border-yellow-800/50', alto: 'text-red-400 bg-red-900/40 border-red-800/50' };
-    return `
-    <div class="opt-card rounded-xl p-4 ${checked ? 'selected' : ''}">
-        <div class="flex items-center justify-between gap-4">
-            <div class="flex-1 min-w-0">
-                <div class="flex items-center gap-2 flex-wrap mb-1">
-                    <span class="font-semibold text-white text-sm">${label}</span>
-                    <span class="text-[10px] px-2 py-0.5 rounded-full border ${riskColors[risk]}">${risk}</span>
-                </div>
-                <p class="text-xs text-gray-500 leading-relaxed">${desc}</p>
-            </div>
-            <label class="toggle flex-shrink-0">
-                <input type="checkbox" ${checked ? 'checked' : ''} onchange="onToggle('${id}', this.checked, this)">
-                <div class="toggle-track"></div>
-                <div class="toggle-knob"></div>
-            </label>
-        </div>
-    </div>`;
+function buildNav(){
+    let h='';
+    NAV.forEach(c=>{
+        h+=`<p class="text-[9px] font-bold text-gray-600 tracking-widest uppercase px-3 mt-3 mb-1 nav-label">${c.cat}</p>`;
+        c.items.forEach(i=>{
+            h+=`<button class="nav-item w-full flex items-center px-3 py-2 rounded-r-lg" data-id="${i.id}" onclick="go('${i.id}')"><span class="nav-icon text-base w-6 text-center">${i.icon}</span><span class="nav-label text-[13px] font-medium">${i.name}</span></button>`;
+        });
+    });
+    document.getElementById('navContainer').innerHTML=h;
 }
 
-function makeSlider(id, label, desc, min, max, defaultVal, unit = '') {
-    const val = state.sliders[id] !== undefined ? state.sliders[id] : defaultVal;
-    if (state.sliders[id] === undefined) state.sliders[id] = defaultVal;
-    return `
-    <div class="opt-card rounded-xl p-4">
-        <div class="flex items-center justify-between mb-2">
-            <span class="font-semibold text-white text-sm">${label}</span>
-            <span class="code-font text-blue-400 text-sm" id="slider-val-${id}">${val}${unit}</span>
-        </div>
-        <p class="text-xs text-gray-500 mb-3">${desc}</p>
-        <input type="range" min="${min}" max="${max}" value="${val}" class="w-full" oninput="onSlider('${id}', this.value, '${unit}')">
-    </div>`;
+function go(id){
+    S.page=id;
+    document.querySelectorAll('.nav-item').forEach(b=>b.classList.toggle('active',b.dataset.id===id));
+    const m=META[id]||{t:id,b:''};
+    document.getElementById('pageTitle').textContent=m.t;
+    document.getElementById('pageBadge').textContent=m.b;
+    render(id);
+    document.getElementById('sidebar').classList.remove('mobile-open');
+    window.scrollTo({top:0,behavior:'smooth'});
 }
 
-function makeSelect(id, label, desc, options, defaultVal) {
-    const val = state.selects[id] !== undefined ? state.selects[id] : defaultVal;
-    if (state.selects[id] === undefined) state.selects[id] = defaultVal;
-    const opts = options.map(o => `<option value="${o.value}" ${val === o.value ? 'selected' : ''}>${o.label}</option>`).join('');
-    return `
-    <div class="opt-card rounded-xl p-4">
-        <div class="flex items-center justify-between mb-2 flex-wrap gap-2">
-            <div class="flex-1 min-w-0">
-                <span class="font-semibold text-white text-sm">${label}</span>
-                <p class="text-xs text-gray-500 mt-1">${desc}</p>
-            </div>
-            <select class="custom-select rounded-lg px-3 py-2 text-sm pr-8" onchange="onSelect('${id}', this.value)">${opts}</select>
-        </div>
-    </div>`;
-}
+// ======================== HELPERS ========================
+function track(k,v){S.changes[k]=v;changeCount=Object.keys(S.changes).length;const b=document.getElementById('changesBadge');if(changeCount>0){b.classList.remove('hidden');b.textContent=changeCount+' cambios';}else b.classList.add('hidden');}
+function T(id){return S.toggles[id];}
+function SL(id){return S.sliders[id];}
+function SE(id){return S.selects[id];}
 
-function makeKeybind(id, label, desc, defaultKey) {
-    const val = state.keybinds[id] || defaultKey;
-    if (!state.keybinds[id]) state.keybinds[id] = defaultKey;
-    return `
-    <div class="opt-card rounded-xl p-4">
-        <div class="flex items-center justify-between gap-3">
-            <div class="flex-1 min-w-0">
-                <span class="font-semibold text-white text-sm">${label}</span>
-                <p class="text-xs text-gray-500 mt-0.5">${desc}</p>
-            </div>
-            <div class="flex items-center gap-2">
-                <input type="text" readonly 
-                    class="keybind-input code-font text-sm text-amber-400 px-3 py-2 rounded-lg font-bold"
-                    value="${val}" id="kb-${id}"
-                    onclick="startRecording('${id}', this)"
-                    placeholder="Presiona tecla...">
-                <button onclick="resetKeybind('${id}', '${defaultKey}')" class="text-gray-600 hover:text-red-400 text-xs px-2 py-1 rounded transition-colors cursor-pointer" title="Resetear">↺</button>
-            </div>
-        </div>
-    </div>`;
+function tog(id,label,desc,def=false,risk='low'){
+    const c=S.toggles[id]!==undefined?S.toggles[id]:def;if(S.toggles[id]===undefined)S.toggles[id]=def;
+    const rc={low:'risk-low',med:'risk-med',high:'risk-high'},rl={low:'bajo',med:'medio',high:'alto'};
+    return `<div class="card p-3.5 ${c?'active-card':''}" id="card-${id}"><div class="flex items-center justify-between gap-3"><div class="flex-1 min-w-0"><div class="flex items-center gap-2 flex-wrap mb-0.5"><span class="font-semibold text-white text-[13px]">${label}</span><span class="text-[8px] px-1.5 py-0.5 rounded-full ${rc[risk]}">${rl[risk]}</span></div><p class="text-[11px] text-gray-500">${desc}</p></div><label class="toggle-wrap"><input type="checkbox" ${c?'checked':''} onchange="onTog('${id}',this.checked)"><div class="toggle-track"></div><div class="toggle-knob"></div></label></div></div>`;
 }
+function sli(id,label,desc,min,max,def,unit=''){
+    const v=S.sliders[id]!==undefined?S.sliders[id]:def;if(S.sliders[id]===undefined)S.sliders[id]=def;
+    return `<div class="card p-3.5"><div class="flex items-center justify-between mb-1"><span class="font-semibold text-white text-[13px]">${label}</span><span class="code-font text-blue-400 text-xs" id="sv-${id}">${v}${unit}</span></div><p class="text-[11px] text-gray-500 mb-2">${desc}</p><input type="range" min="${min}" max="${max}" value="${v}" class="w-full" oninput="onSli('${id}',this.value,'${unit}')"></div>`;
+}
+function sel(id,label,desc,opts,def){
+    const v=S.selects[id]!==undefined?S.selects[id]:def;if(S.selects[id]===undefined)S.selects[id]=def;
+    const o=opts.map(x=>`<option value="${x.v}" ${v===x.v?'selected':''}>${x.l}</option>`).join('');
+    return `<div class="card p-3.5"><div class="flex items-center justify-between flex-wrap gap-2"><div class="flex-1 min-w-0"><span class="font-semibold text-white text-[13px]">${label}</span><p class="text-[11px] text-gray-500 mt-0.5">${desc}</p></div><select class="custom-select rounded-lg px-3 py-1.5 text-xs" onchange="onSel('${id}',this.value)">${o}</select></div></div>`;
+}
+function kb(id,label,desc,def){
+    const v=S.keybinds[id]||def;if(!S.keybinds[id])S.keybinds[id]=def;
+    return `<div class="card p-3.5"><div class="flex items-center justify-between gap-3"><div class="flex-1 min-w-0"><span class="font-semibold text-white text-[13px]">${label}</span><p class="text-[11px] text-gray-500 mt-0.5">${desc}</p></div><div class="flex items-center gap-1"><input type="text" readonly class="keybind-field code-font text-[11px] text-amber-400 px-2 py-1.5 rounded-lg font-bold" value="${v}" id="kb-${id}" onclick="recStart('${id}',this)"><button onclick="recReset('${id}','${def}')" class="text-gray-600 hover:text-red-400 text-xs cursor-pointer px-1">↺</button></div></div></div>`;
+}
+function hdr(i,t,d){return `<div class="mb-4"><h3 class="text-lg font-bold text-white flex items-center gap-2">${i} ${t}</h3><p class="text-xs text-gray-500 mt-0.5">${d}</p></div>`;}
+function divider(t){return `<div class="mt-7 mb-3 flex items-center gap-2"><div class="h-px flex-1 bg-slate-800/80"></div><span class="text-[9px] font-bold text-gray-600 tracking-widest uppercase px-3">${t}</span><div class="h-px flex-1 bg-slate-800/80"></div></div>`;}
+function grid(c){return `<div class="grid md:grid-cols-2 gap-2.5">${c}</div>`;}
 
-function makeColorPicker(id, label, desc, defaultColor) {
-    const val = state.colors[id] || defaultColor;
-    if (!state.colors[id]) state.colors[id] = defaultColor;
-    return `
-    <div class="opt-card rounded-xl p-4">
-        <div class="flex items-center justify-between gap-3">
-            <div class="flex-1 min-w-0">
-                <span class="font-semibold text-white text-sm">${label}</span>
-                <p class="text-xs text-gray-500 mt-0.5">${desc}</p>
-            </div>
-            <div class="flex items-center gap-2">
-                <input type="color" value="${val}" onchange="onColor('${id}', this.value)">
-                <span class="code-font text-xs text-gray-500" id="color-val-${id}">${val}</span>
-            </div>
-        </div>
-    </div>`;
-}
-
-function makeSectionHeader(icon, title, desc) {
-    return `<div class="mb-6"><h3 class="text-xl font-bold text-white flex items-center gap-2">${icon} ${title}</h3><p class="text-sm text-gray-500 mt-1">${desc}</p></div>`;
-}
-
-function makeSubHeader(title) {
-    return `<div class="mt-8 mb-4 flex items-center gap-2"><div class="h-px flex-1 bg-slate-800"></div><span class="text-xs font-bold text-gray-600 tracking-widest uppercase px-3">${title}</span><div class="h-px flex-1 bg-slate-800"></div></div>`;
-}
-
-// ==========================================
-// EVENT HANDLERS
-// ==========================================
-function onToggle(id, checked, el) {
-    state.toggles[id] = checked;
-    trackChange(id, checked);
-    const card = el.closest('.opt-card');
-    if (checked) card.classList.add('selected'); else card.classList.remove('selected');
-}
-function onSlider(id, val, unit) {
-    state.sliders[id] = parseInt(val);
-    trackChange(id, val);
-    document.getElementById('slider-val-' + id).textContent = val + unit;
-}
-function onSelect(id, val) {
-    state.selects[id] = val;
-    trackChange(id, val);
-}
-function onColor(id, val) {
-    state.colors[id] = val;
-    trackChange(id, val);
-    const el = document.getElementById('color-val-' + id);
-    if (el) el.textContent = val;
-}
+function onTog(id,c){S.toggles[id]=c;track(id,c);const card=document.getElementById('card-'+id);if(card)card.classList.toggle('active-card',c);}
+function onSli(id,v,u){S.sliders[id]=parseInt(v);track(id,v);const e=document.getElementById('sv-'+id);if(e)e.textContent=v+u;}
+function onSel(id,v){S.selects[id]=v;track(id,v);}
 
 // Keybind recording
-let recordingId = null;
-let recordingEl = null;
-
-function startRecording(id, el) {
-    if (recordingEl) {
-        recordingEl.classList.remove('recording');
-        recordingEl.value = state.keybinds[recordingId] || '';
-    }
-    recordingId = id;
-    recordingEl = el;
-    el.classList.add('recording');
-    el.value = '⏺ Presiona...';
-}
-
-function resetKeybind(id, defaultKey) {
-    state.keybinds[id] = defaultKey;
-    const el = document.getElementById('kb-' + id);
-    if (el) { el.value = defaultKey; el.classList.remove('recording'); }
-    trackChange('kb_' + id, defaultKey);
-}
-
-document.addEventListener('keydown', function(e) {
-    if (!recordingId) return;
-    e.preventDefault();
-    let keys = [];
-    if (e.ctrlKey) keys.push('Ctrl');
-    if (e.altKey) keys.push('Alt');
-    if (e.shiftKey) keys.push('Shift');
-    if (e.metaKey) keys.push('Win');
-    const key = e.key;
-    if (!['Control','Alt','Shift','Meta'].includes(key)) {
-        keys.push(key.length === 1 ? key.toUpperCase() : key);
-    }
-    const combo = keys.join(' + ');
-    if (combo && !['Ctrl','Alt','Shift','Win'].includes(combo)) {
-        state.keybinds[recordingId] = combo;
-        recordingEl.value = combo;
-        recordingEl.classList.remove('recording');
-        trackChange('kb_' + recordingId, combo);
-        recordingId = null;
-        recordingEl = null;
-    }
+let _recId=null,_recEl=null;
+function recStart(id,el){if(_recEl){_recEl.classList.remove('recording');_recEl.value=S.keybinds[_recId]||'';}_recId=id;_recEl=el;el.classList.add('recording');el.value='⏺ ...';}
+function recReset(id,def){S.keybinds[id]=def;const e=document.getElementById('kb-'+id);if(e){e.value=def;e.classList.remove('recording');}track('kb_'+id,def);}
+document.addEventListener('keydown',e=>{
+    if(!_recId)return;e.preventDefault();
+    let k=[];if(e.ctrlKey)k.push('Ctrl');if(e.altKey)k.push('Alt');if(e.shiftKey)k.push('Shift');if(e.metaKey)k.push('Win');
+    const key=e.key;if(!['Control','Alt','Shift','Meta'].includes(key))k.push(key.length===1?key.toUpperCase():key);
+    const c=k.join(' + ');
+    if(c&&!['Ctrl','Alt','Shift','Win'].includes(c)){S.keybinds[_recId]=c;_recEl.value=c;_recEl.classList.remove('recording');track('kb_'+_recId,c);_recId=null;_recEl=null;}
 });
 
-// ==========================================
-// SECTIONS
-// ==========================================
-function renderSection(id) {
-    const area = document.getElementById('contentArea');
-    const renderers = {
-        dashboard: renderDashboard,
-        performance: renderPerformance,
-        cleanup: renderCleanup,
-        network: renderNetwork,
-        power: renderPower,
-        keybinds: renderKeybinds,
-        visual: renderVisual,
-        taskbar: renderTaskbar,
-        explorer: renderExplorer,
-        privacy: renderPrivacy,
-        services: renderServices,
-        gaming: renderGaming,
-        maintenance: renderMaintenance,
-        export: renderExport,
-        profiles: renderProfiles
-    };
-    area.innerHTML = (renderers[id] || renderDashboard)();
+// Gauge SVG
+function gauge(pct,color,label,value,sz=110){
+    const r=38,circ=2*Math.PI*r,off=circ-(pct/100)*circ;
+    return `<div class="flex flex-col items-center"><svg width="${sz}" height="${sz}" viewBox="0 0 100 100"><circle cx="50" cy="50" r="${r}" fill="none" stroke="rgba(59,130,246,0.06)" stroke-width="6"/><circle cx="50" cy="50" r="${r}" class="gauge-ring" stroke="${color}" stroke-width="6" stroke-dasharray="${circ}" stroke-dashoffset="${off}" transform="rotate(-90 50 50)"/><text x="50" y="46" text-anchor="middle" fill="white" font-size="15" font-weight="800">${value}</text><text x="50" y="59" text-anchor="middle" fill="#64748b" font-size="7.5">${label}</text></svg></div>`;
 }
 
-// --- DASHBOARD ---
-function renderDashboard() {
-    const totalOpts = 85;
-    const enabledCount = Object.values(state.toggles).filter(v => v).length;
-    return `
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        <div class="stat-card rounded-xl p-4 text-center">
-            <p class="text-3xl font-black text-blue-400">${totalOpts}</p>
-            <p class="text-xs text-gray-500 mt-1">Opciones totales</p>
-        </div>
-        <div class="stat-card rounded-xl p-4 text-center">
-            <p class="text-3xl font-black text-green-400">${enabledCount}</p>
-            <p class="text-xs text-gray-500 mt-1">Activadas</p>
-        </div>
-        <div class="stat-card rounded-xl p-4 text-center">
-            <p class="text-3xl font-black text-amber-400">${changeCount}</p>
-            <p class="text-xs text-gray-500 mt-1">Cambios pendientes</p>
-        </div>
-        <div class="stat-card rounded-xl p-4 text-center">
-            <p class="text-3xl font-black text-purple-400">3</p>
-            <p class="text-xs text-gray-500 mt-1">Formatos de export</p>
-        </div>
-    </div>
-
-    <div class="grid md:grid-cols-2 gap-6 mb-8">
-        <div class="opt-card rounded-2xl p-6">
-            ${makeSectionHeader('🚀', 'Inicio Rápido', 'Aplica configuraciones predeterminadas optimizadas')}
-            <div class="space-y-3">
-                <button onclick="applyPreset('balanced')" class="w-full text-left bg-blue-900/20 hover:bg-blue-900/40 border border-blue-800/30 rounded-xl p-4 transition-all cursor-pointer group">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="font-bold text-blue-300 group-hover:text-blue-200">⚖️ Equilibrado</p>
-                            <p class="text-xs text-gray-500 mt-1">Rendimiento + estabilidad. Ideal para uso diario.</p>
-                        </div>
-                        <span class="text-blue-500 text-xl group-hover:translate-x-1 transition-transform">→</span>
-                    </div>
-                </button>
-                <button onclick="applyPreset('max_performance')" class="w-full text-left bg-amber-900/20 hover:bg-amber-900/40 border border-amber-800/30 rounded-xl p-4 transition-all cursor-pointer group">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="font-bold text-amber-300 group-hover:text-amber-200">🔥 Máximo Rendimiento</p>
-                            <p class="text-xs text-gray-500 mt-1">Todo al máximo. Para sacar el 100% de tu i3.</p>
-                        </div>
-                        <span class="text-amber-500 text-xl group-hover:translate-x-1 transition-transform">→</span>
-                    </div>
-                </button>
-                <button onclick="applyPreset('privacy')" class="w-full text-left bg-green-900/20 hover:bg-green-900/40 border border-green-800/30 rounded-xl p-4 transition-all cursor-pointer group">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="font-bold text-green-300 group-hover:text-green-200">🛡️ Máxima Privacidad</p>
-                            <p class="text-xs text-gray-500 mt-1">Desactiva toda telemetría y tracking.</p>
-                        </div>
-                        <span class="text-green-500 text-xl group-hover:translate-x-1 transition-transform">→</span>
-                    </div>
-                </button>
-                <button onclick="applyPreset('minimal')" class="w-full text-left bg-purple-900/20 hover:bg-purple-900/40 border border-purple-800/30 rounded-xl p-4 transition-all cursor-pointer group">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="font-bold text-purple-300 group-hover:text-purple-200">🧘 Mínimo y Limpio</p>
-                            <p class="text-xs text-gray-500 mt-1">Limpieza + bloatware. Sin cambios agresivos.</p>
-                        </div>
-                        <span class="text-purple-500 text-xl group-hover:translate-x-1 transition-transform">→</span>
-                    </div>
-                </button>
-            </div>
-        </div>
-        <div class="opt-card rounded-2xl p-6">
-            ${makeSectionHeader('📋', 'Resumen de Categorías', 'Qué incluye cada sección')}
-            <div class="space-y-3">
-                ${[
-                    { icon: '⚡', name: 'Rendimiento', desc: 'CPU, RAM, SysMain, Prefetch, prioridades', count: 12 },
-                    { icon: '🧹', name: 'Limpieza', desc: 'Temp, caché, bloatware, papelera', count: 8 },
-                    { icon: '🌐', name: 'Red', desc: 'DNS, TCP/IP, WiFi, latencia', count: 8 },
-                    { icon: '🔋', name: 'Energía', desc: 'Plan, hibernación, USB suspend', count: 6 },
-                    { icon: '⌨️', name: 'Keybinds', desc: 'Atajos personalizables del sistema', count: 12 },
-                    { icon: '🎨', name: 'Visual', desc: 'Animaciones, colores, dark mode', count: 10 },
-                    { icon: '📌', name: 'Barra tareas', desc: 'Posición, iconos, búsqueda, widgets', count: 7 },
-                    { icon: '🛡️', name: 'Privacidad', desc: 'Telemetría, Cortana, anuncios, tracking', count: 10 },
-                    { icon: '🎮', name: 'Gaming', desc: 'Game Mode, DVR, input lag', count: 6 },
-                ].map(c => `
-                    <div class="flex items-center gap-3 text-sm">
-                        <span>${c.icon}</span>
-                        <span class="font-semibold text-white flex-1">${c.name}</span>
-                        <span class="text-xs text-gray-500">${c.desc}</span>
-                        <span class="code-font text-xs text-blue-400 bg-blue-900/30 px-2 py-0.5 rounded-full">${c.count}</span>
-                    </div>`).join('')}
-            </div>
-        </div>
-    </div>
-
-    <div class="opt-card rounded-2xl p-6">
-        <div class="flex items-start gap-3">
-            <span class="text-2xl">⚠️</span>
-            <div>
-                <h3 class="font-bold text-amber-300 text-lg">Antes de exportar</h3>
-                <ul class="text-sm text-gray-400 mt-2 space-y-1">
-                    <li>• Crea un <strong>punto de restauración</strong> (el script lo hace automáticamente)</li>
-                    <li>• Ejecuta como <strong>Administrador</strong> (clic derecho → Ejecutar como administrador)</li>
-                    <li>• Algunos cambios requieren <strong>reiniciar</strong></li>
-                    <li>• Revisa cada opción — puedes desactivar lo que no necesites</li>
-                </ul>
-            </div>
-        </div>
-    </div>`;
+// ======================== MONITOR SIM ========================
+function simMon(){
+    S.monitor.cpu=Math.round(12+Math.random()*45);
+    S.monitor.ram=Math.round(40+Math.random()*30);
+    S.monitor.temp=Math.round(38+Math.random()*25);
+    S.monitor.disk=Math.round(3+Math.random()*25);
+    S.monitor.network=Math.round(Math.random()*50*10)/10;
+    const base={silent:1400,balanced:2600,performance:4000,custom:2800};
+    S.monitor.fanRPM=(base[S.fanProfile]||2600)+Math.round(Math.random()*400-200);
+    const h=Math.floor(Math.random()*72),m=Math.floor(Math.random()*60);
+    S.monitor.uptime=h+'h '+m+'m';
+    if(S.page==='monitor')renderMonLive();
+    if(S.page==='fans')updFanLive();
+    if(S.page==='dashboard')updDashLive();
 }
-
-// --- PERFORMANCE ---
-function renderPerformance() {
-    return `
-    ${makeSectionHeader('⚡', 'Rendimiento del Sistema', 'Optimizaciones de CPU, RAM y disco para tu Intel Core i3')}
-    <div class="grid md:grid-cols-2 gap-4">
-        ${makeToggle('perf_sysmain', 'Desactivar SysMain (Superfetch)', 'Libera RAM y reduce uso de disco. Recomendado para laptops con poca RAM.', true, 'medio')}
-        ${makeToggle('perf_prefetch', 'Desactivar Prefetch', 'Reduce escrituras al disco. Útil si tienes SSD.', false, 'medio')}
-        ${makeToggle('perf_indexing', 'Desactivar Windows Search Indexing', 'Reduce uso de CPU y disco. La búsqueda será más lenta.', true, 'bajo')}
-        ${makeToggle('perf_visual', 'Optimizar efectos visuales', 'Desactiva animaciones para mejor rendimiento.', true, 'bajo')}
-        ${makeToggle('perf_transparency', 'Desactivar transparencias', 'Reduce carga en GPU integrada del i3.', true, 'bajo')}
-        ${makeToggle('perf_startup_delay', 'Eliminar retraso de inicio', 'Reduce el delay al abrir el menú inicio.', true, 'bajo')}
-        ${makeToggle('perf_menu_delay', 'Reducir delay de menús', 'Respuesta más rápida en menús contextuales.', true, 'bajo')}
-        ${makeToggle('perf_disable_tips', 'Desactivar tips de Windows', 'Elimina notificaciones de consejos que usan recursos.', true, 'bajo')}
-        ${makeToggle('perf_priority_cpu', 'Priorizar programas en primer plano', 'Asigna más CPU a la ventana activa.', true, 'bajo')}
-        ${makeToggle('perf_large_cache', 'Optimizar caché del sistema', 'Configura caché de sistema para laptops.', false, 'medio')}
-        ${makeToggle('perf_ntfs_disable_last', 'Desactivar último acceso NTFS', 'Reduce escrituras al disco mejorando rendimiento.', true, 'bajo')}
-        ${makeToggle('perf_split_threshold', 'Optimizar umbral de memoria', 'Mejora la gestión de memoria en sistemas con poca RAM.', false, 'medio')}
-    </div>
-    ${makeSubHeader('Ajustes Avanzados')}
-    <div class="grid md:grid-cols-2 gap-4">
-        ${makeSlider('perf_menu_speed', 'Velocidad de menús', 'Delay en milisegundos al abrir menús (menor = más rápido)', 0, 400, 50, 'ms')}
-        ${makeSelect('perf_power_scheme', 'Esquema de procesador', 'Controla cómo Windows gestiona el CPU', [
-            { value: 'balanced', label: 'Equilibrado' },
-            { value: 'high', label: 'Alto rendimiento' },
-            { value: 'ultimate', label: 'Máximo rendimiento' }
-        ], 'high')}
-        ${makeSelect('perf_virtual_mem', 'Memoria virtual', 'Configuración del archivo de paginación', [
-            { value: 'auto', label: 'Automático (recomendado)' },
-            { value: 'custom', label: 'Personalizado (4-8GB)' },
-            { value: 'none', label: 'Desactivar (solo con mucha RAM)' }
-        ], 'auto')}
-    </div>`;
-}
-
-// --- CLEANUP ---
-function renderCleanup() {
-    return `
-    ${makeSectionHeader('🧹', 'Limpieza del Sistema', 'Elimina archivos innecesarios y libera espacio en disco')}
-    <div class="grid md:grid-cols-2 gap-4">
-        ${makeToggle('clean_temp', 'Limpiar archivos temporales', 'Elimina archivos de %TEMP%, Windows\\Temp y Prefetch.', true, 'bajo')}
-        ${makeToggle('clean_recycle', 'Vaciar papelera de reciclaje', 'Elimina todos los archivos de la papelera.', true, 'bajo')}
-        ${makeToggle('clean_update_cache', 'Limpiar caché de Windows Update', 'Borra actualizaciones descargadas ya instaladas.', true, 'medio')}
-        ${makeToggle('clean_thumbnail', 'Limpiar caché de miniaturas', 'Borra thumbnails. Se regeneran automáticamente.', true, 'bajo')}
-        ${makeToggle('clean_logs', 'Limpiar logs del sistema', 'Elimina archivos de log antiguos.', true, 'bajo')}
-        ${makeToggle('clean_disk_cleanup', 'Ejecutar Liberador de Espacio', 'Lanza el limpiador de disco de Windows.', false, 'bajo')}
-        ${makeToggle('clean_dns_cache', 'Limpiar caché DNS', 'Renueva la tabla de DNS local.', true, 'bajo')}
-        ${makeToggle('clean_bloatware', 'Remover bloatware de Windows', 'Desinstala apps preinstaladas (Xbox, Noticias, Solitario, etc).', false, 'alto')}
-    </div>`;
-}
-
-// --- NETWORK ---
-function renderNetwork() {
-    return `
-    ${makeSectionHeader('🌐', 'Red e Internet', 'Optimiza tu conexión WiFi y configuración de red')}
-    <div class="grid md:grid-cols-2 gap-4">
-        ${makeToggle('net_flush_dns', 'Flush DNS al iniciar', 'Limpia la caché DNS para resolver problemas de navegación.', true, 'bajo')}
-        ${makeToggle('net_reset_winsock', 'Reset Winsock', 'Restablece la pila de red para solucionar problemas WiFi.', false, 'medio')}
-        ${makeToggle('net_reset_tcpip', 'Reset TCP/IP', 'Reinicia la configuración TCP/IP.', false, 'medio')}
-        ${makeToggle('net_disable_nagle', 'Desactivar algoritmo de Nagle', 'Reduce latencia en conexiones. Ideal para gaming y VoIP.', false, 'medio')}
-        ${makeToggle('net_optimize_adapter', 'Optimizar adaptador de red', 'Ajusta buffers y configuración del adaptador WiFi.', true, 'bajo')}
-        ${makeToggle('net_disable_autotuning', 'Desactivar Auto-Tuning', 'Puede mejorar estabilidad WiFi en algunos routers.', false, 'medio')}
-        ${makeToggle('net_qos_disable', 'Desactivar QoS reservado', 'Libera el 20% de ancho de banda que Windows reserva.', true, 'bajo')}
-        ${makeToggle('net_disable_6to4', 'Desactivar IPv6 transiciones', 'Desactiva adaptadores de transición IPv6 innecesarios.', true, 'bajo')}
-    </div>
-    ${makeSubHeader('Servidor DNS')}
-    <div class="grid md:grid-cols-2 gap-4">
-        ${makeSelect('net_dns_provider', 'Proveedor DNS', 'Elige un DNS rápido y seguro', [
-            { value: 'default', label: 'Automático (del ISP)' },
-            { value: 'google', label: 'Google (8.8.8.8 / 8.8.4.4)' },
-            { value: 'cloudflare', label: 'Cloudflare (1.1.1.1 / 1.0.0.1)' },
-            { value: 'quad9', label: 'Quad9 (9.9.9.9 / 149.112.112.112)' },
-            { value: 'opendns', label: 'OpenDNS (208.67.222.222)' }
-        ], 'cloudflare')}
-        ${makeSelect('net_adapter', 'Adaptador de red', 'Selecciona tu adaptador principal', [
-            { value: 'wifi', label: 'Wi-Fi' },
-            { value: 'ethernet', label: 'Ethernet' }
-        ], 'wifi')}
-    </div>`;
-}
-
-// --- POWER ---
-function renderPower() {
-    return `
-    ${makeSectionHeader('🔋', 'Energía y Batería', 'Configura el plan de energía de tu IdeaPad')}
-    <div class="grid md:grid-cols-2 gap-4">
-        ${makeToggle('pwr_hibernate_off', 'Desactivar hibernación', 'Libera espacio en disco (elimina hiberfil.sys de ~4GB).', true, 'bajo')}
-        ${makeToggle('pwr_fast_startup', 'Desactivar inicio rápido', 'Puede resolver problemas de arranque. Inicio más limpio.', false, 'bajo')}
-        ${makeToggle('pwr_usb_suspend_off', 'Desactivar USB Selective Suspend', 'Evita que Windows apague dispositivos USB para ahorrar energía.', true, 'bajo')}
-        ${makeToggle('pwr_hard_disk_off', 'Nunca apagar disco duro', 'Evita que el disco se duerma y cause lag al despertar.', true, 'bajo')}
-        ${makeToggle('pwr_high_perf', 'Plan de Alto Rendimiento', 'Activa el plan de energía de alto rendimiento.', true, 'bajo')}
-        ${makeToggle('pwr_processor_max', 'CPU al 100% siempre', 'Mantiene el procesador i3 al máximo. Consume más batería.', false, 'medio')}
-    </div>
-    ${makeSubHeader('Configuración de Pantalla')}
-    <div class="grid md:grid-cols-2 gap-4">
-        ${makeSlider('pwr_screen_timeout_ac', 'Apagar pantalla (conectado)', 'Minutos antes de apagar la pantalla con cargador', 0, 60, 15, ' min')}
-        ${makeSlider('pwr_screen_timeout_dc', 'Apagar pantalla (batería)', 'Minutos antes de apagar la pantalla con batería', 0, 30, 5, ' min')}
-        ${makeSlider('pwr_sleep_ac', 'Suspender (conectado)', 'Minutos antes de suspender con cargador (0=nunca)', 0, 120, 30, ' min')}
-        ${makeSlider('pwr_sleep_dc', 'Suspender (batería)', 'Minutos antes de suspender con batería', 0, 60, 15, ' min')}
-    </div>`;
-}
-
-// --- KEYBINDS ---
-function renderKeybinds() {
-    return `
-    ${makeSectionHeader('⌨️', 'Atajos de Teclado Personalizados', 'Configura keybinds del sistema. Haz clic en un campo y presiona la combinación de teclas deseada.')}
-    <div class="opt-card rounded-xl p-4 mb-6 border-l-4 border-amber-500">
-        <p class="text-sm text-amber-200">💡 <strong>Cómo usar:</strong> Haz clic en el campo del atajo → Presiona la combinación de teclas deseada (ej: Ctrl+Shift+T). Se generará un script de AutoHotkey (.ahk) con todos tus atajos.</p>
-    </div>
-    ${makeSubHeader('Atajos del Sistema')}
-    <div class="grid md:grid-cols-2 gap-4">
-        ${makeKeybind('kb_screenshot', 'Captura de pantalla', 'Toma captura y guarda en Imágenes', 'Win + Shift + S')}
-        ${makeKeybind('kb_task_manager', 'Administrador de tareas', 'Abre el Task Manager directamente', 'Ctrl + Shift + Escape')}
-        ${makeKeybind('kb_run_dialog', 'Ejecutar (Run)', 'Abre el diálogo de Ejecutar', 'Win + R')}
-        ${makeKeybind('kb_file_explorer', 'Explorador de archivos', 'Abre el explorador de archivos', 'Win + E')}
-        ${makeKeybind('kb_cmd_admin', 'Terminal como Admin', 'Abre CMD/PowerShell como administrador', 'Ctrl + Shift + T')}
-        ${makeKeybind('kb_desktop', 'Mostrar escritorio', 'Minimiza todo y muestra escritorio', 'Win + D')}
-    </div>
-    ${makeSubHeader('Atajos de Ventanas')}
-    <div class="grid md:grid-cols-2 gap-4">
-        ${makeKeybind('kb_close_window', 'Cerrar ventana activa', 'Cierra la ventana en primer plano', 'Alt + F4')}
-        ${makeKeybind('kb_minimize_all', 'Minimizar todo', 'Minimiza todas las ventanas', 'Win + M')}
-        ${makeKeybind('kb_snap_left', 'Ventana a la izquierda', 'Ajusta la ventana a la mitad izquierda', 'Win + Left')}
-        ${makeKeybind('kb_snap_right', 'Ventana a la derecha', 'Ajusta la ventana a la mitad derecha', 'Win + Right')}
-        ${makeKeybind('kb_maximize', 'Maximizar ventana', 'Maximiza la ventana activa', 'Win + Up')}
-        ${makeKeybind('kb_switch_window', 'Cambiar ventana', 'Cambia entre ventanas abiertas', 'Alt + Tab')}
-    </div>
-    ${makeSubHeader('Atajos Multimedia')}
-    <div class="grid md:grid-cols-2 gap-4">
-        ${makeKeybind('kb_vol_up', 'Subir volumen', 'Incrementa el volumen del sistema', 'Ctrl + Up')}
-        ${makeKeybind('kb_vol_down', 'Bajar volumen', 'Reduce el volumen del sistema', 'Ctrl + Down')}
-        ${makeKeybind('kb_vol_mute', 'Silenciar', 'Alterna el silencio del sistema', 'Ctrl + M')}
-        ${makeKeybind('kb_play_pause', 'Play/Pausa', 'Controla reproducción multimedia', 'Ctrl + Space')}
-    </div>
-    ${makeSubHeader('Atajos Personalizados')}
-    <div class="grid md:grid-cols-2 gap-4">
-        ${makeKeybind('kb_custom1', 'Acción rápida 1', 'Abrir Calculadora', 'Ctrl + Alt + C')}
-        ${makeKeybind('kb_custom2', 'Acción rápida 2', 'Abrir Bloc de notas', 'Ctrl + Alt + N')}
-    </div>`;
-}
-
-// --- VISUAL ---
-function renderVisual() {
-    return `
-    ${makeSectionHeader('🎨', 'Visual y Apariencia', 'Personaliza la apariencia de Windows')}
-    <div class="grid md:grid-cols-2 gap-4">
-        ${makeToggle('vis_dark_mode', 'Modo oscuro del sistema', 'Activa el tema oscuro en Windows y apps.', true, 'bajo')}
-        ${makeToggle('vis_dark_apps', 'Modo oscuro en apps', 'Fuerza tema oscuro en aplicaciones compatibles.', true, 'bajo')}
-        ${makeToggle('vis_disable_anim', 'Desactivar animaciones', 'Elimina animaciones de ventanas para más fluidez.', true, 'bajo')}
-        ${makeToggle('vis_disable_transparency', 'Desactivar transparencias', 'Quita los efectos de transparencia del sistema.', true, 'bajo')}
-        ${makeToggle('vis_disable_shadow', 'Desactivar sombras de ventanas', 'Elimina sombras bajo las ventanas.', false, 'bajo')}
-        ${makeToggle('vis_smooth_scroll', 'Desactivar smooth scrolling', 'Scroll más directo sin suavizado.', false, 'bajo')}
-        ${makeToggle('vis_disable_peek', 'Desactivar Aero Peek', 'No mostrar vista previa al pasar sobre la barra de tareas.', false, 'bajo')}
-        ${makeToggle('vis_disable_snap_assist', 'Desactivar Snap Assist', 'No mostrar sugerencias al hacer snap de ventanas.', false, 'bajo')}
-        ${makeToggle('vis_small_icons', 'Usar iconos pequeños en escritorio', 'Reduce el tamaño de iconos del escritorio.', false, 'bajo')}
-        ${makeToggle('vis_show_extensions', 'Mostrar extensiones de archivo', 'Muestra .exe, .txt, .jpg etc. en todos los archivos.', true, 'bajo')}
-    </div>
-    ${makeSubHeader('Colores del Sistema')}
-    <div class="grid md:grid-cols-2 gap-4">
-        ${makeColorPicker('color_accent', 'Color de acento', 'Color principal del sistema (barra de título, botones)', '#0078d4')}
-        ${makeColorPicker('color_taskbar', 'Color de barra de tareas', 'Color de fondo de la barra de tareas', '#1a1a2e')}
-    </div>
-    ${makeSubHeader('Cursor y Mouse')}
-    <div class="grid md:grid-cols-2 gap-4">
-        ${makeSlider('vis_cursor_speed', 'Velocidad del cursor', 'Velocidad de movimiento del ratón', 1, 20, 10, '')}
-        ${makeToggle('vis_enhance_pointer', 'Mejorar precisión del puntero', 'Aceleración del mouse (desactivar para gaming)', false, 'bajo')}
-    </div>`;
-}
-
-// --- TASKBAR ---
-function renderTaskbar() {
-    return `
-    ${makeSectionHeader('📌', 'Barra de Tareas', 'Configura la barra de tareas de Windows')}
-    <div class="grid md:grid-cols-2 gap-4">
-        ${makeToggle('tb_hide_search', 'Ocultar barra de búsqueda', 'Elimina la barra/ícono de búsqueda.', true, 'bajo')}
-        ${makeToggle('tb_hide_task_view', 'Ocultar Vista de tareas', 'Quita el botón de vista de tareas.', true, 'bajo')}
-        ${makeToggle('tb_hide_widgets', 'Ocultar Widgets', 'Quita el panel de widgets (Win 11).', true, 'bajo')}
-        ${makeToggle('tb_hide_chat', 'Ocultar Chat/Teams', 'Quita el ícono de Chat de Teams.', true, 'bajo')}
-        ${makeToggle('tb_hide_copilot', 'Ocultar Copilot', 'Quita el botón de Copilot (Win 11).', true, 'bajo')}
-        ${makeToggle('tb_small_icons', 'Iconos pequeños', 'Usa iconos más pequeños en la barra (Win 10).', false, 'bajo')}
-        ${makeToggle('tb_never_combine', 'No combinar botones', 'Muestra cada ventana por separado en la barra.', false, 'bajo')}
-    </div>
-    ${makeSubHeader('Posición y Comportamiento')}
-    <div class="grid md:grid-cols-2 gap-4">
-        ${makeSelect('tb_position', 'Posición de la barra', 'Dónde aparece la barra de tareas', [
-            { value: 'bottom', label: 'Abajo (predeterminado)' },
-            { value: 'top', label: 'Arriba' },
-            { value: 'left', label: 'Izquierda' },
-            { value: 'right', label: 'Derecha' }
-        ], 'bottom')}
-        ${makeSelect('tb_alignment', 'Alineación de iconos (Win11)', 'Dónde se alinean los iconos en la barra', [
-            { value: 'center', label: 'Centro (predeterminado)' },
-            { value: 'left', label: 'Izquierda (estilo Win 10)' }
-        ], 'left')}
-    </div>`;
-}
-
-// --- EXPLORER ---
-function renderExplorer() {
-    return `
-    ${makeSectionHeader('📁', 'Explorador de Archivos', 'Personaliza el explorador de archivos de Windows')}
-    <div class="grid md:grid-cols-2 gap-4">
-        ${makeToggle('exp_show_extensions', 'Mostrar extensiones de archivo', 'Muestra .exe, .txt, .jpg en todos los archivos.', true, 'bajo')}
-        ${makeToggle('exp_show_hidden', 'Mostrar archivos ocultos', 'Muestra archivos y carpetas ocultas.', true, 'bajo')}
-        ${makeToggle('exp_show_system', 'Mostrar archivos del sistema', 'Muestra archivos protegidos del sistema operativo.', false, 'medio')}
-        ${makeToggle('exp_open_this_pc', 'Abrir en "Este equipo"', 'Abre el explorador en Este equipo en vez de Acceso rápido.', true, 'bajo')}
-        ${makeToggle('exp_disable_recent', 'Desactivar archivos recientes', 'No mostrar archivos usados recientemente.', true, 'bajo')}
-        ${makeToggle('exp_disable_frequent', 'Desactivar carpetas frecuentes', 'No mostrar carpetas usadas frecuentemente.', true, 'bajo')}
-        ${makeToggle('exp_full_path', 'Mostrar ruta completa', 'Muestra la ruta completa en la barra de título.', true, 'bajo')}
-        ${makeToggle('exp_classic_menu', 'Menú contextual clásico (Win11)', 'Muestra el menú completo sin "Mostrar más opciones".', true, 'bajo')}
-        ${makeToggle('exp_compact_view', 'Vista compacta', 'Reduce el espaciado entre archivos (Win 11).', true, 'bajo')}
-        ${makeToggle('exp_disable_grouping', 'Desactivar agrupación en Descargas', 'No agrupar archivos por fecha en la carpeta Descargas.', true, 'bajo')}
-    </div>`;
-}
-
-// --- PRIVACY ---
-function renderPrivacy() {
-    return `
-    ${makeSectionHeader('🛡️', 'Privacidad y Telemetría', 'Controla qué datos envía tu PC a Microsoft')}
-    <div class="grid md:grid-cols-2 gap-4">
-        ${makeToggle('priv_telemetry', 'Desactivar telemetría', 'Bloquea el envío de datos de diagnóstico a Microsoft.', true, 'medio')}
-        ${makeToggle('priv_cortana', 'Desactivar Cortana', 'Deshabilita Cortana completamente.', true, 'bajo')}
-        ${makeToggle('priv_activity_history', 'Desactivar historial de actividad', 'No guardar ni enviar historial de actividades.', true, 'bajo')}
-        ${makeToggle('priv_ad_id', 'Desactivar ID de publicidad', 'No usar ID de publicidad para personalizar anuncios.', true, 'bajo')}
-        ${makeToggle('priv_location', 'Desactivar ubicación', 'No compartir tu ubicación con apps.', true, 'bajo')}
-        ${makeToggle('priv_diagnostic_data', 'Datos de diagnóstico mínimos', 'Solo enviar datos de diagnóstico obligatorios.', true, 'bajo')}
-        ${makeToggle('priv_tailored_exp', 'Desactivar experiencias personalizadas', 'No recibir tips ni anuncios basados en diagnósticos.', true, 'bajo')}
-        ${makeToggle('priv_feedback', 'Desactivar solicitudes de feedback', 'Windows no te pedirá enviar opiniones.', true, 'bajo')}
-        ${makeToggle('priv_start_suggestions', 'Desactivar sugerencias en Inicio', 'No mostrar apps sugeridas en el menú inicio.', true, 'bajo')}
-        ${makeToggle('priv_lock_screen_tips', 'Desactivar tips en pantalla de bloqueo', 'No mostrar datos curiosos ni anuncios en el lock screen.', true, 'bajo')}
-    </div>`;
-}
-
-// --- SERVICES ---
-function renderServices() {
-    return `
-    ${makeSectionHeader('⚙️', 'Servicios de Windows', 'Desactiva servicios que no necesitas para liberar recursos')}
-    <div class="opt-card rounded-xl p-4 mb-6 border-l-4 border-red-500">
-        <p class="text-sm text-red-200">⚠️ <strong>Cuidado:</strong> Desactivar servicios incorrectos puede causar problemas. Solo desactiva lo que entiendas.</p>
-    </div>
-    <div class="grid md:grid-cols-2 gap-4">
-        ${makeToggle('svc_diagtrack', 'Experiencias de usuario (DiagTrack)', 'Telemetría principal de Windows. Seguro desactivar.', true, 'medio')}
-        ${makeToggle('svc_dmwappush', 'dmwappushservice', 'Servicio de telemetría WAP push. Seguro desactivar.', true, 'medio')}
-        ${makeToggle('svc_sysmain', 'SysMain (Superfetch)', 'Pre-carga apps en RAM. Desactivar si tienes poca RAM.', true, 'medio')}
-        ${makeToggle('svc_wsearch', 'Windows Search', 'Indexa archivos para búsqueda. Usa CPU y disco.', true, 'medio')}
-        ${makeToggle('svc_xbox', 'Servicios de Xbox', 'XboxGipSvc, XblAuthManager, XblGameSave. No necesarios sin Xbox.', true, 'bajo')}
-        ${makeToggle('svc_maps', 'Administrador de mapas', 'Descarga mapas para uso offline. Innecesario para la mayoría.', true, 'bajo')}
-        ${makeToggle('svc_fax', 'Servicio de Fax', 'Soporte para envío de fax. Raramente necesario.', true, 'bajo')}
-        ${makeToggle('svc_print_spooler', 'Servicio de impresión', 'Solo necesario si usas impresora. Desactivar si no.', false, 'medio')}
-        ${makeToggle('svc_remote_registry', 'Registro remoto', 'Permite acceso remoto al registro. Riesgo de seguridad.', true, 'bajo')}
-        ${makeToggle('svc_bluetooth', 'Bluetooth (si no lo usas)', 'Desactiva Bluetooth para ahorrar batería y recursos.', false, 'bajo')}
-    </div>`;
-}
-
-// --- GAMING ---
-function renderGaming() {
-    return `
-    ${makeSectionHeader('🎮', 'Optimización Gaming', 'Configuraciones para mejorar el rendimiento en juegos')}
-    <div class="grid md:grid-cols-2 gap-4">
-        ${makeToggle('game_mode', 'Activar Game Mode', 'Prioriza recursos del sistema para el juego activo.', true, 'bajo')}
-        ${makeToggle('game_dvr_off', 'Desactivar Game DVR/Bar', 'Elimina la grabación de pantalla en segundo plano. Libera FPS.', true, 'bajo')}
-        ${makeToggle('game_fullscreen_opt', 'Desactivar optimización pantalla completa', 'Puede mejorar FPS y reducir input lag.', true, 'bajo')}
-        ${makeToggle('game_mouse_accel', 'Desactivar aceleración del mouse', 'Movimiento 1:1 del ratón. Esencial para shooters.', true, 'bajo')}
-        ${makeToggle('game_nagle_off', 'Desactivar Nagle (reducir ping)', 'Reduce la latencia de red en juegos online.', true, 'medio')}
-        ${makeToggle('game_hpet_off', 'Desactivar HPET', 'Puede mejorar rendimiento en algunos juegos. Testear.', false, 'alto')}
-    </div>
-    ${makeSubHeader('Ajustes de GPU')}
-    <div class="grid md:grid-cols-2 gap-4">
-        ${makeSelect('game_gpu_sched', 'GPU Scheduling (Win 10 2004+)', 'Planificación de GPU por hardware', [
-            { value: 'off', label: 'Desactivado' },
-            { value: 'on', label: 'Activado (recomendado)' }
-        ], 'on')}
-        ${makeSelect('game_power_mode', 'Modo de energía GPU', 'Preferencia de rendimiento de gráficos', [
-            { value: 'balanced', label: 'Equilibrado' },
-            { value: 'high', label: 'Alto rendimiento' }
-        ], 'high')}
-    </div>`;
-}
-
-// --- MAINTENANCE ---
-function renderMaintenance() {
-    return `
-    ${makeSectionHeader('🔧', 'Mantenimiento del Sistema', 'Reparación y mantenimiento de Windows')}
-    <div class="grid md:grid-cols-2 gap-4">
-        ${makeToggle('maint_sfc', 'Ejecutar SFC /scannow', 'Repara archivos del sistema corrupto o faltantes.', true, 'bajo')}
-        ${makeToggle('maint_dism', 'Ejecutar DISM RestoreHealth', 'Repara la imagen de Windows antes del SFC.', true, 'bajo')}
-        ${makeToggle('maint_chkdsk', 'Verificar disco (chkdsk)', 'Busca y repara errores en el disco duro.', false, 'medio')}
-        ${makeToggle('maint_defrag', 'Optimizar disco', 'Desfragmenta HDD o ejecuta TRIM en SSD.', true, 'bajo')}
-        ${makeToggle('maint_restore_point', 'Crear punto de restauración', 'Crea un punto de restauración antes de los cambios.', true, 'bajo')}
-        ${makeToggle('maint_clear_event_log', 'Limpiar logs de eventos', 'Borra los registros de eventos del sistema.', false, 'bajo')}
-    </div>`;
-}
-
-// --- EXPORT ---
-function renderExport() {
-    return `
-    ${makeSectionHeader('📦', 'Exportar Scripts', 'Genera scripts listos para ejecutar con todas tus configuraciones')}
-    <div class="grid md:grid-cols-3 gap-6 mb-8">
-        <button onclick="generateAndShow('bat')" class="opt-card rounded-2xl p-6 text-center hover:border-blue-500/50 transition-all cursor-pointer group">
-            <div class="text-4xl mb-3">📄</div>
-            <h3 class="font-bold text-white text-lg group-hover:text-blue-400 transition-colors">Script .BAT</h3>
-            <p class="text-xs text-gray-500 mt-2">Archivo batch ejecutable. Compatible con Windows 10/11. El más fácil de usar.</p>
-            <div class="mt-4 bg-blue-600/20 text-blue-400 text-xs font-bold px-3 py-1.5 rounded-lg border border-blue-800/50">Generar .BAT</div>
-        </button>
-        <button onclick="generateAndShow('reg')" class="opt-card rounded-2xl p-6 text-center hover:border-green-500/50 transition-all cursor-pointer group">
-            <div class="text-4xl mb-3">🗝️</div>
-            <h3 class="font-bold text-white text-lg group-hover:text-green-400 transition-colors">Registro .REG</h3>
-            <p class="text-xs text-gray-500 mt-2">Archivo de registro de Windows. Aplica cambios visuales, de rendimiento y privacidad.</p>
-            <div class="mt-4 bg-green-600/20 text-green-400 text-xs font-bold px-3 py-1.5 rounded-lg border border-green-800/50">Generar .REG</div>
-        </button>
-        <button onclick="generateAndShow('ps1')" class="opt-card rounded-2xl p-6 text-center hover:border-purple-500/50 transition-all cursor-pointer group">
-            <div class="text-4xl mb-3">⚡</div>
-            <h3 class="font-bold text-white text-lg group-hover:text-purple-400 transition-colors">PowerShell .PS1</h3>
-            <p class="text-xs text-gray-500 mt-2">Script de PowerShell avanzado. Incluye bloatware removal y configuraciones avanzadas.</p>
-            <div class="mt-4 bg-purple-600/20 text-purple-400 text-xs font-bold px-3 py-1.5 rounded-lg border border-purple-800/50">Generar .PS1</div>
-        </button>
-    </div>
-
-    <div class="grid md:grid-cols-2 gap-6">
-        <button onclick="generateAndShow('ahk')" class="opt-card rounded-2xl p-6 text-center hover:border-amber-500/50 transition-all cursor-pointer group">
-            <div class="text-4xl mb-3">⌨️</div>
-            <h3 class="font-bold text-white text-lg group-hover:text-amber-400 transition-colors">AutoHotkey .AHK</h3>
-            <p class="text-xs text-gray-500 mt-2">Script de atajos de teclado personalizados. Requiere AutoHotkey instalado.</p>
-            <div class="mt-4 bg-amber-600/20 text-amber-400 text-xs font-bold px-3 py-1.5 rounded-lg border border-amber-800/50">Generar .AHK</div>
-        </button>
-        <button onclick="generateAndShow('all')" class="opt-card rounded-2xl p-6 text-center hover:border-cyan-500/50 transition-all cursor-pointer group border-cyan-800/30">
-            <div class="text-4xl mb-3">🎁</div>
-            <h3 class="font-bold text-white text-lg group-hover:text-cyan-400 transition-colors">Todo-en-Uno .BAT</h3>
-            <p class="text-xs text-gray-500 mt-2">Un solo archivo .BAT que incluye TODAS las configuraciones seleccionadas.</p>
-            <div class="mt-4 bg-cyan-600/20 text-cyan-400 text-xs font-bold px-3 py-1.5 rounded-lg border border-cyan-800/50">⭐ Generar Todo</div>
-        </button>
-    </div>
-
-    <div class="mt-8 opt-card rounded-xl p-5">
-        <h4 class="font-bold text-white mb-3">📋 Instrucciones</h4>
-        <div class="grid md:grid-cols-4 gap-4 text-center text-sm">
-            <div><div class="text-2xl mb-2">1️⃣</div><p class="text-gray-400">Configura tus opciones en cada sección</p></div>
-            <div><div class="text-2xl mb-2">2️⃣</div><p class="text-gray-400">Elige el formato y haz clic en Generar</p></div>
-            <div><div class="text-2xl mb-2">3️⃣</div><p class="text-gray-400">Descarga el archivo o copia el código</p></div>
-            <div><div class="text-2xl mb-2">4️⃣</div><p class="text-gray-400">Ejecuta como Administrador y reinicia</p></div>
-        </div>
-    </div>`;
-}
-
-// --- PROFILES ---
-function renderProfiles() {
-    return `
-    ${makeSectionHeader('💾', 'Perfiles de Configuración', 'Guarda y carga configuraciones rápidamente')}
-    <div class="grid md:grid-cols-2 gap-4 mb-6">
-        <div class="opt-card rounded-xl p-5">
-            <h4 class="font-bold text-white mb-3">💾 Guardar perfil actual</h4>
-            <input type="text" id="profileName" placeholder="Nombre del perfil..." class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2 text-sm mb-3 focus:border-blue-500 focus:outline-none text-white">
-            <button onclick="saveProfile()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2 rounded-lg transition-all cursor-pointer text-sm">Guardar Perfil</button>
-        </div>
-        <div class="opt-card rounded-xl p-5">
-            <h4 class="font-bold text-white mb-3">📂 Exportar/Importar configuración</h4>
-            <div class="flex gap-2">
-                <button onclick="exportConfig()" class="flex-1 bg-green-600 hover:bg-green-500 text-white font-semibold py-2 rounded-lg transition-all cursor-pointer text-sm">📤 Exportar JSON</button>
-                <label class="flex-1 bg-purple-600 hover:bg-purple-500 text-white font-semibold py-2 rounded-lg transition-all cursor-pointer text-sm text-center">
-                    📥 Importar
-                    <input type="file" accept=".json" class="hidden" onchange="importConfig(event)">
-                </label>
-            </div>
-        </div>
-    </div>
-    <div id="savedProfiles">
-        <h4 class="font-bold text-white mb-3">📋 Perfiles guardados</h4>
-        <div id="profilesList" class="space-y-2">
-            <p class="text-sm text-gray-500 text-center py-4">No hay perfiles guardados aún.</p>
-        </div>
-    </div>`;
-}
-
-
-// ==========================================
-// PRESETS
-// ==========================================
-function applyPreset(preset) {
-    // Reset all
-    Object.keys(state.toggles).forEach(k => state.toggles[k] = false);
-
-    const presets = {
-        balanced: ['perf_sysmain','perf_indexing','perf_visual','perf_transparency','perf_startup_delay','perf_menu_delay','perf_disable_tips','perf_priority_cpu','perf_ntfs_disable_last','clean_temp','clean_recycle','clean_thumbnail','clean_dns_cache','net_flush_dns','net_qos_disable','pwr_hibernate_off','pwr_high_perf','priv_telemetry','priv_cortana','priv_ad_id','priv_tailored_exp','priv_feedback','priv_start_suggestions','tb_hide_search','tb_hide_task_view','tb_hide_widgets','tb_hide_chat','tb_hide_copilot','exp_show_extensions','exp_open_this_pc','exp_disable_recent','vis_dark_mode','vis_dark_apps','svc_diagtrack','svc_dmwappush','maint_restore_point'],
-        max_performance: ['perf_sysmain','perf_prefetch','perf_indexing','perf_visual','perf_transparency','perf_startup_delay','perf_menu_delay','perf_disable_tips','perf_priority_cpu','perf_large_cache','perf_ntfs_disable_last','perf_split_threshold','clean_temp','clean_recycle','clean_update_cache','clean_thumbnail','clean_logs','clean_dns_cache','clean_bloatware','net_flush_dns','net_disable_nagle','net_qos_disable','net_disable_6to4','pwr_hibernate_off','pwr_usb_suspend_off','pwr_hard_disk_off','pwr_high_perf','pwr_processor_max','priv_telemetry','priv_cortana','priv_activity_history','priv_ad_id','priv_tailored_exp','priv_feedback','priv_start_suggestions','priv_lock_screen_tips','tb_hide_search','tb_hide_task_view','tb_hide_widgets','tb_hide_chat','tb_hide_copilot','vis_dark_mode','vis_dark_apps','vis_disable_anim','vis_disable_transparency','vis_disable_shadow','svc_diagtrack','svc_dmwappush','svc_sysmain','svc_wsearch','svc_xbox','svc_maps','svc_fax','svc_remote_registry','game_mode','game_dvr_off','game_fullscreen_opt','game_mouse_accel','game_nagle_off','exp_show_extensions','exp_open_this_pc','exp_classic_menu','exp_compact_view','maint_sfc','maint_dism','maint_defrag','maint_restore_point'],
-        privacy: ['priv_telemetry','priv_cortana','priv_activity_history','priv_ad_id','priv_location','priv_diagnostic_data','priv_tailored_exp','priv_feedback','priv_start_suggestions','priv_lock_screen_tips','svc_diagtrack','svc_dmwappush','tb_hide_widgets','tb_hide_chat','tb_hide_copilot','net_disable_6to4','maint_restore_point'],
-        minimal: ['clean_temp','clean_recycle','clean_thumbnail','clean_dns_cache','perf_disable_tips','perf_startup_delay','perf_menu_delay','tb_hide_search','tb_hide_widgets','tb_hide_chat','tb_hide_copilot','exp_show_extensions','exp_open_this_pc','vis_dark_mode','vis_dark_apps','maint_restore_point']
-    };
-
-    if (presets[preset]) {
-        presets[preset].forEach(k => { state.toggles[k] = true; trackChange(k, true); });
-    }
-    renderSection(state.currentSection);
-    alert('✅ Preset aplicado: ' + { balanced: 'Equilibrado', max_performance: 'Máximo Rendimiento', privacy: 'Máxima Privacidad', minimal: 'Mínimo y Limpio' }[preset]);
-}
-
-
-// ==========================================
-// SCRIPT GENERATORS
-// ==========================================
-function generateBat() {
-    let s = `@echo off
-chcp 65001 >nul
-title ═══════ LENOVOTUNER PRO — Optimizador Integral ═══════
-color 0A
-echo.
-echo  ╔══════════════════════════════════════════════════════════╗
-echo  ║                                                          ║
-echo  ║        LENOVOTUNER PRO — Optimizador Integral            ║
-echo  ║        Lenovo IdeaPad — Intel Core i3                    ║
-echo  ║                                                          ║
-echo  ╚══════════════════════════════════════════════════════════╝
-echo.
-
-:: Verificar Administrador
-net session >nul 2>&1
-if %errorlevel% neq 0 (
-    echo [ERROR] Se requieren permisos de ADMINISTRADOR.
-    echo Clic derecho -^> Ejecutar como administrador.
-    pause & exit /b 1
-)
-echo [OK] Permisos de administrador verificados.
-echo [INFO] Fecha: %date% — Hora: %time%
-echo.
-`;
-
-    if (state.toggles['maint_restore_point']) s += `
-echo ══════════════════════════════════════════════
-echo   Creando punto de restauracion...
-echo ══════════════════════════════════════════════
-PowerShell -Command "Checkpoint-Computer -Description 'LenovoTuner_Backup' -RestorePointType 'MODIFY_SETTINGS'" 2>nul
-echo [OK] Punto de restauracion creado.
-`;
-
-    // Performance
-    if (state.toggles['perf_sysmain']) s += `\necho [*] Desactivando SysMain...\nsc config "SysMain" start= disabled >nul 2>&1\nsc stop "SysMain" >nul 2>&1\necho [OK] SysMain desactivado.\n`;
-    if (state.toggles['perf_prefetch']) s += `\necho [*] Desactivando Prefetch...\nreg add "HKLM\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Memory Management\\PrefetchParameters" /v EnablePrefetcher /t REG_DWORD /d 0 /f >nul\nreg add "HKLM\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Memory Management\\PrefetchParameters" /v EnableSuperfetch /t REG_DWORD /d 0 /f >nul\necho [OK] Prefetch desactivado.\n`;
-    if (state.toggles['perf_indexing']) s += `\necho [*] Desactivando Windows Search Indexing...\nsc config "WSearch" start= disabled >nul 2>&1\nsc stop "WSearch" >nul 2>&1\necho [OK] Indexacion desactivada.\n`;
-    if (state.toggles['perf_visual']) s += `\necho [*] Optimizando efectos visuales...\nreg add "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\VisualEffects" /v VisualFXSetting /t REG_DWORD /d 2 /f >nul\nreg add "HKCU\\Control Panel\\Desktop\\WindowMetrics" /v MinAnimate /t REG_SZ /d "0" /f >nul\nreg add "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced" /v TaskbarAnimations /t REG_DWORD /d 0 /f >nul\necho [OK] Efectos visuales optimizados.\n`;
-    if (state.toggles['perf_transparency']) s += `\necho [*] Desactivando transparencias...\nreg add "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize" /v EnableTransparency /t REG_DWORD /d 0 /f >nul\necho [OK] Transparencias desactivadas.\n`;
-    if (state.toggles['perf_startup_delay']) s += `\necho [*] Eliminando retraso de inicio...\nreg add "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Serialize" /v StartupDelayInMSec /t REG_DWORD /d 0 /f >nul\necho [OK] Retraso de inicio eliminado.\n`;
-    if (state.toggles['perf_menu_delay']) s += `\necho [*] Reduciendo delay de menus...\nreg add "HKCU\\Control Panel\\Desktop" /v MenuShowDelay /t REG_SZ /d "${state.sliders['perf_menu_speed'] || 50}" /f >nul\necho [OK] Delay de menus: ${state.sliders['perf_menu_speed'] || 50}ms.\n`;
-    if (state.toggles['perf_disable_tips']) s += `\necho [*] Desactivando tips de Windows...\nreg add "HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows\\CloudContent" /v DisableSoftLanding /t REG_DWORD /d 1 /f >nul\nreg add "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager" /v SubscribedContent-338389Enabled /t REG_DWORD /d 0 /f >nul\necho [OK] Tips desactivados.\n`;
-    if (state.toggles['perf_priority_cpu']) s += `\necho [*] Priorizando programas en primer plano...\nreg add "HKLM\\SYSTEM\\CurrentControlSet\\Control\\PriorityControl" /v Win32PrioritySeparation /t REG_DWORD /d 38 /f >nul\necho [OK] CPU prioriza primer plano.\n`;
-    if (state.toggles['perf_ntfs_disable_last']) s += `\necho [*] Desactivando ultimo acceso NTFS...\nfsutil behavior set disablelastaccess 1 >nul\necho [OK] Ultimo acceso NTFS desactivado.\n`;
-
-    // Cleanup
-    if (state.toggles['clean_temp']) s += `\necho [*] Limpiando archivos temporales...\ndel /q /f /s "%TEMP%\\*" 2>nul\ndel /q /f /s "C:\\Windows\\Temp\\*" 2>nul\ndel /q /f /s "C:\\Windows\\Prefetch\\*" 2>nul\necho [OK] Temporales limpiados.\n`;
-    if (state.toggles['clean_recycle']) s += `\necho [*] Vaciando papelera...\nrd /s /q C:\\$Recycle.Bin 2>nul\necho [OK] Papelera vaciada.\n`;
-    if (state.toggles['clean_update_cache']) s += `\necho [*] Limpiando cache de Windows Update...\nnet stop wuauserv >nul 2>&1\ndel /q /f /s "C:\\Windows\\SoftwareDistribution\\Download\\*" 2>nul\nnet start wuauserv >nul 2>&1\necho [OK] Cache de Update limpiada.\n`;
-    if (state.toggles['clean_thumbnail']) s += `\necho [*] Limpiando cache de miniaturas...\ndel /f /s /q "%LocalAppData%\\Microsoft\\Windows\\Explorer\\thumbcache_*.db" 2>nul\necho [OK] Miniaturas limpiadas.\n`;
-    if (state.toggles['clean_logs']) s += `\necho [*] Limpiando logs del sistema...\nfor /F "tokens=*" %%G in ('wevtutil el') do wevtutil cl "%%G" 2>nul\necho [OK] Logs limpiados.\n`;
-    if (state.toggles['clean_dns_cache']) s += `\necho [*] Limpiando cache DNS...\nipconfig /flushdns >nul\necho [OK] Cache DNS limpiada.\n`;
-    if (state.toggles['clean_bloatware']) s += `\necho [*] Removiendo bloatware...\nPowerShell -Command "Get-AppxPackage *3dbuilder* | Remove-AppxPackage" 2>nul\nPowerShell -Command "Get-AppxPackage *getstarted* | Remove-AppxPackage" 2>nul\nPowerShell -Command "Get-AppxPackage *solitairecollection* | Remove-AppxPackage" 2>nul\nPowerShell -Command "Get-AppxPackage *bingfinance* | Remove-AppxPackage" 2>nul\nPowerShell -Command "Get-AppxPackage *bingnews* | Remove-AppxPackage" 2>nul\nPowerShell -Command "Get-AppxPackage *bingsports* | Remove-AppxPackage" 2>nul\nPowerShell -Command "Get-AppxPackage *bingweather* | Remove-AppxPackage" 2>nul\nPowerShell -Command "Get-AppxPackage *zunevideo* | Remove-AppxPackage" 2>nul\nPowerShell -Command "Get-AppxPackage *zunemusic* | Remove-AppxPackage" 2>nul\nPowerShell -Command "Get-AppxPackage *xboxapp* | Remove-AppxPackage" 2>nul\nPowerShell -Command "Get-AppxPackage *officehub* | Remove-AppxPackage" 2>nul\nPowerShell -Command "Get-AppxPackage *skypeapp* | Remove-AppxPackage" 2>nul\nPowerShell -Command "Get-AppxPackage *windowsmaps* | Remove-AppxPackage" 2>nul\nPowerShell -Command "Get-AppxPackage *clipchamp* | Remove-AppxPackage" 2>nul\necho [OK] Bloatware removido.\n`;
-
-    // Network
-    if (state.toggles['net_flush_dns']) s += `\necho [*] Flush DNS...\nipconfig /flushdns >nul\nipconfig /registerdns >nul\necho [OK] DNS renovado.\n`;
-    if (state.toggles['net_reset_winsock']) s += `\necho [*] Reseteando Winsock...\nnetsh winsock reset >nul\necho [OK] Winsock reseteado.\n`;
-    if (state.toggles['net_reset_tcpip']) s += `\necho [*] Reseteando TCP/IP...\nnetsh int ip reset >nul\necho [OK] TCP/IP reseteado.\n`;
-    if (state.toggles['net_disable_nagle']) s += `\necho [*] Desactivando Nagle...\nreg add "HKLM\\SOFTWARE\\Microsoft\\MSMQ\\Parameters" /v TCPNoDelay /t REG_DWORD /d 1 /f >nul\necho [OK] Nagle desactivado.\n`;
-    if (state.toggles['net_qos_disable']) s += `\necho [*] Liberando ancho de banda QoS...\nreg add "HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows\\Psched" /v NonBestEffortLimit /t REG_DWORD /d 0 /f >nul\necho [OK] QoS al 0%%.\n`;
-    if (state.toggles['net_disable_autotuning']) s += `\necho [*] Desactivando Auto-Tuning...\nnetsh int tcp set global autotuninglevel=disabled >nul\necho [OK] Auto-Tuning desactivado.\n`;
-    const dnsMap = { google: ['8.8.8.8','8.8.4.4'], cloudflare: ['1.1.1.1','1.0.0.1'], quad9: ['9.9.9.9','149.112.112.112'], opendns: ['208.67.222.222','208.67.220.220'] };
-    const dns = state.selects['net_dns_provider'] || 'cloudflare';
-    const adapter = state.selects['net_adapter'] === 'ethernet' ? 'Ethernet' : 'Wi-Fi';
-    if (dns !== 'default') {
-        const d = dnsMap[dns];
-        s += `\necho [*] Configurando DNS ${dns}...\nnetsh interface ip set dns "${adapter}" static ${d[0]} primary >nul\nnetsh interface ip add dns "${adapter}" ${d[1]} index=2 >nul\necho [OK] DNS configurado: ${d[0]} / ${d[1]}.\n`;
-    }
-
-    // Power
-    if (state.toggles['pwr_high_perf']) s += `\necho [*] Activando plan de alto rendimiento...\npowercfg /setactive 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c >nul 2>&1\necho [OK] Plan alto rendimiento activado.\n`;
-    if (state.toggles['pwr_hibernate_off']) s += `\necho [*] Desactivando hibernacion...\npowercfg /hibernate off >nul\necho [OK] Hibernacion desactivada.\n`;
-    if (state.toggles['pwr_fast_startup']) s += `\necho [*] Desactivando inicio rapido...\nreg add "HKLM\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Power" /v HiberbootEnabled /t REG_DWORD /d 0 /f >nul\necho [OK] Inicio rapido desactivado.\n`;
-    if (state.toggles['pwr_usb_suspend_off']) s += `\necho [*] Desactivando USB Selective Suspend...\npowercfg /SETACVALUEINDEX SCHEME_CURRENT 2a737441-1930-4402-8d77-b2bebba308a3 48e6b7a6-50f5-4782-a5d4-53bb8f07e226 0 >nul\npowercfg /SETACTIVE SCHEME_CURRENT >nul\necho [OK] USB Suspend desactivado.\n`;
-
-    // Privacy
-    if (state.toggles['priv_telemetry']) s += `\necho [*] Desactivando telemetria...\nreg add "HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows\\DataCollection" /v AllowTelemetry /t REG_DWORD /d 0 /f >nul\nsc config "DiagTrack" start= disabled >nul 2>&1\nsc stop "DiagTrack" >nul 2>&1\necho [OK] Telemetria desactivada.\n`;
-    if (state.toggles['priv_cortana']) s += `\necho [*] Desactivando Cortana...\nreg add "HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows\\Windows Search" /v AllowCortana /t REG_DWORD /d 0 /f >nul\necho [OK] Cortana desactivada.\n`;
-    if (state.toggles['priv_activity_history']) s += `\necho [*] Desactivando historial de actividad...\nreg add "HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows\\System" /v EnableActivityFeed /t REG_DWORD /d 0 /f >nul\nreg add "HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows\\System" /v PublishUserActivities /t REG_DWORD /d 0 /f >nul\necho [OK] Historial desactivado.\n`;
-    if (state.toggles['priv_ad_id']) s += `\necho [*] Desactivando ID de publicidad...\nreg add "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\AdvertisingInfo" /v Enabled /t REG_DWORD /d 0 /f >nul\necho [OK] Ad ID desactivado.\n`;
-    if (state.toggles['priv_location']) s += `\necho [*] Desactivando ubicacion...\nreg add "HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows\\LocationAndSensors" /v DisableLocation /t REG_DWORD /d 1 /f >nul\necho [OK] Ubicacion desactivada.\n`;
-    if (state.toggles['priv_diagnostic_data']) s += `\necho [*] Datos de diagnostico minimos...\nreg add "HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\DataCollection" /v AllowTelemetry /t REG_DWORD /d 0 /f >nul\necho [OK] Diagnostico al minimo.\n`;
-    if (state.toggles['priv_tailored_exp']) s += `\necho [*] Desactivando experiencias personalizadas...\nreg add "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Privacy" /v TailoredExperiencesWithDiagnosticDataEnabled /t REG_DWORD /d 0 /f >nul\necho [OK] Experiencias personalizadas desactivadas.\n`;
-    if (state.toggles['priv_feedback']) s += `\necho [*] Desactivando feedback...\nreg add "HKCU\\Software\\Microsoft\\Siuf\\Rules" /v NumberOfSIUFInPeriod /t REG_DWORD /d 0 /f >nul\necho [OK] Feedback desactivado.\n`;
-    if (state.toggles['priv_start_suggestions']) s += `\necho [*] Desactivando sugerencias en Inicio...\nreg add "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager" /v SubscribedContent-338388Enabled /t REG_DWORD /d 0 /f >nul\nreg add "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager" /v SystemPaneSuggestionsEnabled /t REG_DWORD /d 0 /f >nul\necho [OK] Sugerencias desactivadas.\n`;
-    if (state.toggles['priv_lock_screen_tips']) s += `\necho [*] Desactivando tips en lock screen...\nreg add "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager" /v RotatingLockScreenOverlayEnabled /t REG_DWORD /d 0 /f >nul\necho [OK] Tips de lock screen desactivados.\n`;
-
-    // Taskbar
-    if (state.toggles['tb_hide_search']) s += `\necho [*] Ocultando busqueda de barra de tareas...\nreg add "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Search" /v SearchboxTaskbarMode /t REG_DWORD /d 0 /f >nul\necho [OK] Busqueda ocultada.\n`;
-    if (state.toggles['tb_hide_task_view']) s += `\necho [*] Ocultando Vista de tareas...\nreg add "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced" /v ShowTaskViewButton /t REG_DWORD /d 0 /f >nul\necho [OK] Vista de tareas ocultada.\n`;
-    if (state.toggles['tb_hide_widgets']) s += `\necho [*] Ocultando Widgets...\nreg add "HKLM\\SOFTWARE\\Policies\\Microsoft\\Dsh" /v AllowNewsAndInterests /t REG_DWORD /d 0 /f >nul\necho [OK] Widgets ocultados.\n`;
-    if (state.toggles['tb_hide_chat']) s += `\necho [*] Ocultando Chat...\nreg add "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced" /v TaskbarMn /t REG_DWORD /d 0 /f >nul\necho [OK] Chat ocultado.\n`;
-    if (state.toggles['tb_hide_copilot']) s += `\necho [*] Ocultando Copilot...\nreg add "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced" /v ShowCopilotButton /t REG_DWORD /d 0 /f >nul\necho [OK] Copilot ocultado.\n`;
-    const tbAlign = state.selects['tb_alignment'];
-    if (tbAlign === 'left') s += `\necho [*] Alineando iconos a la izquierda...\nreg add "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced" /v TaskbarAl /t REG_DWORD /d 0 /f >nul\necho [OK] Iconos alineados a la izquierda.\n`;
-
-    // Explorer
-    if (state.toggles['exp_show_extensions']) s += `\necho [*] Mostrando extensiones de archivo...\nreg add "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced" /v HideFileExt /t REG_DWORD /d 0 /f >nul\necho [OK] Extensiones visibles.\n`;
-    if (state.toggles['exp_show_hidden']) s += `\necho [*] Mostrando archivos ocultos...\nreg add "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced" /v Hidden /t REG_DWORD /d 1 /f >nul\necho [OK] Archivos ocultos visibles.\n`;
-    if (state.toggles['exp_open_this_pc']) s += `\necho [*] Abriendo explorador en Este equipo...\nreg add "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced" /v LaunchTo /t REG_DWORD /d 1 /f >nul\necho [OK] Explorador abre en Este equipo.\n`;
-    if (state.toggles['exp_classic_menu']) s += `\necho [*] Activando menu contextual clasico (Win11)...\nreg add "HKCU\\Software\\Classes\\CLSID\\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\\InprocServer32" /f /ve >nul 2>&1\necho [OK] Menu clasico activado.\n`;
-    if (state.toggles['exp_disable_recent']) s += `\necho [*] Desactivando archivos recientes...\nreg add "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer" /v ShowRecent /t REG_DWORD /d 0 /f >nul\necho [OK] Recientes desactivados.\n`;
-    if (state.toggles['exp_disable_frequent']) s += `\necho [*] Desactivando carpetas frecuentes...\nreg add "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer" /v ShowFrequent /t REG_DWORD /d 0 /f >nul\necho [OK] Frecuentes desactivados.\n`;
-
-    // Visual
-    if (state.toggles['vis_dark_mode']) s += `\necho [*] Activando modo oscuro del sistema...\nreg add "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize" /v SystemUsesLightTheme /t REG_DWORD /d 0 /f >nul\necho [OK] Modo oscuro del sistema activado.\n`;
-    if (state.toggles['vis_dark_apps']) s += `\necho [*] Activando modo oscuro en apps...\nreg add "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize" /v AppsUseLightTheme /t REG_DWORD /d 0 /f >nul\necho [OK] Modo oscuro en apps activado.\n`;
-    if (state.toggles['vis_show_extensions']) s += `\nreg add "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced" /v HideFileExt /t REG_DWORD /d 0 /f >nul\n`;
-    if (state.toggles['vis_enhance_pointer'] === false && state.toggles['vis_enhance_pointer'] !== undefined) s += `\necho [*] Desactivando aceleracion del mouse...\nreg add "HKCU\\Control Panel\\Mouse" /v MouseSpeed /t REG_SZ /d "0" /f >nul\nreg add "HKCU\\Control Panel\\Mouse" /v MouseThreshold1 /t REG_SZ /d "0" /f >nul\nreg add "HKCU\\Control Panel\\Mouse" /v MouseThreshold2 /t REG_SZ /d "0" /f >nul\necho [OK] Aceleracion del mouse desactivada.\n`;
-
-    // Services
-    if (state.toggles['svc_diagtrack']) s += `\nsc config "DiagTrack" start= disabled >nul 2>&1 & sc stop "DiagTrack" >nul 2>&1\n`;
-    if (state.toggles['svc_dmwappush']) s += `\nsc config "dmwappushservice" start= disabled >nul 2>&1 & sc stop "dmwappushservice" >nul 2>&1\n`;
-    if (state.toggles['svc_xbox']) s += `\necho [*] Desactivando servicios Xbox...\nsc config "XblAuthManager" start= disabled >nul 2>&1\nsc config "XblGameSave" start= disabled >nul 2>&1\nsc config "XboxGipSvc" start= disabled >nul 2>&1\nsc config "XboxNetApiSvc" start= disabled >nul 2>&1\necho [OK] Servicios Xbox desactivados.\n`;
-    if (state.toggles['svc_maps']) s += `\nsc config "MapsBroker" start= disabled >nul 2>&1 & sc stop "MapsBroker" >nul 2>&1\n`;
-    if (state.toggles['svc_fax']) s += `\nsc config "Fax" start= disabled >nul 2>&1\n`;
-    if (state.toggles['svc_print_spooler']) s += `\nsc config "Spooler" start= disabled >nul 2>&1 & sc stop "Spooler" >nul 2>&1\n`;
-    if (state.toggles['svc_remote_registry']) s += `\nsc config "RemoteRegistry" start= disabled >nul 2>&1 & sc stop "RemoteRegistry" >nul 2>&1\n`;
-
-    // Gaming
-    if (state.toggles['game_mode']) s += `\necho [*] Activando Game Mode...\nreg add "HKCU\\Software\\Microsoft\\GameBar" /v AllowAutoGameMode /t REG_DWORD /d 1 /f >nul\necho [OK] Game Mode activado.\n`;
-    if (state.toggles['game_dvr_off']) s += `\necho [*] Desactivando Game DVR...\nreg add "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\GameDVR" /v AppCaptureEnabled /t REG_DWORD /d 0 /f >nul\nreg add "HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows\\GameDVR" /v AllowGameDVR /t REG_DWORD /d 0 /f >nul\necho [OK] Game DVR desactivado.\n`;
-    if (state.toggles['game_fullscreen_opt']) s += `\necho [*] Desactivando optimizacion pantalla completa...\nreg add "HKCU\\System\\GameConfigStore" /v GameDVR_FSEBehaviorMode /t REG_DWORD /d 2 /f >nul\nreg add "HKCU\\System\\GameConfigStore" /v GameDVR_FSEBehavior /t REG_DWORD /d 2 /f >nul\necho [OK] Optimizacion fullscreen desactivada.\n`;
-    if (state.toggles['game_mouse_accel']) s += `\necho [*] Desactivando aceleracion del mouse (gaming)...\nreg add "HKCU\\Control Panel\\Mouse" /v MouseSpeed /t REG_SZ /d "0" /f >nul\nreg add "HKCU\\Control Panel\\Mouse" /v MouseThreshold1 /t REG_SZ /d "0" /f >nul\nreg add "HKCU\\Control Panel\\Mouse" /v MouseThreshold2 /t REG_SZ /d "0" /f >nul\necho [OK] Aceleracion del mouse desactivada.\n`;
-
-    // Maintenance
-    if (state.toggles['maint_dism']) s += `\necho [*] Ejecutando DISM...\nDISM /Online /Cleanup-Image /RestoreHealth\necho [OK] DISM completado.\n`;
-    if (state.toggles['maint_sfc']) s += `\necho [*] Ejecutando SFC...\nsfc /scannow\necho [OK] SFC completado.\n`;
-    if (state.toggles['maint_defrag']) s += `\necho [*] Optimizando disco...\ndefrag C: /O\necho [OK] Disco optimizado.\n`;
-
-    s += `
-echo.
-echo ══════════════════════════════════════════════════════════
-echo.
-echo   ✅ OPTIMIZACION COMPLETADA — LenovoTuner Pro
-echo   Dispositivo: Lenovo IdeaPad i3
-echo   Fecha: %date%
-echo.
-echo   Reinicia tu laptop para aplicar todos los cambios.
-echo.
-echo ══════════════════════════════════════════════════════════
-echo.
-set /p r="¿Reiniciar ahora? (S/N): "
-if /i "%r%"=="S" (shutdown /r /t 10 /c "Reiniciando — LenovoTuner Pro")
-pause
-`;
-    return s;
-}
-
-function generateReg() {
-    let s = `Windows Registry Editor Version 5.00
-
-; ═══════════════════════════════════════════
-; LenovoTuner Pro — Archivo de Registro
-; Lenovo IdeaPad — Intel Core i3
-; ═══════════════════════════════════════════
-
-`;
-    if (state.toggles['perf_visual'] || state.toggles['vis_disable_anim']) s += `; Optimizar efectos visuales\n[HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\VisualEffects]\n"VisualFXSetting"=dword:00000002\n\n[HKEY_CURRENT_USER\\Control Panel\\Desktop\\WindowMetrics]\n"MinAnimate"="0"\n\n[HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced]\n"TaskbarAnimations"=dword:00000000\n\n`;
-    if (state.toggles['perf_transparency'] || state.toggles['vis_disable_transparency']) s += `; Desactivar transparencias\n[HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize]\n"EnableTransparency"=dword:00000000\n\n`;
-    if (state.toggles['perf_menu_delay']) s += `; Reducir delay de menus\n[HKEY_CURRENT_USER\\Control Panel\\Desktop]\n"MenuShowDelay"="${state.sliders['perf_menu_speed'] || 50}"\n\n`;
-    if (state.toggles['vis_dark_mode']) s += `; Modo oscuro sistema\n[HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize]\n"SystemUsesLightTheme"=dword:00000000\n\n`;
-    if (state.toggles['vis_dark_apps']) s += `; Modo oscuro apps\n[HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize]\n"AppsUseLightTheme"=dword:00000000\n\n`;
-    if (state.toggles['priv_telemetry']) s += `; Desactivar telemetria\n[HKEY_LOCAL_MACHINE\\SOFTWARE\\Policies\\Microsoft\\Windows\\DataCollection]\n"AllowTelemetry"=dword:00000000\n\n`;
-    if (state.toggles['priv_cortana']) s += `; Desactivar Cortana\n[HKEY_LOCAL_MACHINE\\SOFTWARE\\Policies\\Microsoft\\Windows\\Windows Search]\n"AllowCortana"=dword:00000000\n\n`;
-    if (state.toggles['priv_ad_id']) s += `; Desactivar Ad ID\n[HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\AdvertisingInfo]\n"Enabled"=dword:00000000\n\n`;
-    if (state.toggles['tb_hide_search']) s += `; Ocultar busqueda\n[HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Search]\n"SearchboxTaskbarMode"=dword:00000000\n\n`;
-    if (state.toggles['tb_hide_task_view']) s += `; Ocultar vista de tareas\n[HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced]\n"ShowTaskViewButton"=dword:00000000\n\n`;
-    if (state.toggles['exp_show_extensions']) s += `; Mostrar extensiones\n[HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced]\n"HideFileExt"=dword:00000000\n\n`;
-    if (state.toggles['exp_open_this_pc']) s += `; Abrir en Este equipo\n[HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced]\n"LaunchTo"=dword:00000001\n\n`;
-    if (state.toggles['exp_classic_menu']) s += `; Menu contextual clasico Win11\n[HKEY_CURRENT_USER\\Software\\Classes\\CLSID\\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\\InprocServer32]\n@=""\n\n`;
-    if (state.toggles['game_dvr_off']) s += `; Desactivar Game DVR\n[HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\GameDVR]\n"AppCaptureEnabled"=dword:00000000\n\n[HKEY_LOCAL_MACHINE\\SOFTWARE\\Policies\\Microsoft\\Windows\\GameDVR]\n"AllowGameDVR"=dword:00000000\n\n`;
-    return s;
-}
-
-function generatePS1() {
-    let s = `# ═══════════════════════════════════════════
-# LenovoTuner Pro — PowerShell Script
-# Lenovo IdeaPad — Intel Core i3
-# Ejecutar como Administrador
-# ═══════════════════════════════════════════
-
-# Verificar Admin
-if (-NOT ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
-    Write-Host "[ERROR] Ejecuta PowerShell como Administrador" -ForegroundColor Red
-    exit
-}
-
-Write-Host "═══════════════════════════════════════════" -ForegroundColor Cyan
-Write-Host "  LenovoTuner Pro — Optimizador Integral" -ForegroundColor Cyan
-Write-Host "═══════════════════════════════════════════" -ForegroundColor Cyan
-Write-Host ""
-
-`;
-    if (state.toggles['maint_restore_point']) s += `Write-Host "[*] Creando punto de restauracion..." -ForegroundColor Yellow\nCheckpoint-Computer -Description "LenovoTuner_Backup" -RestorePointType "MODIFY_SETTINGS" -ErrorAction SilentlyContinue\nWrite-Host "[OK] Punto de restauracion creado." -ForegroundColor Green\n\n`;
-    if (state.toggles['clean_bloatware']) s += `# Remover Bloatware\nWrite-Host "[*] Removiendo bloatware..." -ForegroundColor Yellow\n$bloatware = @("*3dbuilder*","*getstarted*","*solitairecollection*","*bingfinance*","*bingnews*","*bingsports*","*bingweather*","*zunevideo*","*zunemusic*","*xboxapp*","*officehub*","*skypeapp*","*windowsmaps*","*clipchamp*","*todos*","*feedback*")\nforeach ($app in $bloatware) {\n    Get-AppxPackage $app | Remove-AppxPackage -ErrorAction SilentlyContinue\n}\nWrite-Host "[OK] Bloatware removido." -ForegroundColor Green\n\n`;
-    if (state.toggles['priv_telemetry']) s += `# Desactivar telemetria\nWrite-Host "[*] Desactivando telemetria..." -ForegroundColor Yellow\nSet-ItemProperty -Path "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\DataCollection" -Name "AllowTelemetry" -Value 0 -Type DWord -Force\nStop-Service "DiagTrack" -Force -ErrorAction SilentlyContinue\nSet-Service "DiagTrack" -StartupType Disabled\nWrite-Host "[OK] Telemetria desactivada." -ForegroundColor Green\n\n`;
-    if (state.toggles['perf_sysmain']) s += `# Desactivar SysMain\nWrite-Host "[*] Desactivando SysMain..." -ForegroundColor Yellow\nStop-Service "SysMain" -Force -ErrorAction SilentlyContinue\nSet-Service "SysMain" -StartupType Disabled\nWrite-Host "[OK] SysMain desactivado." -ForegroundColor Green\n\n`;
-    if (state.toggles['clean_temp']) s += `# Limpiar temporales\nWrite-Host "[*] Limpiando archivos temporales..." -ForegroundColor Yellow\nRemove-Item -Path "$env:TEMP\\*" -Recurse -Force -ErrorAction SilentlyContinue\nRemove-Item -Path "C:\\Windows\\Temp\\*" -Recurse -Force -ErrorAction SilentlyContinue\nWrite-Host "[OK] Temporales limpiados." -ForegroundColor Green\n\n`;
-    s += `\nWrite-Host ""\nWrite-Host "═══════════════════════════════════════════" -ForegroundColor Green\nWrite-Host "  Optimizacion completada — LenovoTuner Pro" -ForegroundColor Green\nWrite-Host "  Reinicia para aplicar todos los cambios." -ForegroundColor Yellow\nWrite-Host "═══════════════════════════════════════════" -ForegroundColor Green\nRead-Host "Presiona Enter para salir"\n`;
-    return s;
-}
-
-function generateAHK() {
-    let s = `; ═══════════════════════════════════════════
-; LenovoTuner Pro — AutoHotkey Keybinds
-; Requiere: AutoHotkey v2.0+
-; https://www.autohotkey.com/
-; ═══════════════════════════════════════════
-
-#Requires AutoHotkey v2.0
-#SingleInstance Force
-
-; ─── Atajos del Sistema ───
-`;
-    const ahkMap = {
-        'kb_screenshot': { action: 'Send "{PrintScreen}"', desc: 'Captura de pantalla' },
-        'kb_task_manager': { action: 'Run "taskmgr.exe"', desc: 'Abrir Task Manager' },
-        'kb_run_dialog': { action: 'Send "#r"', desc: 'Diálogo Ejecutar' },
-        'kb_file_explorer': { action: 'Run "explorer.exe"', desc: 'Explorador de archivos' },
-        'kb_cmd_admin': { action: 'Run "*RunAs cmd.exe"', desc: 'CMD como Admin' },
-        'kb_desktop': { action: 'Send "#d"', desc: 'Mostrar escritorio' },
-        'kb_vol_up': { action: 'Send "{Volume_Up}"', desc: 'Subir volumen' },
-        'kb_vol_down': { action: 'Send "{Volume_Down}"', desc: 'Bajar volumen' },
-        'kb_vol_mute': { action: 'Send "{Volume_Mute}"', desc: 'Silenciar' },
-        'kb_play_pause': { action: 'Send "{Media_Play_Pause}"', desc: 'Play/Pausa' },
-        'kb_custom1': { action: 'Run "calc.exe"', desc: 'Abrir Calculadora' },
-        'kb_custom2': { action: 'Run "notepad.exe"', desc: 'Abrir Bloc de notas' },
-    };
-
-    Object.entries(state.keybinds).forEach(([id, combo]) => {
-        const info = ahkMap[id];
-        if (!info) return;
-        let ahkCombo = combo.replace(/Ctrl/g, '^').replace(/Alt/g, '!').replace(/Shift/g, '+').replace(/Win/g, '#').replace(/ \+ /g, '').replace(/Escape/g, 'Escape').replace(/Space/g, 'Space');
-        // Handle single letter keys
-        ahkCombo = ahkCombo.replace(/([A-Z])$/, (m) => m.toLowerCase());
-        s += `; ${info.desc}\n${ahkCombo}:: {\n    ${info.action}\n}\n\n`;
+function renderMonLive(){
+    const m=S.monitor;
+    ['cpu','ram','temp','disk'].forEach(k=>{
+        const el=document.getElementById('mon-'+k);if(!el)return;
+        const vals={cpu:{p:m.cpu,c:m.cpu>80?'#ef4444':m.cpu>50?'#f59e0b':'#22c55e',l:'CPU',v:m.cpu+'%'},ram:{p:m.ram,c:m.ram>85?'#ef4444':m.ram>60?'#f59e0b':'#3b82f6',l:'RAM',v:m.ram+'%'},temp:{p:m.temp,c:m.temp>80?'#ef4444':m.temp>60?'#f59e0b':'#22c55e',l:'TEMP',v:m.temp+'°C'},disk:{p:m.disk,c:'#8b5cf6',l:'DISCO',v:m.disk+'%'}};
+        const d=vals[k];el.innerHTML=gauge(d.p,d.c,d.l,d.v,120);
     });
+    const r=document.getElementById('mon-rpm');if(r)r.textContent=m.fanRPM+' RPM';
+    const u=document.getElementById('mon-up');if(u)u.textContent=m.uptime;
+    const n=document.getElementById('mon-net');if(n)n.textContent=m.network+' MB/s';
+}
+function updFanLive(){const r=document.getElementById('fan-rpm');if(r)r.textContent=S.monitor.fanRPM;const t=document.getElementById('fan-temp');if(t)t.textContent=S.monitor.temp+'°C';}
+function updDashLive(){
+    const m=S.monitor;
+    const c=document.getElementById('dash-cpu');if(c)c.innerHTML=gauge(m.cpu,m.cpu>80?'#ef4444':m.cpu>50?'#f59e0b':'#22c55e','CPU',m.cpu+'%');
+    const r=document.getElementById('dash-ram');if(r)r.innerHTML=gauge(m.ram,m.ram>85?'#ef4444':'#3b82f6','RAM',m.ram+'%');
+    const t=document.getElementById('dash-temp');if(t)t.innerHTML=gauge(m.temp,m.temp>75?'#ef4444':'#22c55e','TEMP',m.temp+'°C');
+    const f=document.getElementById('dash-fan');if(f)f.textContent=m.fanRPM;
+}
 
-    s += `; ─── Notificación de inicio ───\nToolTip "LenovoTuner Keybinds activos!"\nSetTimer () => ToolTip(), -2000\n`;
+// ======================== RENDER ========================
+function render(id){
+    const fns={dashboard:pDash,monitor:pMon,fans:pFans,performance:pPerf,cleanup:pClean,network:pNet,power:pPow,startup:pStart,gaming:pGame,keybinds:pKeys,visual:pVis,taskbar:pTask,explorer:pExp,sound:pSnd,privacy:pPriv,services:pSvc,updates:pUpd,security:pSec,maintenance:pMaint,terminal:pTerm,profiles:pProf,about:pAbout};
+    document.getElementById('content').innerHTML=(fns[id]||pDash)();
+    if(id==='fans')initFanCanvas();
+}
+
+// ======================== DASHBOARD ========================
+function pDash(){
+    const hw=S.hw;
+    const gpuShort=hw.gpu?hw.gpu.replace(/ANGLE \(|,.*|\)/g,'').substring(0,40):'No detectada';
+    return `
+    <!-- HW Detection -->
+    <div class="hw-badge p-4 mb-5 slide-up">
+        <div class="flex items-center justify-between flex-wrap gap-3">
+            <div class="flex items-center gap-3">
+                <div class="text-3xl">${hw.os==='Windows'?'🖥️':hw.os==='macOS'?'🍎':hw.os==='Linux'?'🐧':hw.os==='Android'?'🤖':'📱'}</div>
+                <div>
+                    <h3 class="font-bold text-white text-base">${hw.brand} ${hw.model||''}</h3>
+                    <p class="text-xs text-gray-400">${hw.osVer||hw.os} · ${hw.arch} · ${hw.cores} núcleos${hw.ram?' · '+hw.ram+'GB RAM':''}</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3 flex-wrap">
+                ${hw.battery?`<div class="flex items-center gap-1.5 bg-slate-800/50 px-3 py-1.5 rounded-lg"><span class="text-sm">${hw.charging?'🔌':'🔋'}</span><span class="text-xs font-bold ${hw.batteryLevel<20?'text-red-400':hw.batteryLevel<50?'text-amber-400':'text-green-400'}">${hw.batteryLevel}%</span></div>`:''}
+                <div class="flex items-center gap-1.5 bg-slate-800/50 px-3 py-1.5 rounded-lg"><span class="text-sm">🖥️</span><span class="text-xs text-gray-300">${hw.screenW}×${hw.screenH}</span></div>
+                ${hw.connection?`<div class="flex items-center gap-1.5 bg-slate-800/50 px-3 py-1.5 rounded-lg"><span class="text-sm">📡</span><span class="text-xs text-gray-300">${hw.connection}</span></div>`:''}
+            </div>
+        </div>
+        <div class="mt-3 flex flex-wrap gap-2">
+            <span class="text-[10px] bg-blue-900/30 text-blue-300 px-2 py-0.5 rounded-full border border-blue-800/30">GPU: ${gpuShort}</span>
+            <span class="text-[10px] bg-green-900/30 text-green-300 px-2 py-0.5 rounded-full border border-green-800/30">🛡️ Defender: Intacto</span>
+            ${hw.touchscreen?'<span class="text-[10px] bg-purple-900/30 text-purple-300 px-2 py-0.5 rounded-full border border-purple-800/30">👆 Touch</span>':''}
+        </div>
+    </div>
+
+    <!-- Live gauges -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
+        <div class="card p-3 flex flex-col items-center" id="dash-cpu">${gauge(S.monitor.cpu,'#22c55e','CPU',S.monitor.cpu+'%')}</div>
+        <div class="card p-3 flex flex-col items-center" id="dash-ram">${gauge(S.monitor.ram,'#3b82f6','RAM',S.monitor.ram+'%')}</div>
+        <div class="card p-3 flex flex-col items-center" id="dash-temp">${gauge(S.monitor.temp,'#22c55e','TEMP',S.monitor.temp+'°C')}</div>
+        <div class="card p-3 flex flex-col items-center">
+            <p class="text-3xl mb-1">🌀</p>
+            <p class="font-black text-white text-xl" id="dash-fan">${S.monitor.fanRPM}</p>
+            <p class="text-[10px] text-gray-500">RPM</p>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="grid md:grid-cols-2 gap-4 mb-5">
+        <div class="card p-5">
+            ${hdr('🚀','Presets Rápidos','Optimización con 1 clic para tu '+hw.brand)}
+            <div class="space-y-2">
+                <button onclick="applyPreset('balanced')" class="w-full text-left bg-blue-900/12 hover:bg-blue-900/25 border border-blue-800/15 rounded-xl p-3 transition-all cursor-pointer group"><div class="flex items-center justify-between"><div><p class="font-bold text-blue-300 text-sm">⚖️ Equilibrado</p><p class="text-[10px] text-gray-500">Uso diario. Estable + rápido.</p></div><span class="text-blue-500 group-hover:translate-x-1 transition-transform">→</span></div></button>
+                <button onclick="applyPreset('max')" class="w-full text-left bg-amber-900/12 hover:bg-amber-900/25 border border-amber-800/15 rounded-xl p-3 transition-all cursor-pointer group"><div class="flex items-center justify-between"><div><p class="font-bold text-amber-300 text-sm">🔥 Máximo Rendimiento</p><p class="text-[10px] text-gray-500">100% potencia. Gaming y trabajo pesado.</p></div><span class="text-amber-500 group-hover:translate-x-1 transition-transform">→</span></div></button>
+                <button onclick="applyPreset('privacy')" class="w-full text-left bg-green-900/12 hover:bg-green-900/25 border border-green-800/15 rounded-xl p-3 transition-all cursor-pointer group"><div class="flex items-center justify-between"><div><p class="font-bold text-green-300 text-sm">🛡️ Máxima Privacidad</p><p class="text-[10px] text-gray-500">Sin telemetría ni tracking.</p></div><span class="text-green-500 group-hover:translate-x-1 transition-transform">→</span></div></button>
+                <button onclick="applyPreset('silent')" class="w-full text-left bg-purple-900/12 hover:bg-purple-900/25 border border-purple-800/15 rounded-xl p-3 transition-all cursor-pointer group"><div class="flex items-center justify-between"><div><p class="font-bold text-purple-300 text-sm">🤫 Silencioso</p><p class="text-[10px] text-gray-500">Ventiladores mínimos.</p></div><span class="text-purple-500 group-hover:translate-x-1 transition-transform">→</span></div></button>
+                <button onclick="applyPreset('battery')" class="w-full text-left bg-cyan-900/12 hover:bg-cyan-900/25 border border-cyan-800/15 rounded-xl p-3 transition-all cursor-pointer group"><div class="flex items-center justify-between"><div><p class="font-bold text-cyan-300 text-sm">🔋 Ahorro de Batería</p><p class="text-[10px] text-gray-500">Máxima duración de batería.</p></div><span class="text-cyan-500 group-hover:translate-x-1 transition-transform">→</span></div></button>
+            </div>
+        </div>
+        <div>
+            <div class="card p-5 mb-3">
+                ${hdr('🛡️','Windows Defender','Estado de protección')}
+                <div class="bg-green-900/10 border border-green-800/20 rounded-xl p-4 text-center mb-3">
+                    <p class="text-4xl mb-1">🛡️</p>
+                    <p class="font-bold text-green-400 text-sm">PROTEGIDO</p>
+                    <p class="text-[10px] text-gray-500 mt-1">Defender está activo y no será modificado</p>
+                </div>
+                <p class="text-[11px] text-green-300/80">✅ PCTuner Pro <strong>nunca</strong> toca Windows Defender. Tu seguridad es prioritaria.</p>
+            </div>
+            <div class="card p-4 border-l-4 border-l-amber-500">
+                <div class="flex items-start gap-2"><span class="text-lg">⚠️</span><div><h4 class="font-bold text-amber-300 text-xs">Antes de ejecutar</h4><ul class="text-[10px] text-gray-400 mt-1 space-y-0.5"><li>• Se crea punto de restauración</li><li>• Ejecutar como Administrador</li><li>• Algunos cambios requieren reinicio</li></ul></div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Execute button -->
+    <div class="card p-5 text-center">
+        <p class="text-sm text-gray-400 mb-3">Configura las opciones en cada sección y luego:</p>
+        <div class="flex justify-center gap-3 flex-wrap">
+            <button onclick="openExec()" class="btn btn-green px-8 py-3 text-sm flex items-center gap-2">▶ Ejecutar Optimizaciones</button>
+            <button onclick="openExport()" class="btn btn-blue px-6 py-3 text-sm flex items-center gap-2">📦 Exportar Script</button>
+        </div>
+        <p class="text-[10px] text-gray-600 mt-2">${changeCount} opciones configuradas</p>
+    </div>`;
+}
+
+// ======================== MONITOR ========================
+function pMon(){
+    const m=S.monitor;
+    return `${hdr('📊','Monitor del Sistema','Métricas en tiempo real de tu '+S.hw.brand)}
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
+        <div class="card p-4 flex flex-col items-center" id="mon-cpu">${gauge(m.cpu,'#22c55e','CPU',m.cpu+'%',120)}</div>
+        <div class="card p-4 flex flex-col items-center" id="mon-ram">${gauge(m.ram,'#3b82f6','RAM',m.ram+'%',120)}</div>
+        <div class="card p-4 flex flex-col items-center" id="mon-temp">${gauge(m.temp,'#22c55e','TEMP',m.temp+'°C',120)}</div>
+        <div class="card p-4 flex flex-col items-center" id="mon-disk">${gauge(m.disk,'#8b5cf6','DISCO',m.disk+'%',120)}</div>
+    </div>
+    <div class="grid md:grid-cols-4 gap-3">
+        <div class="stat-box p-3 flex items-center gap-2"><span class="text-xl">🌀</span><div><p class="text-[10px] text-gray-500">Fan</p><p class="font-bold text-white" id="mon-rpm">${m.fanRPM} RPM</p></div></div>
+        <div class="stat-box p-3 flex items-center gap-2"><span class="text-xl">⏱️</span><div><p class="text-[10px] text-gray-500">Uptime</p><p class="font-bold text-white" id="mon-up">${m.uptime}</p></div></div>
+        <div class="stat-box p-3 flex items-center gap-2"><span class="text-xl">🌐</span><div><p class="text-[10px] text-gray-500">Red</p><p class="font-bold text-white" id="mon-net">${m.network} MB/s</p></div></div>
+        <div class="stat-box p-3 flex items-center gap-2"><span class="text-xl">💻</span><div><p class="text-[10px] text-gray-500">Equipo</p><p class="font-bold text-white text-xs">${S.hw.brand} · ${S.hw.cores} cores</p></div></div>
+    </div>`;
+}
+
+// ======================== FANS ========================
+function pFans(){
+    const fp=S.fanProfile;
+    return `${hdr('🌀','Control de Ventiladores','Configura velocidad y curva')}
+    <div class="card p-3 mb-4 border-l-4 border-l-cyan-500"><p class="text-[11px] text-cyan-200">💡 Usa NBFC o el software de tu marca (${S.hw.brand}). El script configura todo automáticamente. <strong>Defender intacto.</strong></p></div>
+    <div class="grid grid-cols-2 gap-3 mb-5">
+        <div class="stat-box p-4 text-center"><p class="text-[10px] text-gray-500 mb-1">RPM</p><p class="text-2xl font-black text-white" id="fan-rpm">${S.monitor.fanRPM}</p></div>
+        <div class="stat-box p-4 text-center"><p class="text-[10px] text-gray-500 mb-1">CPU Temp</p><p class="text-2xl font-black text-white" id="fan-temp">${S.monitor.temp}°C</p></div>
+    </div>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-2.5 mb-5">
+        ${['silent','balanced','performance','custom'].map(p=>{
+            const i={silent:{n:'Silencioso',d:'Mínimo ruido',r:'~1500'},balanced:{n:'Equilibrado',d:'Balance ideal',r:'~2800'},performance:{n:'Rendimiento',d:'Máx frío',r:'~4200'},custom:{n:'Custom',d:'Tu curva',r:'Variable'}};
+            const fc={silent:'fan-slow',balanced:'fan-med',performance:'fan-fast',custom:'fan-med'};
+            const d=i[p];
+            return `<button onclick="setFanP('${p}')" class="card p-3 text-center cursor-pointer ${fp===p?'active-card':''}"><div class="text-2xl mb-1 ${fp===p?(fc[p]||''):''}">🌀</div><p class="font-bold text-white text-[11px]">${d.n}</p><p class="text-[9px] text-gray-500">${d.d}</p><p class="text-[9px] text-blue-400 code-font mt-0.5">${d.r}</p></button>`;
+        }).join('')}
+    </div>
+    ${divider('Curva Personalizada')}
+    <div class="card p-4 mb-4">
+        <div class="flex items-center justify-between mb-2"><p class="font-semibold text-white text-sm">Temp → Velocidad</p><button onclick="resetFC()" class="text-[10px] text-blue-400 hover:text-blue-300 cursor-pointer px-2 py-1 bg-blue-900/30 rounded-lg border border-blue-800/40">↺ Reset</button></div>
+        <div class="fan-canvas-box p-2" style="height:220px" id="fanWrap"><canvas id="fanCanvas" width="600" height="200"></canvas></div>
+        <div class="grid grid-cols-5 gap-2 mt-2" id="fanInputs"></div>
+    </div>
+    ${divider('Config')}${grid(`
+        ${sli('fan_min','Vel mínima','RPM mínimas',0,50,10,'%')}
+        ${sli('fan_max','Vel máxima','RPM máximas',50,100,100,'%')}
+        ${tog('fan_smart','Modo inteligente','Ajusta según carga',true,'low')}
+        ${sel('fan_tool','Herramienta','Software de control',[{v:'nbfc',l:'NBFC'},{v:'brand',l:'Software de '+S.hw.brand},{v:'ps',l:'PowerShell'}],'nbfc')}
+    `)}`;
+}
+function setFanP(p){S.fanProfile=p;track('fan_profile',p);const curves={silent:[{t:30,s:8},{t:45,s:18},{t:60,s:30},{t:75,s:50},{t:90,s:65}],balanced:[{t:30,s:10},{t:45,s:25},{t:60,s:50},{t:75,s:80},{t:90,s:100}],performance:[{t:30,s:30},{t:45,s:50},{t:60,s:70},{t:75,s:90},{t:90,s:100}]};if(curves[p])S.fanCurve=curves[p];render('fans');}
+function resetFC(){S.fanCurve=[{t:30,s:10},{t:45,s:25},{t:60,s:50},{t:75,s:80},{t:90,s:100}];render('fans');}
+function initFanCanvas(){const c=document.getElementById('fanCanvas'),w=document.getElementById('fanWrap');if(!c||!w)return;c.width=w.clientWidth-16;c.height=200;drawFC();updFI();}
+function drawFC(){const c=document.getElementById('fanCanvas');if(!c)return;const ctx=c.getContext('2d'),w=c.width,h=c.height,p=32;ctx.clearRect(0,0,w,h);ctx.strokeStyle='rgba(59,130,246,0.06)';ctx.lineWidth=1;for(let i=0;i<=10;i++){const x=p+(w-p*2)*i/10;ctx.beginPath();ctx.moveTo(x,8);ctx.lineTo(x,h-p);ctx.stroke();const y=8+(h-p-8)*i/10;ctx.beginPath();ctx.moveTo(p,y);ctx.lineTo(w-p,y);ctx.stroke();}ctx.fillStyle='#475569';ctx.font='9px Inter';for(let t=30;t<=90;t+=15){const x=p+(t-20)/80*(w-p*2);ctx.fillText(t+'°',x-6,h-p+13);}for(let s=0;s<=100;s+=25){const y=h-p-s/100*(h-p-8);ctx.fillText(s+'%',2,y+3);}const pts=S.fanCurve.map(pt=>({x:p+(pt.t-20)/80*(w-p*2),y:h-p-pt.s/100*(h-p-8)}));ctx.beginPath();ctx.moveTo(pts[0].x,h-p);pts.forEach(pt=>ctx.lineTo(pt.x,pt.y));ctx.lineTo(pts[pts.length-1].x,h-p);ctx.closePath();const g=ctx.createLinearGradient(0,0,0,h);g.addColorStop(0,'rgba(59,130,246,0.12)');g.addColorStop(1,'rgba(59,130,246,0)');ctx.fillStyle=g;ctx.fill();ctx.beginPath();pts.forEach((pt,i)=>i===0?ctx.moveTo(pt.x,pt.y):ctx.lineTo(pt.x,pt.y));ctx.strokeStyle='#3b82f6';ctx.lineWidth=2;ctx.stroke();pts.forEach((pt,i)=>{ctx.beginPath();ctx.arc(pt.x,pt.y,5,0,Math.PI*2);ctx.fillStyle='#3b82f6';ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=1.5;ctx.stroke();ctx.fillStyle='#e2e8f0';ctx.font='bold 8px Inter';ctx.fillText(S.fanCurve[i].t+'°→'+S.fanCurve[i].s+'%',pt.x-15,pt.y-10);});}
+function updFI(){const d=document.getElementById('fanInputs');if(!d)return;d.innerHTML=S.fanCurve.map((pt,i)=>`<div class="stat-box p-1.5 text-center"><p class="text-[8px] text-gray-600 mb-0.5">P${i+1}</p><div class="flex items-center gap-0.5 justify-center"><input type="number" value="${pt.t}" min="20" max="100" class="w-9 bg-slate-900 border border-slate-700 rounded px-0.5 py-0.5 text-[9px] text-center text-white" onchange="updFP(${i},'t',this.value)"><span class="text-gray-600 text-[8px]">→</span><input type="number" value="${pt.s}" min="0" max="100" class="w-9 bg-slate-900 border border-slate-700 rounded px-0.5 py-0.5 text-[9px] text-center text-white" onchange="updFP(${i},'s',this.value)"><span class="text-gray-600 text-[8px]">%</span></div></div>`).join('');}
+function updFP(i,k,v){S.fanCurve[i][k]=parseInt(v);track('fan_curve','custom');S.fanProfile='custom';drawFC();updFI();}
+
+// ======================== PAGES ========================
+function pPerf(){return `${hdr('⚡','Rendimiento','Optimiza CPU, RAM y disco para tu '+S.hw.brand+' ('+S.hw.cores+' núcleos)')}${grid(`
+    ${tog('p_sysmain','Desactivar SysMain','Libera RAM y disco',true,'med')}
+    ${tog('p_prefetch','Desactivar Prefetch','Reduce escrituras',false,'med')}
+    ${tog('p_indexing','Desactivar Windows Search','Reduce CPU/disco',true,'low')}
+    ${tog('p_visual','Optimizar efectos visuales','Sin animaciones',true,'low')}
+    ${tog('p_transparency','Sin transparencias','Reduce carga GPU',true,'low')}
+    ${tog('p_startup_delay','Sin delay de inicio','Menú inicio rápido',true,'low')}
+    ${tog('p_menu_delay','Menús rápidos','Menús contextuales ágiles',true,'low')}
+    ${tog('p_tips','Sin tips Windows','Sin notificaciones',true,'low')}
+    ${tog('p_cpu_priority','Priorizar primer plano','Más CPU a ventana activa',true,'low')}
+    ${tog('p_ntfs_last','Desactivar último acceso NTFS','Reduce escrituras',true,'low')}
+    ${tog('p_core_parking','Sin Core Parking','Todos los ${S.hw.cores} núcleos activos',false,'med')}
+    ${tog('p_timer_res','Alta resolución timer','Mejor precisión',false,'med')}
+    ${tog('p_split','Optimizar umbral RAM','Mejor gestión memoria',false,'med')}
+    ${tog('p_cache','Optimizar caché sistema','Cache para laptops',false,'med')}
+`)}`;}
+
+function pClean(){return `${hdr('🧹','Limpieza','Elimina archivos innecesarios')}${grid(`
+    ${tog('c_temp','Limpiar temporales','%TEMP%, Prefetch',true,'low')}
+    ${tog('c_recycle','Vaciar papelera','Elimina archivos',true,'low')}
+    ${tog('c_update','Caché de Updates','Borra updates instalados',true,'med')}
+    ${tog('c_thumb','Miniaturas','Cache thumbnails',true,'low')}
+    ${tog('c_logs','Logs del sistema','Logs antiguos',true,'low')}
+    ${tog('c_dns','Caché DNS','Renueva DNS',true,'low')}
+    ${tog('c_bloatware','Remover bloatware','Apps preinstaladas',false,'high')}
+    ${tog('c_delivery','Delivery Optimization','Archivos de updates',true,'low')}
+    ${tog('c_error','Reportes de error','Windows Error Reports',true,'low')}
+    ${tog('c_font','Caché de fuentes','Repara fuentes',false,'low')}
+`)}`;}
+
+function pNet(){return `${hdr('🌐','Red e Internet','Optimiza tu conexión')}${grid(`
+    ${tog('n_flush','Flush DNS','Limpia caché DNS',true,'low')}
+    ${tog('n_winsock','Reset Winsock','Restablece red',false,'med')}
+    ${tog('n_tcpip','Reset TCP/IP','Reinicia config',false,'med')}
+    ${tog('n_nagle','Desactivar Nagle','Reduce latencia',false,'med')}
+    ${tog('n_qos','Sin QoS reservado','Libera ancho de banda',true,'low')}
+    ${tog('n_autotuning','Sin Auto-Tuning','Estabiliza WiFi',false,'med')}
+    ${tog('n_rss','Activar RSS','Receive Side Scaling',true,'low')}
+    ${tog('n_offload','Task Offload','Descarga a NIC',true,'low')}
+`)}${divider('DNS')}${grid(`
+    ${sel('n_dns','DNS','Proveedor rápido',[{v:'default',l:'ISP (auto)'},{v:'google',l:'Google 8.8.8.8'},{v:'cloudflare',l:'Cloudflare 1.1.1.1'},{v:'quad9',l:'Quad9 9.9.9.9'}],'cloudflare')}
+    ${sel('n_adapter','Adaptador','Conexión principal',[{v:'wifi',l:'Wi-Fi'},{v:'ethernet',l:'Ethernet'}],'wifi')}
+`)}`;}
+
+function pPow(){return `${hdr('🔋','Energía','Plan de energía'+(S.hw.battery?' · Batería '+S.hw.batteryLevel+'%':''))}${grid(`
+    ${tog('pw_high','Plan Alto Rendimiento','Energía máxima',true,'low')}
+    ${tog('pw_hibernate','Sin hibernación','Libera ~4GB disco',true,'low')}
+    ${tog('pw_fast_start','Sin inicio rápido','Inicio limpio',false,'low')}
+    ${tog('pw_usb','Sin USB Suspend','No apagar USB',true,'low')}
+    ${tog('pw_disk','Nunca apagar disco','Evita lag',true,'low')}
+    ${tog('pw_cpu_max','CPU 100% siempre','Máx rendimiento',false,'med')}
+`)}${divider('Tiempos')}${grid(`
+    ${sli('pw_screen_ac','Pantalla (AC)','Min para apagar',0,60,15,' min')}
+    ${sli('pw_screen_dc','Pantalla (batería)','Min para apagar',0,30,5,' min')}
+    ${sli('pw_sleep_ac','Suspender (AC)','0=nunca',0,120,30,' min')}
+    ${sli('pw_sleep_dc','Suspender (batería)','Minutos',0,60,15,' min')}
+`)}`;}
+
+function pStart(){return `${hdr('🚀','Arranque','Control de inicio')}${grid(`
+    ${tog('b_delay','Sin delay apps','Inicio rápido',true,'low')}
+    ${tog('b_numlock','NumLock auto','Activa NumLock',true,'low')}
+    ${tog('b_verbose','Boot verbose','Detalles en boot',false,'low')}
+`)}${divider('Apps de Inicio')}${grid(`
+    ${tog('b_onedrive','Sin OneDrive','No abrir al inicio',true,'low')}
+    ${tog('b_teams','Sin Teams','No abrir al inicio',true,'low')}
+    ${tog('b_edge','Sin Edge precarga','No precargar',true,'low')}
+    ${tog('b_spotify','Sin Spotify','No abrir al inicio',true,'low')}
+    ${tog('b_discord','Sin Discord','No abrir al inicio',false,'low')}
+    ${tog('b_cortana','Sin Cortana','No iniciar',true,'low')}
+    ${tog('b_adobe','Sin Adobe updater','Sin actualizador',true,'low')}
+    ${tog('b_skype','Sin Skype','No abrir al inicio',true,'low')}
+`)}`;}
+
+function pGame(){return `${hdr('🎮','Gaming','Optimiza FPS y latencia')}${grid(`
+    ${tog('g_mode','Game Mode','Prioriza juegos',true,'low')}
+    ${tog('g_dvr','Sin Game DVR','Sin grabación fondo',true,'low')}
+    ${tog('g_fullscreen','Sin opt fullscreen','Puede mejorar FPS',true,'low')}
+    ${tog('g_mouse','Sin aceleración mouse','Movimiento 1:1',true,'low')}
+    ${tog('g_nagle','Sin Nagle gaming','Reduce ping',true,'med')}
+    ${tog('g_hpet','Sin HPET','Mejor rendimiento',false,'high')}
+    ${tog('g_throttle','Sin Power Throttling','CPU no baja',true,'low')}
+    ${tog('g_notif','Sin notif en juegos','Bloquea popups',true,'low')}
+    ${tog('g_xbox','Sin Xbox Game Bar','Libera recursos',true,'low')}
+    ${tog('g_standby','Limpiar Standby RAM','Libera RAM periódica',false,'med')}
+`)}${divider('GPU')}${grid(`
+    ${sel('g_gpu_sched','GPU Scheduling','Hardware scheduling',[{v:'off',l:'Off'},{v:'on',l:'On'}],'on')}
+    ${sel('g_gpu_mode','Modo GPU','Preferencia',[{v:'balanced',l:'Equilibrado'},{v:'high',l:'Alto rendimiento'}],'high')}
+`)}`;}
+
+function pKeys(){return `${hdr('⌨️','Keybinds','Clic en campo y presiona teclas')}
+    <div class="card p-3 mb-4 border-l-4 border-l-amber-500"><p class="text-[11px] text-amber-200">💡 Genera un script <strong>AutoHotkey</strong> con tus atajos. Exporta como .AHK.</p></div>
+    ${divider('Sistema')}${grid(`
+    ${kb('k_screenshot','Screenshot','Captura pantalla','Win + Shift + S')}
+    ${kb('k_taskmgr','Task Manager','Admin tareas','Ctrl + Shift + Escape')}
+    ${kb('k_run','Ejecutar','Diálogo ejecutar','Win + R')}
+    ${kb('k_explorer','Explorador','Abrir archivos','Win + E')}
+    ${kb('k_cmd','Terminal Admin','CMD admin','Ctrl + Shift + T')}
+    ${kb('k_desktop','Escritorio','Mostrar escritorio','Win + D')}
+    ${kb('k_close','Cerrar ventana','Cerrar activa','Alt + F4')}
+    ${kb('k_minimize','Minimizar todo','Minimiza todo','Win + M')}
+    `)}${divider('Multimedia')}${grid(`
+    ${kb('k_vol_up','Vol +','Subir volumen','Ctrl + Up')}
+    ${kb('k_vol_down','Vol -','Bajar volumen','Ctrl + Down')}
+    ${kb('k_mute','Silenciar','Toggle mute','Ctrl + M')}
+    ${kb('k_play','Play/Pausa','Multimedia','Ctrl + Space')}
+    `)}${divider('Apps')}${grid(`
+    ${kb('k_calc','Calculadora','Abrir calc','Ctrl + Alt + C')}
+    ${kb('k_notepad','Notepad','Bloc notas','Ctrl + Alt + N')}
+    ${kb('k_lock','Bloquear','Lock screen','Win + L')}
+    ${kb('k_browser','Navegador','Abrir browser','Ctrl + Alt + B')}
+    `)}`;}
+
+function pVis(){return `${hdr('🎨','Visual y UI','Personaliza Windows')}${grid(`
+    ${tog('v_dark','Modo oscuro sistema','Tema oscuro',true,'low')}
+    ${tog('v_dark_apps','Modo oscuro apps','Apps oscuras',true,'low')}
+    ${tog('v_no_anim','Sin animaciones','Más rápido',true,'low')}
+    ${tog('v_no_trans','Sin transparencias','Menos GPU',true,'low')}
+    ${tog('v_no_shadow','Sin sombras','Sin sombras ventanas',false,'low')}
+    ${tog('v_ext','Mostrar extensiones','.exe .jpg visibles',true,'low')}
+    ${tog('v_smooth_font','Suavizado fuentes','ClearType',true,'low')}
+    ${tog('v_wallpaper','Wallpaper HD','Sin compresión',true,'low')}
+`)}${divider('Cursor')}${grid(`
+    ${sli('v_cursor','Velocidad cursor','Mouse speed',1,20,10,'')}
+    ${tog('v_no_accel','Sin aceleración mouse','1:1 para gaming',false,'low')}
+`)}`;}
+
+function pTask(){return `${hdr('📌','Barra de Tareas','Configura taskbar')}${grid(`
+    ${tog('t_search','Ocultar búsqueda','Sin barra búsqueda',true,'low')}
+    ${tog('t_taskview','Sin Vista tareas','Sin botón',true,'low')}
+    ${tog('t_widgets','Sin Widgets','Sin widgets Win11',true,'low')}
+    ${tog('t_chat','Sin Chat/Teams','Sin ícono',true,'low')}
+    ${tog('t_copilot','Sin Copilot','Sin botón Copilot',true,'low')}
+    ${tog('t_small','Iconos pequeños','Más compacto',false,'low')}
+    ${tog('t_never_combine','No combinar','Ventanas separadas',false,'low')}
+    ${tog('t_tray','Todos los iconos','Bandeja visible',false,'low')}
+`)}${divider('Posición')}${grid(`
+    ${sel('t_align','Alineación Win11','Posición iconos',[{v:'center',l:'Centro'},{v:'left',l:'Izquierda'}],'left')}
+`)}`;}
+
+function pExp(){return `${hdr('📁','Explorador','Personaliza explorador')}${grid(`
+    ${tog('e_ext','Extensiones visibles','Muestra extensiones',true,'low')}
+    ${tog('e_hidden','Archivos ocultos','Muestra ocultos',true,'low')}
+    ${tog('e_thispc','Abrir en Este PC','No en Recientes',true,'low')}
+    ${tog('e_classic','Menú clásico Win11','Sin "Mostrar más"',true,'low')}
+    ${tog('e_no_recent','Sin recientes','No mostrar',true,'low')}
+    ${tog('e_full_path','Ruta completa','En barra título',true,'low')}
+    ${tog('e_compact','Vista compacta','Menos espacio Win11',true,'low')}
+    ${tog('e_no_ads','Sin anuncios','Sin tips explorer',true,'low')}
+`)}`;}
+
+function pSnd(){return `${hdr('🔊','Sonido','Config audio')}${grid(`
+    ${tog('s_no_startup','Sin sonido inicio','Silencia Windows',true,'low')}
+    ${tog('s_no_notif','Sin sonido notif','Notif silenciosas',false,'low')}
+    ${tog('s_exclusive','Modo exclusivo off','Apps no toman control',false,'med')}
+    ${tog('s_comms','Sin reducción comms','No baja vol en llamadas',true,'low')}
+    ${tog('s_loudness','Ecualización','Normaliza volumen',false,'low')}
+`)}${divider('Formato')}${grid(`
+    ${sli('s_vol','Volumen default','Vol al iniciar',0,100,50,'%')}
+    ${sel('s_format','Formato audio','Calidad',[{v:'16_44',l:'16bit 44.1kHz'},{v:'16_48',l:'16bit 48kHz'},{v:'24_48',l:'24bit 48kHz'},{v:'24_96',l:'24bit 96kHz Hi-Res'}],'16_48')}
+`)}`;}
+
+function pPriv(){return `${hdr('🛡️','Privacidad','Controla telemetría')}
+    <div class="card p-3 mb-4 border-l-4 border-l-green-500"><p class="text-[11px] text-green-200">✅ <strong>Defender NO se toca.</strong> Solo telemetría y tracking.</p></div>
+    ${grid(`
+    ${tog('pr_telemetry','Sin telemetría','Bloquea diagnósticos',true,'med')}
+    ${tog('pr_cortana','Sin Cortana','Deshabilita Cortana',true,'low')}
+    ${tog('pr_activity','Sin historial','No guardar actividad',true,'low')}
+    ${tog('pr_ad_id','Sin ID publicidad','Sin anuncios personalizados',true,'low')}
+    ${tog('pr_location','Sin ubicación','No compartir',true,'low')}
+    ${tog('pr_diag','Diagnóstico mínimo','Solo obligatorio',true,'low')}
+    ${tog('pr_feedback','Sin feedback','No pedir opiniones',true,'low')}
+    ${tog('pr_suggestions','Sin sugerencias','Sin apps sugeridas',true,'low')}
+    ${tog('pr_lockscreen','Sin tips lock','Sin anuncios bloqueo',true,'low')}
+    ${tog('pr_timeline','Sin Timeline','Sin línea tiempo',true,'low')}
+    ${tog('pr_clipboard','Sin sync clipboard','No sincronizar',true,'low')}
+    ${tog('pr_input','Sin datos escritura','No enviar typing',true,'low')}
+`)}`;}
+
+function pSvc(){return `${hdr('⚙️','Servicios','Desactiva innecesarios')}
+    <div class="card p-3 mb-4 border-l-4 border-l-red-500"><p class="text-[11px] text-red-200">⚠️ <strong>Defender NO incluido.</strong> Solo servicios seguros.</p></div>
+    ${grid(`
+    ${tog('sv_diagtrack','DiagTrack','Telemetría principal',true,'med')}
+    ${tog('sv_dmwap','dmwappushservice','Telemetría WAP',true,'med')}
+    ${tog('sv_sysmain','SysMain','Pre-carga RAM',true,'med')}
+    ${tog('sv_wsearch','Windows Search','Indexación',true,'med')}
+    ${tog('sv_xbox','Servicios Xbox','Xbox services',true,'low')}
+    ${tog('sv_maps','Mapas','Mapas offline',true,'low')}
+    ${tog('sv_fax','Fax','Servicio fax',true,'low')}
+    ${tog('sv_print','Impresión','Solo si usas impresora',false,'med')}
+    ${tog('sv_remote','Registro remoto','Acceso remoto',true,'low')}
+    ${tog('sv_phone','PhoneSvc','Teléfono',true,'low')}
+    ${tog('sv_retail','RetailDemo','Demo tienda',true,'low')}
+    ${tog('sv_wallet','WalletService','Billetera',true,'low')}
+`)}`;}
+
+function pUpd(){return `${hdr('🔄','Windows Update','Control de actualizaciones')}${grid(`
+    ${tog('wu_no_restart','Sin reinicio auto','No reiniciar sin permiso',true,'low')}
+    ${tog('wu_no_driver','Sin actualizar drivers','Windows no toca drivers',false,'med')}
+    ${tog('wu_no_feature','Sin Feature Updates','Bloquea 22H2/23H2',false,'high')}
+    ${tog('wu_metered','Conexión medida','Reduce descargas',false,'med')}
+    ${tog('wu_no_peer','Sin P2P updates','No compartir',true,'low')}
+    ${tog('wu_notify','Solo notificar','No descargar auto',false,'med')}
+    ${tog('wu_no_store','Sin auto-update Store','Store no actualiza',false,'low')}
+`)}${divider('Horas Activas')}${grid(`
+    ${sli('wu_start','Inicio','Hora inicio (24h)',0,23,8,'h')}
+    ${sli('wu_end','Fin','Hora fin (24h)',0,23,23,'h')}
+`)}`;}
+
+function pSec(){return `${hdr('🔒','Seguridad','Config seguridad')}
+    <div class="bg-green-900/10 border border-green-800/20 rounded-xl p-3 mb-4 flex items-center gap-2"><span class="text-2xl">🛡️</span><div><p class="font-bold text-green-400 text-xs">Defender PROTEGIDO</p><p class="text-[10px] text-gray-400">NO se modifica ni desactiva Windows Defender.</p></div></div>
+    ${grid(`
+    ${tog('sec_smb1','Sin SMBv1','Protocolo vulnerable',true,'low')}
+    ${tog('sec_remote','Sin Escritorio Remoto','Si no lo usas',true,'low')}
+    ${tog('sec_assist','Sin Asistencia Remota','Si no lo usas',true,'low')}
+    ${tog('sec_autoplay','Sin AutoPlay','No ejecutar USB auto',true,'low')}
+    ${tog('sec_netbios','Sin NetBIOS','Legacy protocol',true,'low')}
+    ${tog('sec_null','Restringir sesiones nulas','Bloquea anónimo',true,'low')}
+    ${tog('sec_lm','Sin LM Hash','Hash más seguro',true,'low')}
+    ${tog('sec_wpad','Sin WPAD','Sin proxy auto',true,'low')}
+`)}`;}
+
+function pMaint(){return `${hdr('🔧','Mantenimiento','Reparación del sistema')}${grid(`
+    ${tog('m_sfc','SFC /scannow','Repara archivos sistema',true,'low')}
+    ${tog('m_dism','DISM RestoreHealth','Repara imagen Windows',true,'low')}
+    ${tog('m_chkdsk','Verificar disco','Busca errores',false,'med')}
+    ${tog('m_defrag','Optimizar disco','Desfrag HDD / TRIM SSD',true,'low')}
+    ${tog('m_restore','Punto de restauración','Crear antes de cambios',true,'low')}
+    ${tog('m_logs','Limpiar logs','Borra registros eventos',false,'low')}
+    ${tog('m_store','Reset Store','Repara Microsoft Store',false,'low')}
+    ${tog('m_network','Reset red completo','Reinstala adaptadores',false,'med')}
+    ${tog('m_winsxs','Limpiar WinSxS','Componentes obsoletos',false,'med')}
+    ${tog('m_icon','Rebuild iconos','Repara iconos corruptos',false,'low')}
+`)}`;}
+
+function pTerm(){return `${hdr('💻','Terminal','Ejecuta comandos')}
+    <div class="terminal mb-4"><div class="terminal-header"><div class="flex gap-1.5"><div class="w-3 h-3 bg-red-500 rounded-full"></div><div class="w-3 h-3 bg-yellow-500 rounded-full"></div><div class="w-3 h-3 bg-green-500 rounded-full"></div></div><span class="text-gray-400 text-xs ml-2">PCTuner Terminal · ${S.hw.brand}</span></div>
+    <div class="terminal-body" id="termBody" style="min-height:180px"><p class="text-green-400">PCTuner Pro v5 — ${S.hw.brand} ${S.hw.os}</p><p class="text-gray-500 text-[10px] mt-1">Simulación. Exporta el script para ejecutar en tu PC.</p><p class="text-green-400 mt-2">C:\\PCTuner> <span class="animate-pulse">_</span></p></div></div>
+    <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
+        ${[['sfc /scannow','🔍','SFC Scan','Verificar archivos'],['ipconfig /flushdns','🌐','Flush DNS','Limpiar DNS'],['systeminfo','💻','System Info','Info del sistema'],['cleanmgr','🧹','Limpieza','Disk Cleanup'],['powercfg /batteryreport','🔋','Batería','Salud batería'],['netsh wlan show profiles','📡','WiFi','Redes guardadas']].map(([cmd,ico,name,desc])=>`<button onclick="termRun('${cmd}')" class="card p-3 text-center cursor-pointer hover:border-blue-500/20"><p class="text-xl mb-0.5">${ico}</p><p class="font-bold text-white text-[11px]">${name}</p><p class="text-[9px] text-gray-500">${desc}</p></button>`).join('')}
+    </div>`;}
+
+function termRun(cmd){
+    const el=document.getElementById('termBody');if(!el)return;
+    const outs={'sfc /scannow':'Examen del sistema...\n[=========100%=========]\nArchivos verificados correctamente.','ipconfig /flushdns':'Cache DNS vaciado correctamente.','systeminfo':`Nombre: ${S.hw.brand}\nSO: ${S.hw.osVer||S.hw.os}\nArquitectura: ${S.hw.arch}\nNucleos: ${S.hw.cores}\nRAM: ${S.hw.ram||'?'}GB\nGPU: ${S.hw.gpu?S.hw.gpu.substring(0,50):'N/A'}\nPantalla: ${S.hw.screenW}x${S.hw.screenH}`,'cleanmgr':'Analizando C:\\\nTemp: 2.1 GB\nPapelera: 650 MB\nTotal: 2.7 GB liberados.','powercfg /batteryreport':`Batería: ${S.hw.battery?S.hw.batteryLevel+'%':'No detectada'}\nCargando: ${S.hw.charging?'Sí':'No'}\nSalud estimada: 87%`,'netsh wlan show profiles':'Perfiles WiFi:\n    MiRed_5G\n    CafeGratis\n    MOVISTAR_4521'};
+    const out=outs[cmd]||'Ejecutado correctamente.';
+    el.innerHTML+=`<p class="text-cyan-400 mt-2">C:\\PCTuner> <span class="text-white">${cmd}</span></p>`;
+    out.split('\n').forEach((l,i)=>{setTimeout(()=>{el.innerHTML+=`<p class="text-green-400 terminal-line" style="animation-delay:${i*0.04}s">${l}</p>`;el.scrollTop=el.scrollHeight;},i*100);});
+    setTimeout(()=>{el.innerHTML+=`<p class="text-green-400 mt-1">C:\\PCTuner> <span class="animate-pulse">_</span></p>`;el.scrollTop=el.scrollHeight;},out.split('\n').length*100+150);
+}
+
+function pProf(){return `${hdr('💾','Perfiles','Guarda configuraciones')}
+    <div class="grid md:grid-cols-2 gap-3 mb-4">
+        <div class="card p-4"><h4 class="font-bold text-white text-sm mb-2">💾 Guardar</h4><input type="text" id="profName" placeholder="Nombre..." class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm mb-2 focus:border-blue-500 focus:outline-none text-white"><button onclick="saveProf()" class="w-full btn btn-blue py-2 text-sm">Guardar</button></div>
+        <div class="card p-4"><h4 class="font-bold text-white text-sm mb-2">📂 Import/Export</h4><div class="flex gap-2"><button onclick="expJSON()" class="flex-1 btn btn-green py-2 text-sm">📤 Export</button><label class="flex-1 btn btn-blue py-2 text-sm text-center cursor-pointer">📥 Import<input type="file" accept=".json" class="hidden" onchange="impJSON(event)"></label></div></div>
+    </div>`;}
+function saveProf(){const n=document.getElementById('profName')?.value?.trim();if(!n)return;const p=JSON.parse(localStorage.getItem('pct_profiles')||'{}');p[n]={toggles:{...S.toggles},sliders:{...S.sliders},selects:{...S.selects},keybinds:{...S.keybinds},fanCurve:[...S.fanCurve],fanProfile:S.fanProfile};localStorage.setItem('pct_profiles',JSON.stringify(p));alert('✅ Perfil "'+n+'" guardado!');}
+function expJSON(){dl('pctuner_config.json',JSON.stringify({toggles:S.toggles,sliders:S.sliders,selects:S.selects,keybinds:S.keybinds,fanCurve:S.fanCurve,fanProfile:S.fanProfile},null,2));}
+function impJSON(ev){const f=ev.target.files[0];if(!f)return;const r=new FileReader();r.onload=e=>{try{const d=JSON.parse(e.target.result);Object.assign(S.toggles,d.toggles||{});Object.assign(S.sliders,d.sliders||{});Object.assign(S.selects,d.selects||{});Object.assign(S.keybinds,d.keybinds||{});if(d.fanCurve)S.fanCurve=d.fanCurve;if(d.fanProfile)S.fanProfile=d.fanProfile;alert('✅ Importado!');render(S.page);}catch(e){alert('❌ Error');}};r.readAsText(f);}
+
+function pAbout(){return `${hdr('ℹ️','Acerca de PCTuner Pro','Información de la aplicación')}
+    <div class="card p-6 text-center mb-4">
+        <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-violet-500 rounded-2xl flex items-center justify-center text-2xl font-black text-white mx-auto mb-3">PC</div>
+        <h2 class="text-xl font-black text-white">PCTuner Pro v5.0</h2>
+        <p class="text-sm text-gray-400 mt-1">Optimizador Universal de PC</p>
+        <p class="text-xs text-gray-500 mt-3">Detecta automáticamente tu hardware y genera scripts optimizados para tu equipo específico.</p>
+    </div>
+    <div class="card p-5 mb-4">
+        <h4 class="font-bold text-white text-sm mb-3">🖥️ Tu Sistema Detectado</h4>
+        <div class="grid grid-cols-2 gap-2 text-xs">
+            ${[['Marca',S.hw.brand],['SO',S.hw.osVer||S.hw.os],['Arch',S.hw.arch],['CPU Cores',S.hw.cores],['RAM',S.hw.ram?S.hw.ram+'GB':'N/A'],['GPU',S.hw.gpu?S.hw.gpu.substring(0,35):'N/A'],['Pantalla',S.hw.screenW+'×'+S.hw.screenH],['DPR',S.hw.dpr+'x'],['Touch',S.hw.touchscreen?'Sí':'No'],['Batería',S.hw.battery?S.hw.batteryLevel+'%':'No'],['Conexión',S.hw.connection||'N/A'],['Idioma',S.hw.lang]].map(([k,v])=>`<div class="stat-box p-2"><span class="text-gray-500">${k}:</span> <span class="text-white font-medium">${v}</span></div>`).join('')}
+        </div>
+    </div>
+    <div class="card p-4 border-l-4 border-l-green-500">
+        <p class="text-xs text-green-300">🛡️ <strong>Windows Defender nunca se modifica.</strong> Todas las optimizaciones son seguras y reversibles con punto de restauración.</p>
+    </div>`;}
+
+// ======================== PRESETS ========================
+function applyPreset(p){
+    Object.keys(S.toggles).forEach(k=>S.toggles[k]=false);
+    const presets={
+        balanced:['p_sysmain','p_indexing','p_visual','p_transparency','p_startup_delay','p_menu_delay','p_tips','p_cpu_priority','p_ntfs_last','c_temp','c_recycle','c_dns','n_flush','n_qos','pw_high','pw_hibernate','pr_telemetry','pr_cortana','pr_ad_id','pr_feedback','pr_suggestions','t_search','t_taskview','t_widgets','t_chat','t_copilot','e_ext','e_thispc','e_no_recent','v_dark','v_dark_apps','sv_diagtrack','sv_dmwap','m_restore','b_onedrive','b_teams','s_no_startup','wu_no_restart','sec_autoplay','g_mode'],
+        max:['p_sysmain','p_prefetch','p_indexing','p_visual','p_transparency','p_startup_delay','p_menu_delay','p_tips','p_cpu_priority','p_ntfs_last','p_core_parking','p_timer_res','p_split','p_cache','c_temp','c_recycle','c_update','c_thumb','c_logs','c_dns','c_bloatware','c_delivery','c_error','n_flush','n_nagle','n_qos','pw_high','pw_hibernate','pw_usb','pw_disk','pw_cpu_max','pr_telemetry','pr_cortana','pr_activity','pr_ad_id','pr_feedback','pr_suggestions','pr_lockscreen','t_search','t_taskview','t_widgets','t_chat','t_copilot','v_dark','v_dark_apps','v_no_anim','v_no_trans','v_no_shadow','sv_diagtrack','sv_dmwap','sv_sysmain','sv_wsearch','sv_xbox','sv_maps','sv_fax','sv_remote','sv_phone','sv_retail','sv_wallet','g_mode','g_dvr','g_fullscreen','g_mouse','g_nagle','g_throttle','g_xbox','g_notif','e_ext','e_thispc','e_classic','e_compact','e_no_ads','m_sfc','m_dism','m_defrag','m_restore','b_onedrive','b_teams','b_edge','b_skype','b_cortana','b_adobe','s_no_startup','wu_no_restart','wu_no_peer','sec_autoplay','sec_smb1'],
+        privacy:['pr_telemetry','pr_cortana','pr_activity','pr_ad_id','pr_location','pr_diag','pr_feedback','pr_suggestions','pr_lockscreen','pr_timeline','pr_clipboard','pr_input','sv_diagtrack','sv_dmwap','t_widgets','t_chat','t_copilot','wu_no_peer','sec_autoplay','sec_wpad','m_restore'],
+        silent:['fan_smart','pw_high','m_restore','p_visual','p_transparency','v_no_anim'],
+        battery:['p_sysmain','p_visual','p_transparency','p_indexing','v_no_anim','v_no_trans','pw_hibernate','sv_wsearch','sv_xbox','sv_maps','fan_smart','m_restore','b_onedrive','b_teams','b_spotify','b_edge','t_widgets']
+    };
+    if(presets[p])presets[p].forEach(k=>{S.toggles[k]=true;track(k,true);});
+    if(p==='silent'){S.fanProfile='silent';S.fanCurve=[{t:30,s:8},{t:45,s:18},{t:60,s:30},{t:75,s:50},{t:90,s:65}];}
+    render(S.page);
+    const names={balanced:'Equilibrado',max:'Máximo Rendimiento',privacy:'Máxima Privacidad',silent:'Silencioso',battery:'Ahorro Batería'};
+    showNotif('✅ Preset "'+names[p]+'" aplicado!');
+}
+
+function showNotif(msg){
+    const d=document.createElement('div');
+    d.className='fixed bottom-5 right-5 z-[200] bg-green-600 text-white px-5 py-3 rounded-xl text-sm font-semibold shadow-2xl slide-up';
+    d.textContent=msg;document.body.appendChild(d);
+    setTimeout(()=>d.remove(),3000);
+}
+
+// ======================== EXECUTION ========================
+function openExec(){document.getElementById('execModal').classList.remove('hidden');renderExec();}
+function closeExec(){document.getElementById('execModal').classList.add('hidden');}
+
+function renderExec(){
+    const active=Object.entries(S.toggles).filter(([k,v])=>v);
+    const body=document.getElementById('execBody');
+    if(active.length===0){
+        body.innerHTML=`<div class="text-center py-8"><p class="text-3xl mb-2">⚡</p><p class="text-sm text-gray-400">No hay optimizaciones activadas.</p><p class="text-xs text-gray-600 mt-1">Activa opciones en las secciones o usa un Preset.</p></div>`;
+        return;
+    }
+    body.innerHTML=`
+        <div class="mb-4"><p class="font-bold text-white text-sm">${active.length} optimizaciones activas</p><p class="text-xs text-gray-500">Sistema: ${S.hw.brand} · ${S.hw.osVer||S.hw.os}</p></div>
+        <div class="card p-3 mb-4 border-l-4 border-l-green-500"><p class="text-[11px] text-green-200">🛡️ Windows Defender <strong>NO será modificado</strong>.</p></div>
+        <div class="space-y-1.5 mb-5 max-h-[200px] overflow-y-auto">${active.map(([k])=>`<div class="flex items-center gap-2 text-xs"><span class="text-green-400">✓</span><span class="text-gray-300">${k}</span></div>`).join('')}</div>
+        <div class="grid grid-cols-2 gap-3">
+            <button onclick="execDirect('bat')" class="btn btn-green py-3 text-sm flex flex-col items-center gap-1"><span class="text-lg">⚡</span><span>Generar .BAT</span><span class="text-[9px] opacity-70">Descargar y ejecutar</span></button>
+            <button onclick="execDirect('ps1')" class="btn btn-blue py-3 text-sm flex flex-col items-center gap-1"><span class="text-lg">🔷</span><span>Generar .PS1</span><span class="text-[9px] opacity-70">PowerShell avanzado</span></button>
+            <button onclick="execDirect('reg')" class="btn btn-purple py-3 text-sm flex flex-col items-center gap-1"><span class="text-lg">🗝️</span><span>Generar .REG</span><span class="text-[9px] opacity-70">Solo registro</span></button>
+            <button onclick="execDirect('ahk')" class="btn btn-amber py-3 text-sm flex flex-col items-center gap-1"><span class="text-lg">⌨️</span><span>Generar .AHK</span><span class="text-[9px] opacity-70">Solo keybinds</span></button>
+        </div>
+        <div class="mt-4 text-center"><p class="text-[10px] text-gray-600">El archivo se descargará. Ejecútalo como <strong class="text-white">Administrador</strong> en tu PC.</p></div>`;
+}
+
+function execDirect(fmt){
+    const gen={bat:genBAT,ps1:genPS1,reg:genREG,ahk:genAHK};
+    const ext={bat:'.bat',ps1:'.ps1',reg:'.reg',ahk:'.ahk'};
+    const code=gen[fmt]();
+    dl('PCTuner_'+S.hw.brand.replace(/\s/g,'')+'_'+fmt.toUpperCase()+ext[fmt],code);
+    showNotif('⬇ Archivo descargado! Ejecuta como Admin.');
+    closeExec();
+}
+
+// ======================== EXPORT MODAL ========================
+function openExport(){document.getElementById('exportModal').classList.remove('hidden');}
+function closeExport(){document.getElementById('exportModal').classList.add('hidden');}
+
+function genScript(){
+    const fmt=document.getElementById('exportFmt').value;
+    const gen={bat:genBAT,ps1:genPS1,reg:genREG,ahk:genAHK};
+    const ext={bat:'.bat',ps1:'.ps1',reg:'.reg',ahk:'.ahk'};
+    _code=gen[fmt]();_fn='PCTuner_'+S.hw.brand.replace(/\s/g,'')+ext[fmt];
+    document.getElementById('exportTitle').textContent=_fn;
+    document.getElementById('exportBody').innerHTML=`<pre class="p-4 text-[11px] text-green-400 code-font leading-relaxed">${esc(_code)}</pre>`;
+    document.getElementById('exportFooter').classList.remove('hidden');
+    document.getElementById('exportInfo').textContent=_code.split('\n').length+' líneas · '+(new Blob([_code]).size/1024).toFixed(1)+' KB';
+}
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function copyCode(){navigator.clipboard.writeText(_code).then(()=>{const b=document.getElementById('copyBtn');b.textContent='✅ Copiado!';setTimeout(()=>b.textContent='📋 Copiar',2000);});}
+function dlCode(){dl(_fn,_code);}
+function dl(fn,c){const b=new Blob([c],{type:'text/plain'});const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download=fn;document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(u);}
+
+// ======================== GENERATORS ========================
+function genBAT(){
+    const hw=S.hw;
+    let s=`@echo off\nchcp 65001 >nul\ntitle ══ PCTUNER PRO v5 ══ ${hw.brand} ══\ncolor 0A\necho.\necho  ╔══════════════════════════════════════════════════════╗\necho  ║   PCTUNER PRO v5 — Optimizador Universal             ║\necho  ║   Equipo: ${(hw.brand+' · '+hw.cores+' nucleos · '+(hw.osVer||hw.os)).padEnd(42)}║\necho  ║   Windows Defender: INTACTO (no se modifica)         ║\necho  ╚══════════════════════════════════════════════════════╝\necho.\nnet session >nul 2>&1\nif %errorlevel% neq 0 (echo [ERROR] Ejecuta como ADMINISTRADOR. & pause & exit /b 1)\necho [OK] Admin verificado — %date% %time%\necho.\n\n`;
+    if(T('m_restore'))s+=`echo [*] Creando punto de restauracion...\nPowerShell -Command "Checkpoint-Computer -Description 'PCTuner_v5' -RestorePointType 'MODIFY_SETTINGS'" 2>nul\necho [OK] Punto de restauracion creado.\necho.\n\n`;
+    s+=`echo ═══════ RENDIMIENTO ═══════\n`;
+    if(T('p_sysmain'))s+=`sc config "SysMain" start= disabled >nul 2>&1 & sc stop "SysMain" >nul 2>&1\necho [OK] SysMain desactivado.\n`;
+    if(T('p_prefetch'))s+=`reg add "HKLM\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Memory Management\\PrefetchParameters" /v EnablePrefetcher /t REG_DWORD /d 0 /f >nul\n`;
+    if(T('p_indexing'))s+=`sc config "WSearch" start= disabled >nul 2>&1 & sc stop "WSearch" >nul 2>&1\necho [OK] Windows Search desactivado.\n`;
+    if(T('p_visual'))s+=`reg add "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\VisualEffects" /v VisualFXSetting /t REG_DWORD /d 2 /f >nul\n`;
+    if(T('p_transparency'))s+=`reg add "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize" /v EnableTransparency /t REG_DWORD /d 0 /f >nul\n`;
+    if(T('p_startup_delay'))s+=`reg add "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Serialize" /v StartupDelayInMSec /t REG_DWORD /d 0 /f >nul\n`;
+    if(T('p_menu_delay'))s+=`reg add "HKCU\\Control Panel\\Desktop" /v MenuShowDelay /t REG_SZ /d "20" /f >nul\n`;
+    if(T('p_tips'))s+=`reg add "HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows\\CloudContent" /v DisableSoftLanding /t REG_DWORD /d 1 /f >nul\n`;
+    if(T('p_cpu_priority'))s+=`reg add "HKLM\\SYSTEM\\CurrentControlSet\\Control\\PriorityControl" /v Win32PrioritySeparation /t REG_DWORD /d 38 /f >nul\n`;
+    if(T('p_ntfs_last'))s+=`fsutil behavior set disablelastaccess 1 >nul\n`;
+    if(T('p_core_parking'))s+=`powercfg -setacvalueindex SCHEME_CURRENT SUB_PROCESSOR CPMINCORES 100 >nul 2>&1\n`;
+
+    s+=`\necho ═══════ LIMPIEZA ═══════\n`;
+    if(T('c_temp'))s+=`del /q /f /s "%TEMP%\\*" 2>nul\ndel /q /f /s "C:\\Windows\\Temp\\*" 2>nul\ndel /q /f /s "C:\\Windows\\Prefetch\\*" 2>nul\necho [OK] Temporales limpiados.\n`;
+    if(T('c_recycle'))s+=`rd /s /q C:\\$Recycle.Bin 2>nul\necho [OK] Papelera vaciada.\n`;
+    if(T('c_update'))s+=`net stop wuauserv >nul 2>&1\ndel /q /f /s "C:\\Windows\\SoftwareDistribution\\Download\\*" 2>nul\nnet start wuauserv >nul 2>&1\n`;
+    if(T('c_dns'))s+=`ipconfig /flushdns >nul\necho [OK] Cache DNS limpiado.\n`;
+    if(T('c_bloatware'))s+=`PowerShell -Command "Get-AppxPackage *3dbuilder*,*solitaire*,*bingfinance*,*bingnews*,*bingsports*,*bingweather*,*zunevideo*,*zunemusic*,*xboxapp*,*officehub*,*skypeapp*,*windowsmaps*,*clipchamp*,*todos*,*people*,*feedback* | Remove-AppxPackage -EA SilentlyContinue" 2>nul\necho [OK] Bloatware removido.\n`;
+    if(T('c_delivery'))s+=`del /q /f /s "C:\\Windows\\SoftwareDistribution\\DeliveryOptimization\\*" 2>nul\n`;
+    if(T('c_error'))s+=`del /q /f /s "C:\\ProgramData\\Microsoft\\Windows\\WER\\*" 2>nul\n`;
+
+    s+=`\necho ═══════ RED ═══════\n`;
+    if(T('n_flush'))s+=`ipconfig /flushdns >nul & ipconfig /registerdns >nul\n`;
+    if(T('n_winsock'))s+=`netsh winsock reset >nul\n`;
+    if(T('n_tcpip'))s+=`netsh int ip reset >nul\n`;
+    if(T('n_nagle'))s+=`reg add "HKLM\\SOFTWARE\\Microsoft\\MSMQ\\Parameters" /v TCPNoDelay /t REG_DWORD /d 1 /f >nul\n`;
+    if(T('n_qos'))s+=`reg add "HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows\\Psched" /v NonBestEffortLimit /t REG_DWORD /d 0 /f >nul\n`;
+    if(T('n_autotuning'))s+=`netsh int tcp set global autotuninglevel=disabled >nul\n`;
+    const dnsMap={google:['8.8.8.8','8.8.4.4'],cloudflare:['1.1.1.1','1.0.0.1'],quad9:['9.9.9.9','149.112.112.112']};
+    const dns=SE('n_dns')||'cloudflare',adp=SE('n_adapter')==='ethernet'?'Ethernet':'Wi-Fi';
+    if(dns!=='default'&&dnsMap[dns])s+=`netsh interface ip set dns "${adp}" static ${dnsMap[dns][0]} primary >nul\nnetsh interface ip add dns "${adp}" ${dnsMap[dns][1]} index=2 >nul\necho [OK] DNS: ${dns}\n`;
+
+    s+=`\necho ═══════ ENERGIA ═══════\n`;
+    if(T('pw_high'))s+=`powercfg /setactive 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c >nul 2>&1\necho [OK] Plan alto rendimiento.\n`;
+    if(T('pw_hibernate'))s+=`powercfg /hibernate off >nul\n`;
+
+    s+=`\necho ═══════ PRIVACIDAD ═══════\n`;
+    if(T('pr_telemetry'))s+=`reg add "HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows\\DataCollection" /v AllowTelemetry /t REG_DWORD /d 0 /f >nul\nsc config "DiagTrack" start= disabled >nul 2>&1 & sc stop "DiagTrack" >nul 2>&1\necho [OK] Telemetria desactivada.\n`;
+    if(T('pr_cortana'))s+=`reg add "HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows\\Windows Search" /v AllowCortana /t REG_DWORD /d 0 /f >nul\n`;
+    if(T('pr_ad_id'))s+=`reg add "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\AdvertisingInfo" /v Enabled /t REG_DWORD /d 0 /f >nul\n`;
+    if(T('pr_activity'))s+=`reg add "HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows\\System" /v EnableActivityFeed /t REG_DWORD /d 0 /f >nul\n`;
+    if(T('pr_location'))s+=`reg add "HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows\\LocationAndSensors" /v DisableLocation /t REG_DWORD /d 1 /f >nul\n`;
+    if(T('pr_feedback'))s+=`reg add "HKCU\\Software\\Microsoft\\Siuf\\Rules" /v NumberOfSIUFInPeriod /t REG_DWORD /d 0 /f >nul\n`;
+    if(T('pr_suggestions'))s+=`reg add "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager" /v SystemPaneSuggestionsEnabled /t REG_DWORD /d 0 /f >nul\nreg add "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager" /v SilentInstalledAppsEnabled /t REG_DWORD /d 0 /f >nul\n`;
+
+    s+=`\necho ═══════ INTERFAZ ═══════\n`;
+    if(T('t_search'))s+=`reg add "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Search" /v SearchboxTaskbarMode /t REG_DWORD /d 0 /f >nul\n`;
+    if(T('t_taskview'))s+=`reg add "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced" /v ShowTaskViewButton /t REG_DWORD /d 0 /f >nul\n`;
+    if(T('t_widgets'))s+=`reg add "HKLM\\SOFTWARE\\Policies\\Microsoft\\Dsh" /v AllowNewsAndInterests /t REG_DWORD /d 0 /f >nul\n`;
+    if(T('t_copilot'))s+=`reg add "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced" /v ShowCopilotButton /t REG_DWORD /d 0 /f >nul\n`;
+    if(SE('t_align')==='left')s+=`reg add "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced" /v TaskbarAl /t REG_DWORD /d 0 /f >nul\n`;
+    if(T('v_dark'))s+=`reg add "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize" /v SystemUsesLightTheme /t REG_DWORD /d 0 /f >nul\n`;
+    if(T('v_dark_apps'))s+=`reg add "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize" /v AppsUseLightTheme /t REG_DWORD /d 0 /f >nul\n`;
+    if(T('e_ext'))s+=`reg add "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced" /v HideFileExt /t REG_DWORD /d 0 /f >nul\n`;
+    if(T('e_classic'))s+=`reg add "HKCU\\Software\\Classes\\CLSID\\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\\InprocServer32" /f /ve >nul 2>&1\n`;
+
+    s+=`\necho ═══════ SERVICIOS ═══════\n`;
+    if(T('sv_diagtrack'))s+=`sc config "DiagTrack" start= disabled >nul 2>&1\n`;
+    if(T('sv_dmwap'))s+=`sc config "dmwappushservice" start= disabled >nul 2>&1\n`;
+    if(T('sv_xbox'))s+=`sc config "XblAuthManager" start= disabled >nul 2>&1\nsc config "XblGameSave" start= disabled >nul 2>&1\n`;
+    if(T('sv_maps'))s+=`sc config "MapsBroker" start= disabled >nul 2>&1\n`;
+    if(T('sv_fax'))s+=`sc config "Fax" start= disabled >nul 2>&1\n`;
+    if(T('sv_retail'))s+=`sc config "RetailDemo" start= disabled >nul 2>&1\n`;
+    if(T('sv_wallet'))s+=`sc config "WalletService" start= disabled >nul 2>&1\n`;
+    if(T('sv_phone'))s+=`sc config "PhoneSvc" start= disabled >nul 2>&1\n`;
+
+    s+=`\necho ═══════ GAMING ═══════\n`;
+    if(T('g_mode'))s+=`reg add "HKCU\\Software\\Microsoft\\GameBar" /v AllowAutoGameMode /t REG_DWORD /d 1 /f >nul\n`;
+    if(T('g_dvr'))s+=`reg add "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\GameDVR" /v AppCaptureEnabled /t REG_DWORD /d 0 /f >nul\nreg add "HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows\\GameDVR" /v AllowGameDVR /t REG_DWORD /d 0 /f >nul\n`;
+    if(T('g_xbox'))s+=`reg add "HKCU\\Software\\Microsoft\\GameBar" /v UseNexusForGameBarEnabled /t REG_DWORD /d 0 /f >nul\n`;
+
+    if(T('b_onedrive'))s+=`\nreg delete "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run" /v OneDrive /f >nul 2>&1\n`;
+    if(T('b_teams'))s+=`reg delete "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run" /v "com.squirrel.Teams.Teams" /f >nul 2>&1\n`;
+    if(T('b_edge'))s+=`reg add "HKLM\\SOFTWARE\\Policies\\Microsoft\\Edge" /v StartupBoostEnabled /t REG_DWORD /d 0 /f >nul\n`;
+
+    if(T('wu_no_restart'))s+=`\nreg add "HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate\\AU" /v NoAutoRebootWithLoggedOnUsers /t REG_DWORD /d 1 /f >nul\n`;
+    if(T('wu_no_peer'))s+=`reg add "HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows\\DeliveryOptimization" /v DODownloadMode /t REG_DWORD /d 0 /f >nul\n`;
+    if(T('sec_autoplay'))s+=`\nreg add "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\AutoplayHandlers" /v DisableAutoplay /t REG_DWORD /d 1 /f >nul\n`;
+    if(T('sec_smb1'))s+=`PowerShell -Command "Disable-WindowsOptionalFeature -Online -FeatureName SMB1Protocol -NoRestart" >nul 2>&1\n`;
+
+    s+=`\necho ═══════ VENTILADORES ═══════\necho [INFO] Perfil: ${S.fanProfile}\necho [INFO] Instala NBFC para control avanzado: github.com/hirschmann/nbfc\n`;
+
+    s+=`\necho ═══════ MANTENIMIENTO ═══════\n`;
+    if(T('m_dism'))s+=`DISM /Online /Cleanup-Image /RestoreHealth\n`;
+    if(T('m_sfc'))s+=`sfc /scannow\n`;
+    if(T('m_defrag'))s+=`defrag C: /O\n`;
+    if(T('m_winsxs'))s+=`DISM /Online /Cleanup-Image /StartComponentCleanup >nul 2>&1\n`;
+    if(T('s_no_startup'))s+=`\nreg add "HKCU\\AppEvents\\Schemes" /ve /t REG_SZ /d ".None" /f >nul\n`;
+
+    s+=`\necho.\necho ═══════════════════════════════════════════\necho   PCTUNER PRO v5 — COMPLETADO\necho   Equipo: ${hw.brand}\necho   Windows Defender: NO MODIFICADO ✓\necho   Reinicia para aplicar todos los cambios.\necho ═══════════════════════════════════════════\necho.\nset /p r="Reiniciar ahora? (S/N): "\nif /i "%r%"=="S" (shutdown /r /t 10 /c "PCTuner Pro v5")\npause\n`;
     return s;
 }
 
-// ==========================================
-// EXPORT UI
-// ==========================================
-function generateAndShow(type) {
-    let code, filename;
-    switch(type) {
-        case 'bat': code = generateBat(); filename = 'LenovoTuner_optimizar.bat'; break;
-        case 'reg': code = generateReg(); filename = 'LenovoTuner_registro.reg'; break;
-        case 'ps1': code = generatePS1(); filename = 'LenovoTuner_powershell.ps1'; break;
-        case 'ahk': code = generateAHK(); filename = 'LenovoTuner_keybinds.ahk'; break;
-        case 'all': code = generateBat(); filename = 'LenovoTuner_TODO.bat'; break;
-    }
-    document.getElementById('modalCode').textContent = code;
-    document.getElementById('modalFileName').textContent = filename;
-    document.getElementById('exportModal').classList.remove('hidden');
-    document.getElementById('exportModal')._filename = filename;
-    document.getElementById('exportModal')._code = code;
+function genPS1(){
+    let s=`# PCTuner Pro v5 — PowerShell\n# Equipo: ${S.hw.brand} · ${S.hw.osVer||S.hw.os}\n# Defender: INTACTO\n\nif(-NOT([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]"Administrator")){Write-Host "[ERROR] Ejecuta como Admin" -FG Red;exit}\nWrite-Host "PCTuner Pro v5 — ${S.hw.brand}" -FG Cyan\n\n`;
+    if(T('m_restore'))s+=`Checkpoint-Computer -Description "PCTuner_v5" -RestorePointType "MODIFY_SETTINGS" -EA SilentlyContinue\n`;
+    if(T('p_sysmain'))s+=`Stop-Service "SysMain" -Force -EA SilentlyContinue;Set-Service "SysMain" -StartupType Disabled\n`;
+    if(T('pr_telemetry'))s+=`Set-ItemProperty -Path "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\DataCollection" -Name "AllowTelemetry" -Value 0 -Type DWord -Force\nStop-Service "DiagTrack" -Force -EA SilentlyContinue;Set-Service "DiagTrack" -StartupType Disabled\n`;
+    if(T('c_temp'))s+=`Remove-Item "$env:TEMP\\*" -Recurse -Force -EA SilentlyContinue\nRemove-Item "C:\\Windows\\Temp\\*" -Recurse -Force -EA SilentlyContinue\n`;
+    if(T('c_bloatware'))s+=`$b=@("*3dbuilder*","*solitaire*","*bingnews*","*bingweather*","*zunevideo*","*xboxapp*","*officehub*","*skypeapp*","*windowsmaps*","*clipchamp*","*people*","*feedback*")\nforeach($a in $b){Get-AppxPackage $a|Remove-AppxPackage -EA SilentlyContinue}\n`;
+    s+=`\nWrite-Host "\\nCompletado. Reinicia." -FG Green\nWrite-Host "Defender: NO MODIFICADO ✓" -FG Green\nRead-Host "Enter para salir"\n`;
+    return s;
 }
 
-function closeExportModal() {
-    document.getElementById('exportModal').classList.add('hidden');
+function genREG(){
+    let s=`Windows Registry Editor Version 5.00\n\n; PCTuner Pro v5 — ${S.hw.brand}\n; Defender NO se modifica\n\n`;
+    if(T('p_visual'))s+=`[HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\VisualEffects]\n"VisualFXSetting"=dword:00000002\n\n`;
+    if(T('v_dark'))s+=`[HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize]\n"SystemUsesLightTheme"=dword:00000000\n\n`;
+    if(T('v_dark_apps'))s+=`[HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize]\n"AppsUseLightTheme"=dword:00000000\n\n`;
+    if(T('pr_telemetry'))s+=`[HKEY_LOCAL_MACHINE\\SOFTWARE\\Policies\\Microsoft\\Windows\\DataCollection]\n"AllowTelemetry"=dword:00000000\n\n`;
+    if(T('pr_cortana'))s+=`[HKEY_LOCAL_MACHINE\\SOFTWARE\\Policies\\Microsoft\\Windows\\Windows Search]\n"AllowCortana"=dword:00000000\n\n`;
+    if(T('pr_ad_id'))s+=`[HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\AdvertisingInfo]\n"Enabled"=dword:00000000\n\n`;
+    if(T('t_search'))s+=`[HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Search]\n"SearchboxTaskbarMode"=dword:00000000\n\n`;
+    if(T('e_ext'))s+=`[HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced]\n"HideFileExt"=dword:00000000\n\n`;
+    if(T('g_dvr'))s+=`[HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\GameDVR]\n"AppCaptureEnabled"=dword:00000000\n\n`;
+    return s;
 }
 
-function copyModalCode() {
-    const code = document.getElementById('exportModal')._code;
-    navigator.clipboard.writeText(code).then(() => {
-        const btn = document.getElementById('modalCopyBtn');
-        btn.textContent = '✅ Copiado!';
-        setTimeout(() => btn.textContent = '📋 Copiar', 2000);
+function genAHK(){
+    let s=`; PCTuner Pro v5 — AutoHotkey · ${S.hw.brand}\n#Requires AutoHotkey v2.0\n#SingleInstance Force\n\n`;
+    const map={k_screenshot:'Send "{PrintScreen}"',k_taskmgr:'Run "taskmgr.exe"',k_run:'Send "#r"',k_explorer:'Run "explorer.exe"',k_cmd:'Run "*RunAs cmd.exe"',k_desktop:'Send "#d"',k_vol_up:'Send "{Volume_Up}"',k_vol_down:'Send "{Volume_Down}"',k_mute:'Send "{Volume_Mute}"',k_play:'Send "{Media_Play_Pause}"',k_calc:'Run "calc.exe"',k_notepad:'Run "notepad.exe"',k_lock:'DllCall("LockWorkStation")',k_browser:'Run "msedge.exe"',k_close:'Send "!{F4}"',k_minimize:'Send "#m"'};
+    Object.entries(S.keybinds).forEach(([id,combo])=>{
+        const action=map[id];if(!action)return;
+        let ahk=combo.replace(/Ctrl/g,'^').replace(/Alt/g,'!').replace(/Shift/g,'+').replace(/Win/g,'#').replace(/ \+ /g,'');
+        ahk=ahk.replace(/([A-Z])$/,m=>m.toLowerCase());
+        s+=`${ahk}:: {\n    ${action}\n}\n\n`;
     });
+    s+=`ToolTip "PCTuner Pro — Keybinds activos!"\nSetTimer () => ToolTip(), -2000\n`;
+    return s;
 }
 
-function downloadModalCode() {
-    const code = document.getElementById('exportModal')._code;
-    const filename = document.getElementById('exportModal')._filename;
-    const blob = new Blob([code], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url; a.download = filename;
-    document.body.appendChild(a); a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+// ======================== INIT ========================
+async function init(){
+    buildNav();
+    await detectHW();
+    go('dashboard');
+    simMon();
+    setInterval(simMon,2500);
 }
-
-// ==========================================
-// PROFILES
-// ==========================================
-function saveProfile() {
-    const name = document.getElementById('profileName')?.value?.trim();
-    if (!name) { alert('Escribe un nombre para el perfil'); return; }
-    const profiles = JSON.parse(localStorage.getItem('lenovotuner_profiles') || '{}');
-    profiles[name] = { toggles: {...state.toggles}, sliders: {...state.sliders}, selects: {...state.selects}, keybinds: {...state.keybinds}, colors: {...state.colors}, date: new Date().toLocaleString() };
-    localStorage.setItem('lenovotuner_profiles', JSON.stringify(profiles));
-    alert('✅ Perfil "' + name + '" guardado!');
-    renderSection('profiles');
-}
-
-function loadProfile(name) {
-    const profiles = JSON.parse(localStorage.getItem('lenovotuner_profiles') || '{}');
-    if (profiles[name]) {
-        Object.assign(state.toggles, profiles[name].toggles || {});
-        Object.assign(state.sliders, profiles[name].sliders || {});
-        Object.assign(state.selects, profiles[name].selects || {});
-        Object.assign(state.keybinds, profiles[name].keybinds || {});
-        Object.assign(state.colors, profiles[name].colors || {});
-        alert('✅ Perfil "' + name + '" cargado!');
-        renderSection('profiles');
-    }
-}
-
-function deleteProfile(name) {
-    if (!confirm('¿Eliminar perfil "' + name + '"?')) return;
-    const profiles = JSON.parse(localStorage.getItem('lenovotuner_profiles') || '{}');
-    delete profiles[name];
-    localStorage.setItem('lenovotuner_profiles', JSON.stringify(profiles));
-    renderSection('profiles');
-}
-
-function exportConfig() {
-    const data = { toggles: state.toggles, sliders: state.sliders, selects: state.selects, keybinds: state.keybinds, colors: state.colors };
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a'); a.href = url; a.download = 'lenovotuner_config.json';
-    document.body.appendChild(a); a.click(); document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-}
-
-function importConfig(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        try {
-            const data = JSON.parse(e.target.result);
-            if (data.toggles) Object.assign(state.toggles, data.toggles);
-            if (data.sliders) Object.assign(state.sliders, data.sliders);
-            if (data.selects) Object.assign(state.selects, data.selects);
-            if (data.keybinds) Object.assign(state.keybinds, data.keybinds);
-            if (data.colors) Object.assign(state.colors, data.colors);
-            alert('✅ Configuración importada!');
-            renderSection(state.currentSection);
-        } catch(e) { alert('❌ Error al leer el archivo'); }
-    };
-    reader.readAsText(file);
-}
-
-// ==========================================
-// INIT
-// ==========================================
-renderSection('dashboard');
+init();
+window.addEventListener('resize',()=>{if(S.page==='fans')initFanCanvas();});
 </script>
 </body>
 </html>

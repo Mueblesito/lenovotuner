@@ -3,183 +3,451 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PCTuner Pro v5 — Optimizador Universal</title>
+    <title>PCTuner Pro v6 — Optimizador Universal</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;500;600;700;800;900&display=swap');
-        *{box-sizing:border-box;margin:0;padding:0}
-        body{font-family:'Inter',sans-serif;background:#050810;min-height:100vh;overflow-x:hidden;color:#cbd5e1}
-        .code-font{font-family:'JetBrains Mono',monospace}
-        ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:#1e3a5f;border-radius:3px}
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+        *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+        html{scroll-behavior:smooth}
+        body{font-family:'Inter',system-ui,sans-serif;background:#06080f;min-height:100vh;overflow-x:hidden;color:#c8d6e5}
+        .mono{font-family:'JetBrains Mono',monospace}
 
-        .bg-grid{background-image:radial-gradient(rgba(59,130,246,0.03) 1px,transparent 1px);background-size:20px 20px}
-        .glass{background:rgba(12,20,35,0.7);backdrop-filter:blur(20px);border:1px solid rgba(59,130,246,0.08)}
-        .glass-heavy{background:rgba(8,12,24,0.9);backdrop-filter:blur(30px);border:1px solid rgba(59,130,246,0.1)}
+        ::-webkit-scrollbar{width:6px;height:6px}
+        ::-webkit-scrollbar-track{background:transparent}
+        ::-webkit-scrollbar-thumb{background:rgba(99,102,241,0.25);border-radius:10px}
+        ::-webkit-scrollbar-thumb:hover{background:rgba(99,102,241,0.4)}
 
-        /* Sidebar */
-        .sidebar{width:68px;transition:width 0.3s cubic-bezier(0.4,0,0.2,1)}
-        .sidebar:hover,.sidebar.expanded{width:230px}
-        .sidebar:hover .nav-label,.sidebar.expanded .nav-label{opacity:1;width:auto;max-width:200px}
-        .sidebar:hover .nav-icon,.sidebar.expanded .nav-icon{margin-right:10px}
-        .nav-label{opacity:0;width:0;max-width:0;overflow:hidden;white-space:nowrap;transition:all 0.3s}
-        .nav-icon{transition:margin 0.3s;flex-shrink:0}
-        .nav-item{transition:all 0.15s;border-left:3px solid transparent;cursor:pointer}
-        .nav-item:hover{background:rgba(59,130,246,0.06);border-left-color:rgba(59,130,246,0.3)}
-        .nav-item.active{background:rgba(59,130,246,0.1);border-left-color:#3b82f6}
-        .nav-item.active .nav-icon{color:#60a5fa}
-
-        /* Cards */
-        .card{background:linear-gradient(135deg,rgba(12,20,35,0.8),rgba(25,35,55,0.4));border:1px solid rgba(59,130,246,0.08);border-radius:14px;transition:all 0.2s}
-        .card:hover{border-color:rgba(59,130,246,0.18)}
-        .card.active-card{border-color:rgba(59,130,246,0.4);background:linear-gradient(135deg,rgba(12,20,35,0.9),rgba(25,50,120,0.12))}
-
-        /* Toggles */
-        .toggle-wrap{position:relative;width:42px;height:22px;flex-shrink:0}
-        .toggle-wrap input{display:none}
-        .toggle-track{position:absolute;inset:0;background:#1e293b;border-radius:11px;transition:all 0.3s;cursor:pointer;border:1px solid rgba(100,116,139,0.2)}
-        .toggle-wrap input:checked+.toggle-track{background:#2563eb;border-color:#3b82f6}
-        .toggle-knob{position:absolute;top:2px;left:2px;width:18px;height:18px;background:#e2e8f0;border-radius:50%;transition:all 0.3s;pointer-events:none;box-shadow:0 1px 3px rgba(0,0,0,0.3)}
-        .toggle-wrap input:checked~.toggle-knob{left:22px;background:#fff}
-
-        .custom-select{background:rgba(12,20,35,0.8);border:1px solid rgba(59,130,246,0.15);color:#e2e8f0;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%2360a5fa' d='M5 7L1 3h8z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px}
-        input[type="range"]{-webkit-appearance:none;height:4px;background:#1e293b;border-radius:2px;outline:none}
-        input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;background:#3b82f6;border-radius:50%;cursor:pointer;box-shadow:0 0 8px rgba(59,130,246,0.4)}
-
-        .keybind-field{background:rgba(8,12,24,0.8);border:1px solid rgba(59,130,246,0.15);cursor:pointer;min-width:100px;text-align:center;transition:all 0.2s}
-        .keybind-field:focus,.keybind-field.recording{border-color:#f59e0b;box-shadow:0 0 10px rgba(245,158,11,0.2);outline:none}
-
-        @keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
-        .fan-slow{animation:spin 3s linear infinite}
-        .fan-med{animation:spin 1.5s linear infinite}
-        .fan-fast{animation:spin 0.5s linear infinite}
-        @keyframes pulse-dot{0%,100%{opacity:1}50%{opacity:0.4}}
-        .pulse-dot{animation:pulse-dot 2s infinite}
-        @keyframes slideUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
-        .slide-up{animation:slideUp 0.25s ease}
-        .gauge-ring{fill:none;stroke-linecap:round;transition:stroke-dashoffset 0.8s ease}
-
-        .terminal{background:#080c14;border:1px solid rgba(59,130,246,0.12);border-radius:12px;font-family:'JetBrains Mono',monospace;font-size:11px;overflow:hidden}
-        .terminal-header{background:rgba(12,20,35,0.8);padding:8px 12px;display:flex;align-items:center;gap:6px;border-bottom:1px solid rgba(59,130,246,0.08)}
-        .terminal-body{padding:12px;max-height:320px;overflow-y:auto;line-height:1.7}
-        .terminal-line{opacity:0;animation:slideUp 0.15s ease forwards}
-
-        .btn{font-weight:600;cursor:pointer;transition:all 0.2s;border-radius:10px;border:none;color:white}
-        .btn:hover{transform:translateY(-1px)}
-        .btn-blue{background:linear-gradient(135deg,#2563eb,#1d4ed8)}.btn-blue:hover{box-shadow:0 4px 16px rgba(37,99,235,0.3)}
-        .btn-red{background:linear-gradient(135deg,#dc2626,#b91c1c)}.btn-red:hover{box-shadow:0 4px 16px rgba(220,38,38,0.3)}
-        .btn-green{background:linear-gradient(135deg,#16a34a,#15803d)}.btn-green:hover{box-shadow:0 4px 16px rgba(22,163,74,0.3)}
-        .btn-amber{background:linear-gradient(135deg,#d97706,#b45309)}.btn-amber:hover{box-shadow:0 4px 16px rgba(217,119,6,0.3)}
-        .btn-purple{background:linear-gradient(135deg,#7c3aed,#6d28d9)}.btn-purple:hover{box-shadow:0 4px 16px rgba(124,58,237,0.3)}
-
-        .risk-low{color:#4ade80;background:rgba(74,222,128,0.08);border:1px solid rgba(74,222,128,0.15)}
-        .risk-med{color:#fbbf24;background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.15)}
-        .risk-high{color:#f87171;background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.15)}
-
-        .stat-box{background:rgba(12,20,35,0.5);border:1px solid rgba(59,130,246,0.06);border-radius:12px}
-        .modal-bg{background:rgba(0,0,0,0.6);backdrop-filter:blur(8px)}
-        .fan-canvas-box{background:rgba(5,8,16,0.9);border:1px solid rgba(59,130,246,0.1);border-radius:12px}
-
-        /* HW detection badge */
-        .hw-badge{background:linear-gradient(135deg,rgba(59,130,246,0.12),rgba(139,92,246,0.08));border:1px solid rgba(59,130,246,0.2);border-radius:12px}
-
-        pre{white-space:pre-wrap;word-wrap:break-word}
-        @media(max-width:768px){
-            .sidebar{position:fixed;z-index:50;height:100vh;transform:translateX(-100%)}
-            .sidebar.mobile-open{transform:translateX(0);width:230px}
-            .sidebar.mobile-open .nav-label{opacity:1;width:auto;max-width:200px}
+        /* Background */
+        .bg-noise{
+            background-image:
+                radial-gradient(ellipse 80% 50% at 50% -20%,rgba(99,102,241,0.08),transparent),
+                radial-gradient(circle at 20% 80%,rgba(59,130,246,0.04),transparent),
+                radial-gradient(rgba(99,102,241,0.02) 1px,transparent 1px);
+            background-size:100% 100%,100% 100%,24px 24px;
         }
 
-        /* Execution progress */
-        .exec-progress{background:rgba(8,12,24,0.95);border:1px solid rgba(59,130,246,0.15);border-radius:14px}
-        .progress-bar{height:6px;background:#1e293b;border-radius:3px;overflow:hidden}
-        .progress-fill{height:100%;background:linear-gradient(90deg,#2563eb,#06b6d4);border-radius:3px;transition:width 0.5s ease}
+        /* Sidebar */
+        .sidebar{
+            width:72px;
+            background:linear-gradient(180deg,rgba(10,12,20,0.98),rgba(8,10,18,0.95));
+            border-right:1px solid rgba(99,102,241,0.06);
+            backdrop-filter:blur(20px);
+            transition:width 0.35s cubic-bezier(0.4,0,0.2,1);
+        }
+        .sidebar:hover,.sidebar.expanded{width:260px}
+        .sidebar:hover .s-text,.sidebar.expanded .s-text{opacity:1;max-width:200px;margin-left:12px}
+        .s-text{opacity:0;max-width:0;overflow:hidden;white-space:nowrap;transition:all 0.35s cubic-bezier(0.4,0,0.2,1);margin-left:0}
+        .s-icon{width:20px;height:20px;flex-shrink:0;transition:color 0.2s}
+        .nav-btn{
+            display:flex;align-items:center;padding:9px 14px;margin:2px 8px;border-radius:10px;
+            transition:all 0.2s;cursor:pointer;border:none;background:transparent;color:#7c8db5;
+            width:calc(100% - 16px);text-align:left;position:relative;
+        }
+        .nav-btn:hover{background:rgba(99,102,241,0.06);color:#a5b4fc}
+        .nav-btn.active{background:rgba(99,102,241,0.1);color:#818cf8}
+        .nav-btn.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:20px;background:#818cf8;border-radius:0 4px 4px 0}
+        .nav-cat{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#3d4a63;padding:16px 22px 6px;transition:opacity 0.3s}
+        .sidebar:not(:hover):not(.expanded) .nav-cat{opacity:0;height:0;padding:0;overflow:hidden}
 
-        @keyframes scanning{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
-        .scanning-bg{background:linear-gradient(270deg,rgba(59,130,246,0.05),rgba(59,130,246,0.15),rgba(59,130,246,0.05));background-size:200% 200%;animation:scanning 2s ease infinite}
+        /* Top bar */
+        .topbar{
+            background:rgba(10,12,20,0.8);
+            backdrop-filter:blur(30px)saturate(1.5);
+            border-bottom:1px solid rgba(99,102,241,0.05);
+        }
+
+        /* Cards */
+        .card{
+            background:rgba(14,17,28,0.8);
+            border:1px solid rgba(99,102,241,0.06);
+            border-radius:16px;
+            transition:all 0.25s cubic-bezier(0.4,0,0.2,1);
+            position:relative;overflow:hidden;
+        }
+        .card::before{content:'';position:absolute;inset:0;border-radius:16px;opacity:0;transition:opacity 0.3s;background:linear-gradient(135deg,rgba(99,102,241,0.03),transparent);pointer-events:none}
+        .card:hover{border-color:rgba(99,102,241,0.12)}
+        .card:hover::before{opacity:1}
+        .card.on{border-color:rgba(99,102,241,0.25);background:rgba(14,17,28,0.95)}
+        .card.on::before{opacity:1;background:linear-gradient(135deg,rgba(99,102,241,0.06),transparent)}
+
+        /* Toggle */
+        .sw{position:relative;width:44px;height:24px;flex-shrink:0;cursor:pointer}
+        .sw input{display:none}
+        .sw-bg{position:absolute;inset:0;background:#1a1f35;border-radius:12px;transition:all 0.3s cubic-bezier(0.4,0,0.2,1);border:1px solid rgba(100,116,139,0.15)}
+        .sw input:checked+.sw-bg{background:linear-gradient(135deg,#6366f1,#4f46e5);border-color:#818cf8}
+        .sw-dot{position:absolute;top:3px;left:3px;width:18px;height:18px;background:#94a3b8;border-radius:50%;transition:all 0.3s cubic-bezier(0.68,-0.55,0.27,1.55);pointer-events:none}
+        .sw input:checked~.sw-dot{left:23px;background:#fff;box-shadow:0 0 12px rgba(129,140,248,0.4)}
+
+        /* Range */
+        input[type="range"]{-webkit-appearance:none;height:5px;background:rgba(30,35,55,0.8);border-radius:10px;outline:none;transition:background 0.2s}
+        input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;background:linear-gradient(135deg,#6366f1,#818cf8);border-radius:50%;cursor:pointer;box-shadow:0 2px 10px rgba(99,102,241,0.35);transition:transform 0.2s}
+        input[type="range"]::-webkit-slider-thumb:hover{transform:scale(1.15)}
+
+        /* Select */
+        .sel{
+            background:rgba(14,17,28,0.9);border:1px solid rgba(99,102,241,0.1);color:#c8d6e5;
+            appearance:none;border-radius:10px;padding:8px 32px 8px 12px;font-size:12px;
+            background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23818cf8' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");
+            background-repeat:no-repeat;background-position:right 10px center;
+            transition:border-color 0.2s;cursor:pointer;
+        }
+        .sel:focus{outline:none;border-color:#6366f1}
+
+        /* Keybind */
+        .kb-input{
+            background:rgba(10,12,20,0.9);border:1px solid rgba(99,102,241,0.12);
+            border-radius:8px;padding:6px 12px;min-width:110px;text-align:center;
+            cursor:pointer;transition:all 0.25s;font-family:'JetBrains Mono',monospace;
+            font-size:11px;color:#fbbf24;font-weight:600;
+        }
+        .kb-input:focus,.kb-input.rec{border-color:#f59e0b;box-shadow:0 0 16px rgba(245,158,11,0.15);outline:none}
+
+        /* Buttons */
+        .btn{
+            font-weight:600;cursor:pointer;transition:all 0.2s cubic-bezier(0.4,0,0.2,1);
+            border-radius:12px;border:none;color:white;display:inline-flex;align-items:center;
+            justify-content:center;gap:8px;font-size:13px;
+        }
+        .btn:hover{transform:translateY(-1px)}
+        .btn:active{transform:translateY(0)}
+        .btn-primary{background:linear-gradient(135deg,#6366f1,#4f46e5);box-shadow:0 2px 12px rgba(99,102,241,0.2)}
+        .btn-primary:hover{box-shadow:0 4px 20px rgba(99,102,241,0.35)}
+        .btn-success{background:linear-gradient(135deg,#10b981,#059669);box-shadow:0 2px 12px rgba(16,185,129,0.2)}
+        .btn-success:hover{box-shadow:0 4px 20px rgba(16,185,129,0.35)}
+        .btn-danger{background:linear-gradient(135deg,#ef4444,#dc2626)}
+        .btn-amber{background:linear-gradient(135deg,#f59e0b,#d97706)}
+        .btn-violet{background:linear-gradient(135deg,#8b5cf6,#7c3aed)}
+        .btn-ghost{background:rgba(99,102,241,0.08);color:#a5b4fc;border:1px solid rgba(99,102,241,0.12)}
+        .btn-ghost:hover{background:rgba(99,102,241,0.15)}
+
+        /* Risk badges */
+        .badge{font-size:9px;padding:2px 8px;border-radius:20px;font-weight:600;letter-spacing:0.5px}
+        .badge-low{color:#34d399;background:rgba(52,211,153,0.1);border:1px solid rgba(52,211,153,0.15)}
+        .badge-med{color:#fbbf24;background:rgba(251,191,36,0.1);border:1px solid rgba(251,191,36,0.15)}
+        .badge-high{color:#f87171;background:rgba(248,113,113,0.1);border:1px solid rgba(248,113,113,0.15)}
+
+        /* Animations */
+        @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+        @keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+        @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+        @keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+        .fade-up{animation:fadeUp 0.3s ease both}
+        .spin-slow{animation:spin 3s linear infinite}
+        .spin-med{animation:spin 1.5s linear infinite}
+        .spin-fast{animation:spin 0.6s linear infinite}
+        .pulse-anim{animation:pulse 2s ease infinite}
+        .shimmer{background:linear-gradient(90deg,transparent 30%,rgba(99,102,241,0.05) 50%,transparent 70%);background-size:200% 100%;animation:shimmer 2s linear infinite}
+
+        /* Gauge */
+        .gauge-ring{fill:none;stroke-linecap:round;transition:stroke-dashoffset 1s cubic-bezier(0.4,0,0.2,1)}
+
+        /* Terminal */
+        .term{background:rgba(8,10,16,0.95);border:1px solid rgba(99,102,241,0.08);border-radius:14px;overflow:hidden}
+        .term-head{background:rgba(14,17,28,0.9);padding:10px 16px;display:flex;align-items:center;gap:8px;border-bottom:1px solid rgba(99,102,241,0.06)}
+        .term-body{padding:16px;max-height:350px;overflow-y:auto;line-height:1.8;font-size:11px;font-family:'JetBrains Mono',monospace}
+
+        /* Glass modal */
+        .overlay{background:rgba(0,0,0,0.6);backdrop-filter:blur(12px)saturate(1.2)}
+        .modal{
+            background:linear-gradient(180deg,rgba(14,17,28,0.98),rgba(10,12,20,0.98));
+            border:1px solid rgba(99,102,241,0.1);border-radius:20px;
+            box-shadow:0 25px 60px rgba(0,0,0,0.5);
+        }
+
+        /* HW Badge */
+        .hw-card{
+            background:linear-gradient(135deg,rgba(99,102,241,0.08),rgba(59,130,246,0.04));
+            border:1px solid rgba(99,102,241,0.12);border-radius:16px;
+        }
+
+        /* Stat box */
+        .stat{background:rgba(14,17,28,0.6);border:1px solid rgba(99,102,241,0.05);border-radius:14px}
+
+        /* Fan canvas */
+        .fan-box{background:rgba(8,10,16,0.9);border:1px solid rgba(99,102,241,0.08);border-radius:14px}
+
+        /* Notif */
+        .notif{
+            position:fixed;bottom:24px;right:24px;z-index:999;padding:14px 24px;
+            border-radius:14px;font-size:13px;font-weight:600;color:white;
+            box-shadow:0 8px 30px rgba(0,0,0,0.4);
+            animation:fadeUp 0.3s ease,fadeOut 0.3s ease 2.7s forwards;
+        }
+        @keyframes fadeOut{to{opacity:0;transform:translateY(8px)}}
+
+        /* Preset btn */
+        .preset-btn{
+            background:rgba(14,17,28,0.6);border:1px solid rgba(99,102,241,0.08);
+            border-radius:14px;padding:14px 18px;cursor:pointer;transition:all 0.25s;
+            text-align:left;width:100%;display:block;
+        }
+        .preset-btn:hover{border-color:rgba(99,102,241,0.2);background:rgba(99,102,241,0.04);transform:translateX(4px)}
+
+        /* Particles */
+        .particle{position:fixed;pointer-events:none;border-radius:50%;opacity:0;z-index:0}
+        @keyframes floatUp{0%{opacity:0;transform:translateY(0) scale(0)}10%{opacity:1}90%{opacity:0.3}100%{opacity:0;transform:translateY(-100vh) scale(1)}}
+
+        /* Ripple */
+        .ripple-wrap{position:relative;overflow:hidden}
+        .ripple{position:absolute;border-radius:50%;background:rgba(255,255,255,0.15);transform:scale(0);animation:rippleAnim 0.6s ease-out forwards;pointer-events:none}
+        @keyframes rippleAnim{to{transform:scale(4);opacity:0}}
+
+        /* Loading screen */
+        .loader-screen{position:fixed;inset:0;z-index:9999;background:#06080f;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity 0.5s,visibility 0.5s}
+        .loader-screen.hide{opacity:0;visibility:hidden}
+        .loader-ring{width:48px;height:48px;border:3px solid rgba(99,102,241,0.1);border-top-color:#6366f1;border-radius:50%;animation:spin 0.8s linear infinite}
+        .loader-text{margin-top:20px;font-size:13px;color:#818cf8;font-weight:600;letter-spacing:2px}
+
+        /* Score */
+        .score-circle{position:relative;display:inline-flex;align-items:center;justify-content:center}
+        .score-circle svg{transform:rotate(-90deg)}
+        .score-val{position:absolute;font-size:14px;font-weight:900;color:white}
+        .score-label{position:absolute;bottom:-2px;font-size:7px;color:#64748b;font-weight:600}
+
+        /* Stagger */
+        .stagger > *{opacity:0;animation:fadeUp 0.35s ease both}
+        .stagger > *:nth-child(1){animation-delay:0.03s}
+        .stagger > *:nth-child(2){animation-delay:0.06s}
+        .stagger > *:nth-child(3){animation-delay:0.09s}
+        .stagger > *:nth-child(4){animation-delay:0.12s}
+        .stagger > *:nth-child(5){animation-delay:0.15s}
+        .stagger > *:nth-child(6){animation-delay:0.18s}
+        .stagger > *:nth-child(7){animation-delay:0.21s}
+        .stagger > *:nth-child(8){animation-delay:0.24s}
+        .stagger > *:nth-child(9){animation-delay:0.27s}
+        .stagger > *:nth-child(10){animation-delay:0.30s}
+        .stagger > *:nth-child(11){animation-delay:0.33s}
+        .stagger > *:nth-child(12){animation-delay:0.36s}
+
+        /* Tooltip */
+        .tip{position:relative}
+        .tip::after{content:attr(data-tip);position:absolute;left:calc(100% + 12px);top:50%;transform:translateY(-50%) scale(0.9);background:rgba(14,17,28,0.95);border:1px solid rgba(99,102,241,0.15);color:#c8d6e5;padding:5px 10px;border-radius:8px;font-size:10px;white-space:nowrap;opacity:0;pointer-events:none;transition:all 0.2s;z-index:100;font-weight:500}
+        .tip:hover::after{opacity:1;transform:translateY(-50%) scale(1)}
+        .sidebar:hover .tip::after,.sidebar.expanded .tip::after{display:none}
+
+        /* Glow effect on active cards */
+        .card.on::after{content:'';position:absolute;top:-1px;right:-1px;width:8px;height:8px;background:#6366f1;border-radius:50%;box-shadow:0 0 8px 2px rgba(99,102,241,0.4);pointer-events:none}
+
+        /* Status bar */
+        .status-bar{background:rgba(8,10,16,0.9);border-top:1px solid rgba(99,102,241,0.05);backdrop-filter:blur(20px)}
+
+        /* Breadcrumb separator */
+        .bc-sep{color:rgba(99,102,241,0.2);margin:0 6px}
+
+        /* Hover card lift */
+        .card:hover{transform:translateY(-1px);box-shadow:0 4px 20px rgba(0,0,0,0.2)}
+        .card{transition:all 0.25s cubic-bezier(0.4,0,0.2,1)}
+
+        /* Version tag glow */
+        @keyframes tagGlow{0%,100%{box-shadow:0 0 8px rgba(99,102,241,0.1)}50%{box-shadow:0 0 16px rgba(99,102,241,0.25)}}
+        .v-tag{animation:tagGlow 3s ease infinite}
+
+        pre{white-space:pre-wrap;word-wrap:break-word}
+
+        @media(max-width:768px){
+            .sidebar{position:fixed;z-index:50;height:100vh;transform:translateX(-100%)}
+            .sidebar.mob{transform:translateX(0);width:260px}
+            .sidebar.mob .s-text{opacity:1;max-width:200px;margin-left:12px}
+            .sidebar.mob .nav-cat{opacity:1;height:auto;padding:16px 22px 6px}
+        }
+
+        .section-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px}
+        @media(max-width:700px){.section-grid{grid-template-columns:1fr}}
+
+        /* ═══ CREDITS PAGE ═══ */
+        @keyframes gradientShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+        @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+        @keyframes rotateGlow{0%{filter:hue-rotate(0deg)}100%{filter:hue-rotate(360deg)}}
+        @keyframes typeWriter{from{width:0}to{width:100%}}
+        @keyframes blinkCaret{50%{border-color:transparent}}
+        @keyframes scaleIn{from{opacity:0;transform:scale(0.7) rotateY(-15deg)}to{opacity:1;transform:scale(1) rotateY(0)}}
+        @keyframes slideInLeft{from{opacity:0;transform:translateX(-40px)}to{opacity:1;transform:translateX(0)}}
+        @keyframes slideInRight{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:translateX(0)}}
+        @keyframes orbFloat{0%{transform:translate(0,0) scale(1)}25%{transform:translate(15px,-20px) scale(1.1)}50%{transform:translate(-10px,-35px) scale(0.95)}75%{transform:translate(-20px,-15px) scale(1.05)}100%{transform:translate(0,0) scale(1)}}
+        @keyframes borderDance{0%{border-color:rgba(99,102,241,0.3)}25%{border-color:rgba(139,92,246,0.3)}50%{border-color:rgba(236,72,153,0.3)}75%{border-color:rgba(59,130,246,0.3)}100%{border-color:rgba(99,102,241,0.3)}}
+        @keyframes starTwinkle{0%,100%{opacity:0.2;transform:scale(0.8)}50%{opacity:1;transform:scale(1.2)}}
+
+        .credit-gradient{
+            background:linear-gradient(135deg,#6366f1,#8b5cf6,#ec4899,#6366f1);
+            background-size:300% 300%;
+            animation:gradientShift 6s ease infinite;
+            -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+            background-clip:text;
+        }
+        .credit-avatar{
+            animation:float 4s ease-in-out infinite;
+            position:relative;
+        }
+        .credit-avatar::after{
+            content:'';position:absolute;inset:-6px;border-radius:inherit;
+            background:conic-gradient(from 0deg,#6366f1,#8b5cf6,#ec4899,#3b82f6,#6366f1);
+            animation:rotateGlow 4s linear infinite;z-index:-1;opacity:0.5;filter:blur(12px);
+        }
+        .credit-card-anim{animation:scaleIn 0.6s cubic-bezier(0.34,1.56,0.64,1) both}
+        .credit-card-anim:nth-child(2){animation-delay:0.1s}
+        .credit-card-anim:nth-child(3){animation-delay:0.2s}
+        .credit-card-anim:nth-child(4){animation-delay:0.3s}
+        .credit-card-anim:nth-child(5){animation-delay:0.35s}
+        .credit-card-anim:nth-child(6){animation-delay:0.4s}
+
+        .orb{
+            position:absolute;border-radius:50%;pointer-events:none;
+            animation:orbFloat 8s ease-in-out infinite;
+        }
+        .orb-1{width:120px;height:120px;background:radial-gradient(circle,rgba(99,102,241,0.08),transparent);top:10%;right:5%;animation-delay:-2s}
+        .orb-2{width:80px;height:80px;background:radial-gradient(circle,rgba(139,92,246,0.06),transparent);bottom:20%;left:8%;animation-delay:-4s}
+        .orb-3{width:60px;height:60px;background:radial-gradient(circle,rgba(236,72,153,0.05),transparent);top:40%;left:15%;animation-delay:-6s}
+
+        .tech-badge{
+            display:inline-flex;align-items:center;gap:5px;
+            padding:5px 12px;border-radius:20px;font-size:10px;font-weight:600;
+            border:1px solid;animation:borderDance 4s ease infinite;
+            transition:all 0.3s;cursor:default;
+        }
+        .tech-badge:hover{transform:translateY(-2px);box-shadow:0 4px 15px rgba(99,102,241,0.15)}
+
+        .star{
+            position:absolute;width:3px;height:3px;background:white;border-radius:50%;
+            animation:starTwinkle 2s ease-in-out infinite;pointer-events:none;
+        }
+
+        .timeline-line{
+            position:absolute;left:18px;top:28px;bottom:0;width:2px;
+            background:linear-gradient(to bottom,rgba(99,102,241,0.3),rgba(139,92,246,0.1),transparent);
+        }
+        .timeline-dot{
+            width:10px;height:10px;border-radius:50%;flex-shrink:0;
+            background:linear-gradient(135deg,#6366f1,#8b5cf6);
+            box-shadow:0 0 10px rgba(99,102,241,0.4);
+            position:relative;z-index:1;
+        }
+
+        .hover-glow:hover{
+            box-shadow:0 0 30px rgba(99,102,241,0.12),0 8px 30px rgba(0,0,0,0.3);
+            border-color:rgba(99,102,241,0.2)!important;
+        }
+
+        /* Smooth entrance for all cards */
+        .card{backface-visibility:hidden;-webkit-font-smoothing:antialiased}
     </style>
 </head>
-<body class="bg-grid">
+<body class="bg-noise">
 
-<!-- Mobile -->
-<button id="mobBtn" class="md:hidden fixed top-3 left-3 z-[60] bg-slate-800/90 p-2 rounded-xl border border-slate-700 text-white" onclick="document.getElementById('sidebar').classList.toggle('mobile-open')">
-    <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11h18M3 6h18M3 16h18"/></svg>
+<!-- LOADING SCREEN -->
+<div id="loaderScreen" class="loader-screen">
+    <div class="w-16 h-16 bg-gradient-to-br from-indigo-500 to-violet-600 rounded-[18px] flex items-center justify-center text-xl font-black text-white mb-4 shadow-xl shadow-indigo-500/30">PC</div>
+    <div class="loader-ring"></div>
+    <p class="loader-text">INICIANDO</p>
+    <p class="text-[10px] text-slate-600 mt-2">Detectando hardware...</p>
+    <p class="text-[9px] text-slate-700 mt-6 tracking-widest">by <span class="text-indigo-500/60 font-semibold">mueblesito</span></p>
+</div>
+
+<!-- PARTICLES -->
+<div id="particles" class="fixed inset-0 pointer-events-none z-0"></div>
+
+<button id="mobMenuBtn" class="md:hidden fixed top-3 left-3 z-[60] p-2.5 rounded-xl bg-slate-800/90 border border-slate-700/50 text-white cursor-pointer" onclick="document.getElementById('sb').classList.toggle('mob')">
+    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="5" x2="17" y2="5"/><line x1="3" y1="10" x2="17" y2="10"/><line x1="3" y1="15" x2="17" y2="15"/></svg>
 </button>
 
-<!-- Sidebar -->
-<aside id="sidebar" class="sidebar fixed top-0 left-0 h-screen flex flex-col z-50 glass-heavy">
-    <div class="p-4 flex items-center gap-3 border-b border-slate-800/50 min-h-[60px]">
-        <div class="w-9 h-9 bg-gradient-to-br from-blue-500 to-violet-500 rounded-xl flex items-center justify-center text-sm font-black text-white flex-shrink-0">PC</div>
-        <div class="nav-label">
-            <h1 class="font-extrabold text-white text-sm leading-tight">PCTuner</h1>
-            <span class="text-[9px] font-bold text-blue-400 tracking-widest">PRO v5 · UNIVERSAL</span>
+<!-- SIDEBAR -->
+<aside id="sb" class="sidebar fixed top-0 left-0 h-screen flex flex-col z-50">
+    <div class="p-5 flex items-center border-b border-white/[0.03] min-h-[64px]">
+        <div class="w-10 h-10 bg-gradient-to-br from-indigo-500 to-violet-600 rounded-[13px] flex items-center justify-center text-sm font-black text-white flex-shrink-0 shadow-lg shadow-indigo-500/20 cursor-pointer hover:shadow-indigo-500/40 hover:scale-105 transition-all duration-300" onclick="go('credits')" title="✨ by mueblesito">PC</div>
+        <div class="s-text">
+            <h1 class="font-extrabold text-white text-[15px] leading-tight">PCTuner</h1>
+            <p class="text-[9px] font-bold text-indigo-400 tracking-[3px] mt-0.5 v-tag">PRO v6</p>
         </div>
     </div>
-    <nav class="flex-1 overflow-y-auto py-2 px-1.5 space-y-0.5" id="navContainer"></nav>
-    <div class="p-3 border-t border-slate-800/50">
+    <nav class="flex-1 overflow-y-auto py-3" id="nav"></nav>
+    <div class="p-4 border-t border-white/[0.03]">
         <div class="flex items-center gap-2 px-2">
-            <span class="w-2 h-2 bg-green-400 rounded-full pulse-dot flex-shrink-0"></span>
-            <span class="nav-label text-[10px] text-gray-500" id="sidebarStatus">Detectando sistema...</span>
+            <span class="w-2 h-2 bg-emerald-400 rounded-full pulse-anim flex-shrink-0"></span>
+            <span class="s-text text-[10px] text-slate-500" id="sbStatus">Detectando...</span>
         </div>
     </div>
 </aside>
 
-<!-- Main -->
-<main id="mainArea" class="ml-[68px] md:ml-[68px] min-h-screen transition-all">
-    <header class="sticky top-0 z-30 glass-heavy px-5 py-3 flex items-center justify-between">
+<!-- MAIN -->
+<main class="ml-[72px] min-h-screen transition-[margin] duration-300">
+    <header class="topbar sticky top-0 z-30 px-6 py-3.5 flex items-center justify-between">
         <div class="flex items-center gap-3 ml-8 md:ml-0">
-            <h2 id="pageTitle" class="text-base font-bold text-white">Detectando Sistema...</h2>
-            <span id="pageBadge" class="text-[10px] bg-blue-900/40 text-blue-400 px-2 py-0.5 rounded-full border border-blue-800/40">Analizando</span>
+            <h2 id="pTitle" class="text-[15px] font-bold text-white">Cargando...</h2>
+            <span class="bc-sep hidden md:inline">›</span>
+            <span id="pBadge" class="text-[10px] bg-indigo-500/10 text-indigo-400 px-2.5 py-0.5 rounded-full border border-indigo-500/15 font-medium">—</span>
         </div>
-        <div class="flex items-center gap-2">
-            <span id="changesBadge" class="text-[10px] code-font text-amber-400 bg-amber-900/30 px-2 py-1 rounded-full border border-amber-800/40 hidden">0</span>
-            <button onclick="openExec()" class="btn btn-green px-4 py-2 text-xs flex items-center gap-2" id="execBtn">
-                <span>▶</span><span>Ejecutar</span>
+        <div class="flex items-center gap-2.5">
+            <!-- Performance Score -->
+            <div id="perfScore" class="hidden md:flex items-center gap-2 bg-emerald-500/8 border border-emerald-500/12 rounded-full px-3 py-1 cursor-pointer" onclick="go('monitor')" title="Score de rendimiento">
+                <div class="score-circle">
+                    <svg width="28" height="28" viewBox="0 0 36 36"><circle cx="18" cy="18" r="14" fill="none" stroke="rgba(16,185,129,0.15)" stroke-width="3"/><circle cx="18" cy="18" r="14" fill="none" stroke="#10b981" stroke-width="3" stroke-dasharray="88" stroke-dashoffset="22" stroke-linecap="round" id="scoreRing"/></svg>
+                    <span class="score-val text-[10px] text-emerald-400" id="scoreVal">75</span>
+                </div>
+            </div>
+            <!-- Clock -->
+            <span id="clock" class="hidden md:block text-[10px] mono text-slate-500 bg-slate-800/40 px-2.5 py-1 rounded-full border border-slate-700/20"></span>
+            <span id="cBadge" class="text-[10px] mono text-amber-400 bg-amber-500/10 px-2.5 py-1 rounded-full border border-amber-500/15 hidden font-semibold">0</span>
+            <button onclick="openExec()" class="btn btn-success ripple-wrap px-5 py-2.5 text-xs">
+                <svg width="14" height="14" fill="currentColor" viewBox="0 0 16 16"><path d="M4 2l10 6-10 6z"/></svg>
+                <span>Ejecutar</span>
             </button>
-            <button onclick="openExport()" class="btn btn-blue px-4 py-2 text-xs flex items-center gap-2">
-                <span>📦</span><span class="hidden sm:inline">Exportar</span>
+            <button onclick="openExport()" class="btn btn-primary ripple-wrap px-4 py-2.5 text-xs">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+                <span class="hidden sm:inline">Exportar</span>
             </button>
         </div>
     </header>
-    <div class="p-4 max-w-7xl mx-auto pb-20" id="content"></div>
+    <div class="p-5 md:p-6 max-w-[1400px] mx-auto pb-24" id="content"></div>
+    <!-- STATUS BAR -->
+    <footer class="status-bar fixed bottom-0 left-[72px] right-0 z-20 px-5 py-1.5 flex items-center justify-between text-[9px] text-slate-600 transition-[left] duration-300">
+        <div class="flex items-center gap-4">
+            <span class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 bg-emerald-500 rounded-full pulse-anim"></span>Sistema activo</span>
+            <span id="sbHw" class="hidden md:inline">—</span>
+        </div>
+        <div class="flex items-center gap-4">
+            <span id="sbChanges">0 cambios</span>
+            <span>🛡️ Defender OK</span>
+            <span class="text-indigo-400 font-semibold cursor-pointer hover:text-indigo-300 transition-colors" onclick="go('credits')">PCTuner Pro v6 · by mueblesito</span>
+        </div>
+    </footer>
 </main>
 
-<!-- Execution Modal -->
+<!-- EXEC MODAL -->
 <div id="execModal" class="fixed inset-0 z-[100] hidden">
-    <div class="modal-bg absolute inset-0" onclick="closeExec()"></div>
+    <div class="overlay absolute inset-0" onclick="closeExec()"></div>
     <div class="relative z-10 flex items-center justify-center min-h-screen p-4">
-        <div class="glass-heavy rounded-2xl w-full max-w-2xl slide-up overflow-hidden">
-            <div class="flex items-center justify-between px-5 py-4 border-b border-slate-800/50">
+        <div class="modal w-full max-w-2xl fade-up">
+            <div class="flex items-center justify-between px-6 py-4 border-b border-white/[0.04]">
                 <div class="flex items-center gap-3">
-                    <div class="flex gap-1.5"><div class="w-3 h-3 bg-red-500 rounded-full cursor-pointer" onclick="closeExec()"></div><div class="w-3 h-3 bg-yellow-500 rounded-full"></div><div class="w-3 h-3 bg-green-500 rounded-full"></div></div>
-                    <span class="text-sm text-gray-300 font-semibold" id="execTitle">Ejecutar Optimizaciones</span>
+                    <div class="flex gap-1.5"><div class="w-3 h-3 bg-red-500 rounded-full cursor-pointer hover:brightness-125" onclick="closeExec()"></div><div class="w-3 h-3 bg-yellow-500 rounded-full"></div><div class="w-3 h-3 bg-green-500 rounded-full"></div></div>
+                    <span class="text-sm text-slate-300 font-semibold">Ejecutar Optimizaciones</span>
                 </div>
             </div>
-            <div id="execBody" class="p-5 max-h-[70vh] overflow-y-auto"></div>
+            <div id="execBody" class="p-6 max-h-[70vh] overflow-y-auto"></div>
         </div>
     </div>
 </div>
 
-<!-- Export Modal -->
+<!-- EXPORT MODAL -->
 <div id="exportModal" class="fixed inset-0 z-[100] hidden">
-    <div class="modal-bg absolute inset-0" onclick="closeExport()"></div>
+    <div class="overlay absolute inset-0" onclick="closeExport()"></div>
     <div class="relative z-10 flex items-center justify-center min-h-screen p-4">
-        <div class="glass-heavy rounded-2xl w-full max-w-3xl max-h-[85vh] overflow-hidden flex flex-col slide-up">
-            <div class="flex items-center justify-between px-5 py-4 border-b border-slate-800/50">
+        <div class="modal w-full max-w-3xl max-h-[85vh] overflow-hidden flex flex-col fade-up">
+            <div class="flex items-center justify-between px-6 py-4 border-b border-white/[0.04]">
                 <div class="flex items-center gap-3">
-                    <div class="flex gap-1.5"><div class="w-3 h-3 bg-red-500 rounded-full cursor-pointer" onclick="closeExport()"></div><div class="w-3 h-3 bg-yellow-500 rounded-full"></div><div class="w-3 h-3 bg-green-500 rounded-full"></div></div>
-                    <span class="text-sm text-gray-300 font-semibold" id="exportTitle">Exportar Script</span>
+                    <div class="flex gap-1.5"><div class="w-3 h-3 bg-red-500 rounded-full cursor-pointer hover:brightness-125" onclick="closeExport()"></div><div class="w-3 h-3 bg-yellow-500 rounded-full"></div><div class="w-3 h-3 bg-green-500 rounded-full"></div></div>
+                    <span class="text-sm text-slate-300 font-semibold" id="expTitle">Exportar Script</span>
                 </div>
                 <div class="flex gap-2">
-                    <select id="exportFmt" class="custom-select rounded-lg px-3 py-1.5 text-xs"><option value="bat">.BAT</option><option value="ps1">.PS1</option><option value="reg">.REG</option><option value="ahk">.AHK</option></select>
-                    <button onclick="genScript()" class="btn btn-blue px-3 py-1.5 text-xs">⚡ Generar</button>
+                    <select id="expFmt" class="sel text-xs"><option value="bat">.BAT</option><option value="ps1">.PS1</option><option value="reg">.REG</option><option value="ahk">.AHK</option></select>
+                    <button onclick="genScript()" class="btn btn-primary px-4 py-2 text-xs">⚡ Generar</button>
                 </div>
             </div>
-            <div id="exportBody" class="flex-1 overflow-auto"><div class="p-6 text-center text-gray-500"><p class="text-3xl mb-2">📦</p><p class="text-sm">Selecciona formato y clic en <strong class="text-blue-400">Generar</strong></p></div></div>
-            <div id="exportFooter" class="px-5 py-3 border-t border-slate-800/50 flex justify-between items-center hidden">
-                <span class="text-xs text-gray-500 code-font" id="exportInfo"></span>
+            <div id="expBody" class="flex-1 overflow-auto"><div class="p-8 text-center text-slate-500"><p class="text-4xl mb-3">📦</p><p class="text-sm">Selecciona formato y clic en <strong class="text-indigo-400">Generar</strong></p></div></div>
+            <div id="expFoot" class="px-6 py-3.5 border-t border-white/[0.04] flex justify-between items-center hidden">
+                <span class="text-xs text-slate-500 mono" id="expInfo"></span>
                 <div class="flex gap-2">
-                    <button onclick="copyCode()" id="copyBtn" class="btn btn-blue px-4 py-2 text-xs">📋 Copiar</button>
-                    <button onclick="dlCode()" class="btn btn-green px-4 py-2 text-xs">⬇ Descargar</button>
+                    <button onclick="copyCode()" id="copyBtn" class="btn btn-primary px-5 py-2 text-xs">📋 Copiar</button>
+                    <button onclick="dlCode()" class="btn btn-success px-5 py-2 text-xs">⬇ Descargar</button>
                 </div>
             </div>
         </div>
@@ -187,776 +455,559 @@
 </div>
 
 <script>
-// ======================== STATE ========================
-const S = {
+const S={
     page:'dashboard',
-    hw:{
-        platform:'',os:'',osVer:'',arch:'',cores:0,ram:0,gpu:'',brand:'',model:'',
-        battery:false,batteryLevel:0,charging:false,
-        connection:'',screenW:0,screenH:0,dpr:1,lang:'',
-        userAgent:'',touchscreen:false,darkMode:false
-    },
+    hw:{platform:'',os:'',osVer:'',arch:'',cores:0,ram:0,gpu:'',brand:'',model:'',battery:false,batteryLevel:0,charging:false,connection:'',screenW:0,screenH:0,dpr:1,lang:'',userAgent:'',touch:false,dark:false},
     toggles:{},sliders:{},selects:{},keybinds:{},
-    fanCurve:[{t:30,s:10},{t:45,s:25},{t:60,s:50},{t:75,s:80},{t:90,s:100}],
-    fanProfile:'balanced',
+    fan:{curve:[{t:30,s:10},{t:45,s:25},{t:60,s:50},{t:75,s:80},{t:90,s:100}],profile:'balanced'},
     changes:{},
-    monitor:{cpu:0,ram:0,temp:0,fanRPM:0,disk:0,uptime:'0h 0m',network:0}
+    mon:{cpu:0,ram:0,temp:0,rpm:0,disk:0,up:'0h 0m',net:0}
 };
-let changeCount=0, _code='', _fn='';
+let cCount=0,_code='',_fn='';
 
-// ======================== HW DETECTION ========================
+// ── HW DETECT ──
 async function detectHW(){
-    const ua = navigator.userAgent;
-    S.hw.userAgent = ua;
-    S.hw.lang = navigator.language;
-    S.hw.screenW = screen.width;
-    S.hw.screenH = screen.height;
-    S.hw.dpr = window.devicePixelRatio || 1;
-    S.hw.touchscreen = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-    S.hw.darkMode = window.matchMedia('(prefers-color-scheme:dark)').matches;
-    S.hw.cores = navigator.hardwareConcurrency || 1;
-    S.hw.ram = navigator.deviceMemory || 0;
-
-    // OS Detection
-    if(ua.includes('Windows NT 10.0')){
-        S.hw.os='Windows';
-        S.hw.osVer=ua.includes('Windows NT 10.0; Win64')? (ua.includes('Edg/')? '10/11 (64-bit)':'10/11') : '10/11';
-        if(navigator.userAgentData){
-            try{
-                const d=await navigator.userAgentData.getHighEntropyValues(['platformVersion','architecture','model','platform']);
-                S.hw.platform=d.platform||'Windows';
-                S.hw.arch=d.architecture||'x86';
-                if(d.platformVersion){
-                    const major=parseInt(d.platformVersion.split('.')[0]);
-                    S.hw.osVer=major>=13?'Windows 11':'Windows 10';
-                }
-                if(d.model)S.hw.model=d.model;
-            }catch(e){}
-        }
-    } else if(ua.includes('Windows NT 6.3'))S.hw.os='Windows',S.hw.osVer='8.1';
-    else if(ua.includes('Windows NT 6.1'))S.hw.os='Windows',S.hw.osVer='7';
-    else if(ua.includes('Mac OS'))S.hw.os='macOS',S.hw.osVer=ua.match(/Mac OS X ([\d_]+)/)?.[1]?.replace(/_/g,'.')||'';
-    else if(ua.includes('Linux'))S.hw.os='Linux',S.hw.osVer=ua.match(/Linux ([\w.]+)/)?.[1]||'';
-    else if(ua.includes('Android'))S.hw.os='Android',S.hw.osVer=ua.match(/Android ([\d.]+)/)?.[1]||'';
-    else if(ua.includes('iPhone')||ua.includes('iPad'))S.hw.os='iOS',S.hw.osVer=ua.match(/OS ([\d_]+)/)?.[1]?.replace(/_/g,'.')||'';
-    else S.hw.os='Desconocido';
-
-    // Arch
-    if(ua.includes('Win64')||ua.includes('x64')||ua.includes('WOW64'))S.hw.arch='x64';
-    else if(ua.includes('ARM'))S.hw.arch='ARM';
-    else if(!S.hw.arch)S.hw.arch='x86';
-
-    // Brand detection from UA
-    const brands = [
-        [/Lenovo/i,'Lenovo'],[/ASUS|ROG/i,'ASUS'],[/Acer/i,'Acer'],[/Dell/i,'Dell'],
-        [/HP|Hewlett/i,'HP'],[/MSI/i,'MSI'],[/Samsung/i,'Samsung'],[/Apple/i,'Apple'],
-        [/Huawei|HUAWEI/i,'Huawei'],[/Surface/i,'Microsoft Surface'],[/Razer/i,'Razer'],
-        [/Toshiba/i,'Toshiba'],[/Sony|VAIO/i,'Sony/VAIO'],[/Xiaomi/i,'Xiaomi']
-    ];
-    for(const [r,n] of brands){if(r.test(ua)){S.hw.brand=n;break;}}
-    if(!S.hw.brand)S.hw.brand='PC Genérico';
-
-    // GPU via WebGL
-    try{
-        const c=document.createElement('canvas'),gl=c.getContext('webgl')||c.getContext('experimental-webgl');
-        if(gl){
-            const ext=gl.getExtension('WEBGL_debug_renderer_info');
-            if(ext){
-                S.hw.gpu=gl.getParameter(ext.UNMASKED_RENDERER_WEBGL)||'';
-                const vendor=gl.getParameter(ext.UNMASKED_VENDOR_WEBGL)||'';
-                // Better brand detection from GPU
-                if(!S.hw.brand||S.hw.brand==='PC Genérico'){
-                    for(const [r,n] of brands){if(r.test(S.hw.gpu)||r.test(vendor)){S.hw.brand=n;break;}}
-                }
-            }
-        }
-    }catch(e){}
-
-    // Battery
-    if(navigator.getBattery){
-        try{
-            const b=await navigator.getBattery();
-            S.hw.battery=true;
-            S.hw.batteryLevel=Math.round(b.level*100);
-            S.hw.charging=b.charging;
-            b.addEventListener('levelchange',()=>{S.hw.batteryLevel=Math.round(b.level*100);});
-            b.addEventListener('chargingchange',()=>{S.hw.charging=b.charging;});
-        }catch(e){}
-    }
-
-    // Connection
-    if(navigator.connection){
-        const c=navigator.connection;
-        S.hw.connection=c.effectiveType||'unknown';
-    }
-
-    // Performance memory
-    if(performance.memory)S.hw.jsHeap=Math.round(performance.memory.usedJSHeapSize/1024/1024);
-
-    // Update UI
-    document.getElementById('sidebarStatus').textContent=S.hw.brand+' · '+S.hw.os;
-    return S.hw;
+    const u=navigator.userAgent;S.hw.userAgent=u;S.hw.lang=navigator.language;
+    S.hw.screenW=screen.width;S.hw.screenH=screen.height;S.hw.dpr=devicePixelRatio||1;
+    S.hw.touch='ontouchstart'in window;S.hw.dark=matchMedia('(prefers-color-scheme:dark)').matches;
+    S.hw.cores=navigator.hardwareConcurrency||1;S.hw.ram=navigator.deviceMemory||0;
+    if(u.includes('Windows NT 10.0')){S.hw.os='Windows';S.hw.osVer='10/11';
+        if(navigator.userAgentData){try{const d=await navigator.userAgentData.getHighEntropyValues(['platformVersion','architecture','model','platform']);S.hw.platform=d.platform||'Windows';S.hw.arch=d.architecture||'x86';if(d.platformVersion){const v=parseInt(d.platformVersion.split('.')[0]);S.hw.osVer=v>=13?'11':'10';}if(d.model)S.hw.model=d.model;}catch(e){}}
+    }else if(u.includes('Mac OS'))S.hw.os='macOS',S.hw.osVer=u.match(/Mac OS X ([\d_]+)/)?.[1]?.replace(/_/g,'.')||'';
+    else if(u.includes('Linux'))S.hw.os='Linux';else if(u.includes('Android'))S.hw.os='Android';
+    else if(u.includes('iPhone')||u.includes('iPad'))S.hw.os='iOS';else S.hw.os='Otro';
+    if(u.includes('Win64')||u.includes('x64')||u.includes('WOW64'))S.hw.arch='x64';
+    else if(u.includes('ARM'))S.hw.arch='ARM';else if(!S.hw.arch)S.hw.arch='x86';
+    const br=[[/Lenovo/i,'Lenovo'],[/ASUS|ROG/i,'ASUS'],[/Acer/i,'Acer'],[/Dell/i,'Dell'],[/HP|Hewlett/i,'HP'],[/MSI/i,'MSI'],[/Samsung/i,'Samsung'],[/Apple/i,'Apple'],[/Huawei/i,'Huawei'],[/Surface/i,'Microsoft'],[/Razer/i,'Razer'],[/Xiaomi/i,'Xiaomi']];
+    for(const[r,n]of br)if(r.test(u)){S.hw.brand=n;break;}
+    if(!S.hw.brand)S.hw.brand='PC';
+    try{const c=document.createElement('canvas'),gl=c.getContext('webgl')||c.getContext('experimental-webgl');if(gl){const x=gl.getExtension('WEBGL_debug_renderer_info');if(x){S.hw.gpu=gl.getParameter(x.UNMASKED_RENDERER_WEBGL)||'';const v=gl.getParameter(x.UNMASKED_VENDOR_WEBGL)||'';if(S.hw.brand==='PC')for(const[r,n]of br)if(r.test(S.hw.gpu)||r.test(v)){S.hw.brand=n;break;}}}}catch(e){}
+    if(navigator.getBattery)try{const b=await navigator.getBattery();S.hw.battery=true;S.hw.batteryLevel=Math.round(b.level*100);S.hw.charging=b.charging;b.onlevelchange=()=>S.hw.batteryLevel=Math.round(b.level*100);b.onchargingchange=()=>S.hw.charging=b.charging;}catch(e){}
+    if(navigator.connection)S.hw.connection=navigator.connection.effectiveType||'';
+    document.getElementById('sbStatus').textContent=S.hw.brand+' · '+S.hw.os;
 }
 
-// ======================== NAV ========================
+// ── NAV ──
 const NAV=[
-    {cat:'Principal',items:[
-        {id:'dashboard',icon:'🏠',name:'Dashboard'},
-        {id:'monitor',icon:'📊',name:'Monitor'},
-        {id:'fans',icon:'🌀',name:'Ventiladores'},
-    ]},
-    {cat:'Optimización',items:[
-        {id:'performance',icon:'⚡',name:'Rendimiento'},
-        {id:'cleanup',icon:'🧹',name:'Limpieza'},
-        {id:'network',icon:'🌐',name:'Red'},
-        {id:'power',icon:'🔋',name:'Energía'},
-        {id:'startup',icon:'🚀',name:'Arranque'},
-        {id:'gaming',icon:'🎮',name:'Gaming'},
-    ]},
-    {cat:'Personalización',items:[
-        {id:'keybinds',icon:'⌨️',name:'Keybinds'},
-        {id:'visual',icon:'🎨',name:'Visual'},
-        {id:'taskbar',icon:'📌',name:'Taskbar'},
-        {id:'explorer',icon:'📁',name:'Explorador'},
-        {id:'sound',icon:'🔊',name:'Sonido'},
-    ]},
-    {cat:'Sistema',items:[
-        {id:'privacy',icon:'🛡️',name:'Privacidad'},
-        {id:'services',icon:'⚙️',name:'Servicios'},
-        {id:'updates',icon:'🔄',name:'Updates'},
-        {id:'security',icon:'🔒',name:'Seguridad'},
-        {id:'maintenance',icon:'🔧',name:'Mantenimiento'},
-    ]},
-    {cat:'Herramientas',items:[
-        {id:'terminal',icon:'💻',name:'Terminal'},
-        {id:'profiles',icon:'💾',name:'Perfiles'},
-        {id:'about',icon:'ℹ️',name:'Acerca de'},
-    ]}
+    {c:'Principal',i:[{id:'dashboard',ic:'🏠',n:'Dashboard'},{id:'monitor',ic:'📊',n:'Monitor'},{id:'fans',ic:'🌀',n:'Ventiladores'}]},
+    {c:'Optimización',i:[{id:'performance',ic:'⚡',n:'Rendimiento'},{id:'cleanup',ic:'🧹',n:'Limpieza'},{id:'network',ic:'🌐',n:'Red'},{id:'power',ic:'🔋',n:'Energía'},{id:'startup',ic:'🚀',n:'Arranque'},{id:'gaming',ic:'🎮',n:'Gaming'}]},
+    {c:'Personalización',i:[{id:'keybinds',ic:'⌨️',n:'Keybinds'},{id:'visual',ic:'🎨',n:'Visual'},{id:'taskbar',ic:'📌',n:'Taskbar'},{id:'explorer',ic:'📁',n:'Explorador'},{id:'sound',ic:'🔊',n:'Sonido'}]},
+    {c:'Sistema',i:[{id:'privacy',ic:'🛡️',n:'Privacidad'},{id:'services',ic:'⚙️',n:'Servicios'},{id:'updates',ic:'🔄',n:'Updates'},{id:'security',ic:'🔒',n:'Seguridad'},{id:'maintenance',ic:'🔧',n:'Mantenimiento'}]},
+    {c:'Herramientas',i:[{id:'terminal',ic:'💻',n:'Terminal'},{id:'profiles',ic:'💾',n:'Perfiles'},{id:'about',ic:'ℹ️',n:'Info'},{id:'credits',ic:'✨',n:'Créditos'}]}
 ];
-const META={
-    dashboard:{t:'Dashboard',b:'Centro de control'},monitor:{t:'Monitor del Sistema',b:'Tiempo real'},
-    fans:{t:'Ventiladores',b:'Control · RPM'},performance:{t:'Rendimiento',b:'CPU · RAM · Disco'},
-    cleanup:{t:'Limpieza',b:'Temp · Caché'},network:{t:'Red',b:'DNS · WiFi'},
-    power:{t:'Energía',b:'Plan · Batería'},startup:{t:'Arranque',b:'Inicio'},
-    gaming:{t:'Gaming',b:'FPS · Latencia'},keybinds:{t:'Keybinds',b:'Atajos'},
-    visual:{t:'Visual',b:'Tema · UI'},taskbar:{t:'Barra de Tareas',b:'Config'},
-    explorer:{t:'Explorador',b:'Archivos'},sound:{t:'Sonido',b:'Audio'},
-    privacy:{t:'Privacidad',b:'Telemetría'},services:{t:'Servicios',b:'Windows'},
-    updates:{t:'Windows Update',b:'Config'},security:{t:'Seguridad',b:'Red · Firewall'},
-    maintenance:{t:'Mantenimiento',b:'Reparar'},terminal:{t:'Terminal',b:'Comandos'},
-    profiles:{t:'Perfiles',b:'Guardar'},about:{t:'Acerca de',b:'Info'}
-};
+const META={dashboard:{t:'Dashboard',b:'Centro de Control'},monitor:{t:'Monitor',b:'Tiempo Real'},fans:{t:'Ventiladores',b:'Control RPM'},performance:{t:'Rendimiento',b:'CPU · RAM'},cleanup:{t:'Limpieza',b:'Temp · Caché'},network:{t:'Red',b:'DNS · WiFi'},power:{t:'Energía',b:'Plan'},startup:{t:'Arranque',b:'Inicio'},gaming:{t:'Gaming',b:'FPS'},keybinds:{t:'Keybinds',b:'Atajos'},visual:{t:'Visual',b:'Tema'},taskbar:{t:'Taskbar',b:'Barra'},explorer:{t:'Explorador',b:'Archivos'},sound:{t:'Sonido',b:'Audio'},privacy:{t:'Privacidad',b:'Telemetría'},services:{t:'Servicios',b:'Windows'},updates:{t:'Updates',b:'Config'},security:{t:'Seguridad',b:'Firewall'},maintenance:{t:'Mantenimiento',b:'Reparar'},terminal:{t:'Terminal',b:'CMD'},profiles:{t:'Perfiles',b:'Guardar'},about:{t:'Acerca de',b:'v6.0'},credits:{t:'Créditos',b:'✨ mueblesito'}};
 
 function buildNav(){
     let h='';
     NAV.forEach(c=>{
-        h+=`<p class="text-[9px] font-bold text-gray-600 tracking-widest uppercase px-3 mt-3 mb-1 nav-label">${c.cat}</p>`;
-        c.items.forEach(i=>{
-            h+=`<button class="nav-item w-full flex items-center px-3 py-2 rounded-r-lg" data-id="${i.id}" onclick="go('${i.id}')"><span class="nav-icon text-base w-6 text-center">${i.icon}</span><span class="nav-label text-[13px] font-medium">${i.name}</span></button>`;
-        });
+        h+=`<div class="nav-cat s-text">${c.c}</div>`;
+        c.i.forEach(i=>{h+=`<button class="nav-btn" data-id="${i.id}" onclick="go('${i.id}')"><span class="s-icon text-center text-base">${i.ic}</span><span class="s-text text-[13px] font-medium">${i.n}</span></button>`;});
     });
-    document.getElementById('navContainer').innerHTML=h;
+    document.getElementById('nav').innerHTML=h;
 }
 
 function go(id){
     S.page=id;
-    document.querySelectorAll('.nav-item').forEach(b=>b.classList.toggle('active',b.dataset.id===id));
+    document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active',b.dataset.id===id));
     const m=META[id]||{t:id,b:''};
-    document.getElementById('pageTitle').textContent=m.t;
-    document.getElementById('pageBadge').textContent=m.b;
+    document.getElementById('pTitle').textContent=m.t;
+    document.getElementById('pBadge').textContent=m.b;
     render(id);
-    document.getElementById('sidebar').classList.remove('mobile-open');
-    window.scrollTo({top:0,behavior:'smooth'});
+    document.getElementById('sb').classList.remove('mob');
+    scrollTo({top:0,behavior:'smooth'});
 }
 
-// ======================== HELPERS ========================
-function track(k,v){S.changes[k]=v;changeCount=Object.keys(S.changes).length;const b=document.getElementById('changesBadge');if(changeCount>0){b.classList.remove('hidden');b.textContent=changeCount+' cambios';}else b.classList.add('hidden');}
-function T(id){return S.toggles[id];}
-function SL(id){return S.sliders[id];}
-function SE(id){return S.selects[id];}
+// ── HELPERS ──
+function track(k,v){S.changes[k]=v;cCount=Object.keys(S.changes).length;const b=document.getElementById('cBadge');if(cCount>0){b.classList.remove('hidden');b.textContent=cCount+' cambios';}else b.classList.add('hidden');if(typeof updScore==='function')updScore();if(typeof updStatusBar==='function')updStatusBar();}
+function T(id){return S.toggles[id]}
+function SE(id){return S.selects[id]}
 
 function tog(id,label,desc,def=false,risk='low'){
     const c=S.toggles[id]!==undefined?S.toggles[id]:def;if(S.toggles[id]===undefined)S.toggles[id]=def;
-    const rc={low:'risk-low',med:'risk-med',high:'risk-high'},rl={low:'bajo',med:'medio',high:'alto'};
-    return `<div class="card p-3.5 ${c?'active-card':''}" id="card-${id}"><div class="flex items-center justify-between gap-3"><div class="flex-1 min-w-0"><div class="flex items-center gap-2 flex-wrap mb-0.5"><span class="font-semibold text-white text-[13px]">${label}</span><span class="text-[8px] px-1.5 py-0.5 rounded-full ${rc[risk]}">${rl[risk]}</span></div><p class="text-[11px] text-gray-500">${desc}</p></div><label class="toggle-wrap"><input type="checkbox" ${c?'checked':''} onchange="onTog('${id}',this.checked)"><div class="toggle-track"></div><div class="toggle-knob"></div></label></div></div>`;
+    const rc={low:'badge-low',med:'badge-med',high:'badge-high'},rl={low:'seguro',med:'medio',high:'riesgo'};
+    return `<div class="card p-4 ${c?'on':''}" id="c-${id}"><div class="flex items-center justify-between gap-3"><div class="flex-1 min-w-0"><div class="flex items-center gap-2 flex-wrap mb-1"><span class="font-semibold text-white text-[13px]">${label}</span><span class="badge ${rc[risk]}">${rl[risk]}</span></div><p class="text-[11px] text-slate-500 leading-relaxed">${desc}</p></div><label class="sw"><input type="checkbox" ${c?'checked':''} onchange="onTog('${id}',this.checked)"><div class="sw-bg"></div><div class="sw-dot"></div></label></div></div>`;
 }
 function sli(id,label,desc,min,max,def,unit=''){
     const v=S.sliders[id]!==undefined?S.sliders[id]:def;if(S.sliders[id]===undefined)S.sliders[id]=def;
-    return `<div class="card p-3.5"><div class="flex items-center justify-between mb-1"><span class="font-semibold text-white text-[13px]">${label}</span><span class="code-font text-blue-400 text-xs" id="sv-${id}">${v}${unit}</span></div><p class="text-[11px] text-gray-500 mb-2">${desc}</p><input type="range" min="${min}" max="${max}" value="${v}" class="w-full" oninput="onSli('${id}',this.value,'${unit}')"></div>`;
+    return `<div class="card p-4"><div class="flex items-center justify-between mb-1.5"><span class="font-semibold text-white text-[13px]">${label}</span><span class="mono text-indigo-400 text-xs font-semibold" id="sv-${id}">${v}${unit}</span></div><p class="text-[11px] text-slate-500 mb-3">${desc}</p><input type="range" min="${min}" max="${max}" value="${v}" class="w-full" oninput="onSli('${id}',this.value,'${unit}')"></div>`;
 }
 function sel(id,label,desc,opts,def){
     const v=S.selects[id]!==undefined?S.selects[id]:def;if(S.selects[id]===undefined)S.selects[id]=def;
-    const o=opts.map(x=>`<option value="${x.v}" ${v===x.v?'selected':''}>${x.l}</option>`).join('');
-    return `<div class="card p-3.5"><div class="flex items-center justify-between flex-wrap gap-2"><div class="flex-1 min-w-0"><span class="font-semibold text-white text-[13px]">${label}</span><p class="text-[11px] text-gray-500 mt-0.5">${desc}</p></div><select class="custom-select rounded-lg px-3 py-1.5 text-xs" onchange="onSel('${id}',this.value)">${o}</select></div></div>`;
+    return `<div class="card p-4"><div class="flex items-center justify-between flex-wrap gap-3"><div class="flex-1 min-w-0"><span class="font-semibold text-white text-[13px]">${label}</span><p class="text-[11px] text-slate-500 mt-1">${desc}</p></div><select class="sel" onchange="onSel('${id}',this.value)">${opts.map(x=>`<option value="${x.v}" ${v===x.v?'selected':''}>${x.l}</option>`).join('')}</select></div></div>`;
 }
 function kb(id,label,desc,def){
     const v=S.keybinds[id]||def;if(!S.keybinds[id])S.keybinds[id]=def;
-    return `<div class="card p-3.5"><div class="flex items-center justify-between gap-3"><div class="flex-1 min-w-0"><span class="font-semibold text-white text-[13px]">${label}</span><p class="text-[11px] text-gray-500 mt-0.5">${desc}</p></div><div class="flex items-center gap-1"><input type="text" readonly class="keybind-field code-font text-[11px] text-amber-400 px-2 py-1.5 rounded-lg font-bold" value="${v}" id="kb-${id}" onclick="recStart('${id}',this)"><button onclick="recReset('${id}','${def}')" class="text-gray-600 hover:text-red-400 text-xs cursor-pointer px-1">↺</button></div></div></div>`;
+    return `<div class="card p-4"><div class="flex items-center justify-between gap-3"><div class="flex-1 min-w-0"><span class="font-semibold text-white text-[13px]">${label}</span><p class="text-[11px] text-slate-500 mt-1">${desc}</p></div><div class="flex items-center gap-2"><input type="text" readonly class="kb-input" value="${v}" id="kb-${id}" onclick="recStart('${id}',this)"><button onclick="recReset('${id}','${def}')" class="text-slate-600 hover:text-red-400 text-xs cursor-pointer p-1 rounded-lg hover:bg-red-500/5 transition-colors">↺</button></div></div></div>`;
 }
-function hdr(i,t,d){return `<div class="mb-4"><h3 class="text-lg font-bold text-white flex items-center gap-2">${i} ${t}</h3><p class="text-xs text-gray-500 mt-0.5">${d}</p></div>`;}
-function divider(t){return `<div class="mt-7 mb-3 flex items-center gap-2"><div class="h-px flex-1 bg-slate-800/80"></div><span class="text-[9px] font-bold text-gray-600 tracking-widest uppercase px-3">${t}</span><div class="h-px flex-1 bg-slate-800/80"></div></div>`;}
-function grid(c){return `<div class="grid md:grid-cols-2 gap-2.5">${c}</div>`;}
+function hdr(icon,title,desc){return `<div class="mb-5 fade-up"><h3 class="text-xl font-bold text-white flex items-center gap-2.5">${icon}<span>${title}</span></h3><p class="text-xs text-slate-500 mt-1 ml-8">${desc}</p></div>`;}
+function divider(t){return `<div class="mt-8 mb-4 flex items-center gap-3"><div class="h-px flex-1 bg-gradient-to-r from-transparent via-slate-800/60 to-transparent"></div><span class="text-[9px] font-bold text-slate-600 tracking-[3px] uppercase">${t}</span><div class="h-px flex-1 bg-gradient-to-r from-transparent via-slate-800/60 to-transparent"></div></div>`;}
+function grid(c){return `<div class="section-grid stagger">${c}</div>`;}
 
-function onTog(id,c){S.toggles[id]=c;track(id,c);const card=document.getElementById('card-'+id);if(card)card.classList.toggle('active-card',c);}
+function onTog(id,c){S.toggles[id]=c;track(id,c);const el=document.getElementById('c-'+id);if(el)el.classList.toggle('on',c);}
 function onSli(id,v,u){S.sliders[id]=parseInt(v);track(id,v);const e=document.getElementById('sv-'+id);if(e)e.textContent=v+u;}
 function onSel(id,v){S.selects[id]=v;track(id,v);}
 
-// Keybind recording
 let _recId=null,_recEl=null;
-function recStart(id,el){if(_recEl){_recEl.classList.remove('recording');_recEl.value=S.keybinds[_recId]||'';}_recId=id;_recEl=el;el.classList.add('recording');el.value='⏺ ...';}
-function recReset(id,def){S.keybinds[id]=def;const e=document.getElementById('kb-'+id);if(e){e.value=def;e.classList.remove('recording');}track('kb_'+id,def);}
+function recStart(id,el){if(_recEl){_recEl.classList.remove('rec');_recEl.value=S.keybinds[_recId]||'';}_recId=id;_recEl=el;el.classList.add('rec');el.value='⏺ Presiona...';}
+function recReset(id,def){S.keybinds[id]=def;const e=document.getElementById('kb-'+id);if(e){e.value=def;e.classList.remove('rec');}track('kb_'+id,def);}
 document.addEventListener('keydown',e=>{
     if(!_recId)return;e.preventDefault();
     let k=[];if(e.ctrlKey)k.push('Ctrl');if(e.altKey)k.push('Alt');if(e.shiftKey)k.push('Shift');if(e.metaKey)k.push('Win');
     const key=e.key;if(!['Control','Alt','Shift','Meta'].includes(key))k.push(key.length===1?key.toUpperCase():key);
     const c=k.join(' + ');
-    if(c&&!['Ctrl','Alt','Shift','Win'].includes(c)){S.keybinds[_recId]=c;_recEl.value=c;_recEl.classList.remove('recording');track('kb_'+_recId,c);_recId=null;_recEl=null;}
+    if(c&&!['Ctrl','Alt','Shift','Win'].includes(c)){S.keybinds[_recId]=c;_recEl.value=c;_recEl.classList.remove('rec');track('kb_'+_recId,c);_recId=null;_recEl=null;}
 });
 
-// Gauge SVG
-function gauge(pct,color,label,value,sz=110){
-    const r=38,circ=2*Math.PI*r,off=circ-(pct/100)*circ;
-    return `<div class="flex flex-col items-center"><svg width="${sz}" height="${sz}" viewBox="0 0 100 100"><circle cx="50" cy="50" r="${r}" fill="none" stroke="rgba(59,130,246,0.06)" stroke-width="6"/><circle cx="50" cy="50" r="${r}" class="gauge-ring" stroke="${color}" stroke-width="6" stroke-dasharray="${circ}" stroke-dashoffset="${off}" transform="rotate(-90 50 50)"/><text x="50" y="46" text-anchor="middle" fill="white" font-size="15" font-weight="800">${value}</text><text x="50" y="59" text-anchor="middle" fill="#64748b" font-size="7.5">${label}</text></svg></div>`;
+function gauge(pct,color,label,value,sz=120){
+    const r=42,circ=2*Math.PI*r,off=circ-(Math.min(pct,100)/100)*circ;
+    return `<div class="flex flex-col items-center"><svg width="${sz}" height="${sz}" viewBox="0 0 100 100"><circle cx="50" cy="50" r="${r}" fill="none" stroke="rgba(99,102,241,0.04)" stroke-width="5"/><circle cx="50" cy="50" r="${r}" class="gauge-ring" stroke="${color}" stroke-width="5" stroke-dasharray="${circ}" stroke-dashoffset="${off}" transform="rotate(-90 50 50)"/><text x="50" y="45" text-anchor="middle" fill="white" font-size="16" font-weight="800" font-family="Inter">${value}</text><text x="50" y="60" text-anchor="middle" fill="#64748b" font-size="8" font-family="Inter">${label}</text></svg></div>`;
 }
 
-// ======================== MONITOR SIM ========================
+// ── MONITOR SIM ──
 function simMon(){
-    S.monitor.cpu=Math.round(12+Math.random()*45);
-    S.monitor.ram=Math.round(40+Math.random()*30);
-    S.monitor.temp=Math.round(38+Math.random()*25);
-    S.monitor.disk=Math.round(3+Math.random()*25);
-    S.monitor.network=Math.round(Math.random()*50*10)/10;
-    const base={silent:1400,balanced:2600,performance:4000,custom:2800};
-    S.monitor.fanRPM=(base[S.fanProfile]||2600)+Math.round(Math.random()*400-200);
-    const h=Math.floor(Math.random()*72),m=Math.floor(Math.random()*60);
-    S.monitor.uptime=h+'h '+m+'m';
-    if(S.page==='monitor')renderMonLive();
+    const m=S.mon;
+    m.cpu=Math.round(10+Math.random()*50);m.ram=Math.round(35+Math.random()*35);
+    m.temp=Math.round(35+Math.random()*28);m.disk=Math.round(2+Math.random()*20);
+    m.net=Math.round(Math.random()*60*10)/10;
+    const b={silent:1200,balanced:2400,performance:3800,custom:2800};
+    m.rpm=(b[S.fan.profile]||2400)+Math.round(Math.random()*500-250);
+    m.up=Math.floor(Math.random()*72)+'h '+Math.floor(Math.random()*60)+'m';
+    if(S.page==='monitor')updMon();
     if(S.page==='fans')updFanLive();
-    if(S.page==='dashboard')updDashLive();
+    if(S.page==='dashboard')updDash();
 }
-function renderMonLive(){
-    const m=S.monitor;
+function updMon(){
+    const m=S.mon;
     ['cpu','ram','temp','disk'].forEach(k=>{
-        const el=document.getElementById('mon-'+k);if(!el)return;
-        const vals={cpu:{p:m.cpu,c:m.cpu>80?'#ef4444':m.cpu>50?'#f59e0b':'#22c55e',l:'CPU',v:m.cpu+'%'},ram:{p:m.ram,c:m.ram>85?'#ef4444':m.ram>60?'#f59e0b':'#3b82f6',l:'RAM',v:m.ram+'%'},temp:{p:m.temp,c:m.temp>80?'#ef4444':m.temp>60?'#f59e0b':'#22c55e',l:'TEMP',v:m.temp+'°C'},disk:{p:m.disk,c:'#8b5cf6',l:'DISCO',v:m.disk+'%'}};
-        const d=vals[k];el.innerHTML=gauge(d.p,d.c,d.l,d.v,120);
+        const el=document.getElementById('m-'+k);if(!el)return;
+        const d={cpu:{p:m.cpu,c:m.cpu>80?'#ef4444':m.cpu>50?'#f59e0b':'#10b981',l:'CPU',v:m.cpu+'%'},ram:{p:m.ram,c:m.ram>85?'#ef4444':m.ram>60?'#f59e0b':'#6366f1',l:'RAM',v:m.ram+'%'},temp:{p:m.temp,c:m.temp>75?'#ef4444':m.temp>55?'#f59e0b':'#10b981',l:'TEMP',v:m.temp+'°C'},disk:{p:m.disk,c:'#8b5cf6',l:'DISCO',v:m.disk+'%'}}[k];
+        el.innerHTML=gauge(d.p,d.c,d.l,d.v,130);
     });
-    const r=document.getElementById('mon-rpm');if(r)r.textContent=m.fanRPM+' RPM';
-    const u=document.getElementById('mon-up');if(u)u.textContent=m.uptime;
-    const n=document.getElementById('mon-net');if(n)n.textContent=m.network+' MB/s';
+    const r=document.getElementById('m-rpm');if(r)r.textContent=m.rpm+' RPM';
+    const u=document.getElementById('m-up');if(u)u.textContent=m.up;
+    const n=document.getElementById('m-net');if(n)n.textContent=m.net+' MB/s';
 }
-function updFanLive(){const r=document.getElementById('fan-rpm');if(r)r.textContent=S.monitor.fanRPM;const t=document.getElementById('fan-temp');if(t)t.textContent=S.monitor.temp+'°C';}
-function updDashLive(){
-    const m=S.monitor;
-    const c=document.getElementById('dash-cpu');if(c)c.innerHTML=gauge(m.cpu,m.cpu>80?'#ef4444':m.cpu>50?'#f59e0b':'#22c55e','CPU',m.cpu+'%');
-    const r=document.getElementById('dash-ram');if(r)r.innerHTML=gauge(m.ram,m.ram>85?'#ef4444':'#3b82f6','RAM',m.ram+'%');
-    const t=document.getElementById('dash-temp');if(t)t.innerHTML=gauge(m.temp,m.temp>75?'#ef4444':'#22c55e','TEMP',m.temp+'°C');
-    const f=document.getElementById('dash-fan');if(f)f.textContent=m.fanRPM;
+function updFanLive(){const r=document.getElementById('f-rpm');if(r)r.textContent=S.mon.rpm;const t=document.getElementById('f-temp');if(t)t.textContent=S.mon.temp+'°C';}
+function updDash(){
+    const m=S.mon;
+    const c=document.getElementById('d-cpu');if(c)c.innerHTML=gauge(m.cpu,m.cpu>80?'#ef4444':m.cpu>50?'#f59e0b':'#10b981','CPU',m.cpu+'%');
+    const r=document.getElementById('d-ram');if(r)r.innerHTML=gauge(m.ram,m.ram>85?'#ef4444':'#6366f1','RAM',m.ram+'%');
+    const t=document.getElementById('d-temp');if(t)t.innerHTML=gauge(m.temp,m.temp>70?'#ef4444':'#10b981','TEMP',m.temp+'°C');
+    const f=document.getElementById('d-fan');if(f)f.textContent=m.rpm;
 }
 
-// ======================== RENDER ========================
+// ── RENDER ──
 function render(id){
-    const fns={dashboard:pDash,monitor:pMon,fans:pFans,performance:pPerf,cleanup:pClean,network:pNet,power:pPow,startup:pStart,gaming:pGame,keybinds:pKeys,visual:pVis,taskbar:pTask,explorer:pExp,sound:pSnd,privacy:pPriv,services:pSvc,updates:pUpd,security:pSec,maintenance:pMaint,terminal:pTerm,profiles:pProf,about:pAbout};
-    document.getElementById('content').innerHTML=(fns[id]||pDash)();
+    const fn={dashboard:pDash,monitor:pMon,fans:pFans,performance:pPerf,cleanup:pClean,network:pNet,power:pPow,startup:pStart,gaming:pGame,keybinds:pKeys,visual:pVis,taskbar:pTask,explorer:pExp,sound:pSnd,privacy:pPriv,services:pSvc,updates:pUpd,security:pSec,maintenance:pMaint,terminal:pTerm,profiles:pProf,about:pAbout,credits:pCredits};
+    document.getElementById('content').innerHTML=(fn[id]||pDash)();
     if(id==='fans')initFanCanvas();
 }
 
-// ======================== DASHBOARD ========================
+// ── DASHBOARD ──
 function pDash(){
-    const hw=S.hw;
-    const gpuShort=hw.gpu?hw.gpu.replace(/ANGLE \(|,.*|\)/g,'').substring(0,40):'No detectada';
+    const h=S.hw,gpu=h.gpu?h.gpu.replace(/ANGLE \(|,.*|\)/g,'').substring(0,45):'No detectada';
     return `
-    <!-- HW Detection -->
-    <div class="hw-badge p-4 mb-5 slide-up">
-        <div class="flex items-center justify-between flex-wrap gap-3">
-            <div class="flex items-center gap-3">
-                <div class="text-3xl">${hw.os==='Windows'?'🖥️':hw.os==='macOS'?'🍎':hw.os==='Linux'?'🐧':hw.os==='Android'?'🤖':'📱'}</div>
+    <div class="hw-card p-5 mb-6 fade-up">
+        <div class="flex items-center justify-between flex-wrap gap-4">
+            <div class="flex items-center gap-4">
+                <div class="w-14 h-14 bg-gradient-to-br from-indigo-500/20 to-violet-500/20 rounded-2xl flex items-center justify-center text-3xl border border-indigo-500/10">${h.os==='Windows'?'🖥️':h.os==='macOS'?'🍎':h.os==='Linux'?'🐧':'📱'}</div>
                 <div>
-                    <h3 class="font-bold text-white text-base">${hw.brand} ${hw.model||''}</h3>
-                    <p class="text-xs text-gray-400">${hw.osVer||hw.os} · ${hw.arch} · ${hw.cores} núcleos${hw.ram?' · '+hw.ram+'GB RAM':''}</p>
+                    <h3 class="font-bold text-white text-lg">${h.brand} ${h.model||''}</h3>
+                    <p class="text-sm text-slate-400 mt-0.5">${h.osVer?'Windows '+h.osVer:h.os} · ${h.arch} · ${h.cores} núcleos${h.ram?' · '+h.ram+'GB RAM':''}</p>
                 </div>
             </div>
-            <div class="flex items-center gap-3 flex-wrap">
-                ${hw.battery?`<div class="flex items-center gap-1.5 bg-slate-800/50 px-3 py-1.5 rounded-lg"><span class="text-sm">${hw.charging?'🔌':'🔋'}</span><span class="text-xs font-bold ${hw.batteryLevel<20?'text-red-400':hw.batteryLevel<50?'text-amber-400':'text-green-400'}">${hw.batteryLevel}%</span></div>`:''}
-                <div class="flex items-center gap-1.5 bg-slate-800/50 px-3 py-1.5 rounded-lg"><span class="text-sm">🖥️</span><span class="text-xs text-gray-300">${hw.screenW}×${hw.screenH}</span></div>
-                ${hw.connection?`<div class="flex items-center gap-1.5 bg-slate-800/50 px-3 py-1.5 rounded-lg"><span class="text-sm">📡</span><span class="text-xs text-gray-300">${hw.connection}</span></div>`:''}
+            <div class="flex items-center gap-2 flex-wrap">
+                ${h.battery?`<div class="stat px-3 py-2 flex items-center gap-2"><span>${h.charging?'🔌':'🔋'}</span><span class="text-xs font-bold ${h.batteryLevel<20?'text-red-400':h.batteryLevel<50?'text-amber-400':'text-emerald-400'}">${h.batteryLevel}%</span></div>`:''}
+                <div class="stat px-3 py-2"><span class="text-xs text-slate-400">${h.screenW}×${h.screenH}</span></div>
+                ${h.connection?`<div class="stat px-3 py-2"><span class="text-xs text-slate-400">📡 ${h.connection}</span></div>`:''}
             </div>
         </div>
-        <div class="mt-3 flex flex-wrap gap-2">
-            <span class="text-[10px] bg-blue-900/30 text-blue-300 px-2 py-0.5 rounded-full border border-blue-800/30">GPU: ${gpuShort}</span>
-            <span class="text-[10px] bg-green-900/30 text-green-300 px-2 py-0.5 rounded-full border border-green-800/30">🛡️ Defender: Intacto</span>
-            ${hw.touchscreen?'<span class="text-[10px] bg-purple-900/30 text-purple-300 px-2 py-0.5 rounded-full border border-purple-800/30">👆 Touch</span>':''}
+        <div class="mt-4 flex flex-wrap gap-2">
+            <span class="text-[10px] bg-indigo-500/8 text-indigo-300 px-2.5 py-1 rounded-full border border-indigo-500/10">GPU: ${gpu}</span>
+            <span class="text-[10px] bg-emerald-500/8 text-emerald-300 px-2.5 py-1 rounded-full border border-emerald-500/10">🛡️ Defender: Intacto</span>
         </div>
     </div>
 
-    <!-- Live gauges -->
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
-        <div class="card p-3 flex flex-col items-center" id="dash-cpu">${gauge(S.monitor.cpu,'#22c55e','CPU',S.monitor.cpu+'%')}</div>
-        <div class="card p-3 flex flex-col items-center" id="dash-ram">${gauge(S.monitor.ram,'#3b82f6','RAM',S.monitor.ram+'%')}</div>
-        <div class="card p-3 flex flex-col items-center" id="dash-temp">${gauge(S.monitor.temp,'#22c55e','TEMP',S.monitor.temp+'°C')}</div>
-        <div class="card p-3 flex flex-col items-center">
-            <p class="text-3xl mb-1">🌀</p>
-            <p class="font-black text-white text-xl" id="dash-fan">${S.monitor.fanRPM}</p>
-            <p class="text-[10px] text-gray-500">RPM</p>
-        </div>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+        <div class="card p-4 flex flex-col items-center" id="d-cpu">${gauge(S.mon.cpu,'#10b981','CPU',S.mon.cpu+'%')}</div>
+        <div class="card p-4 flex flex-col items-center" id="d-ram">${gauge(S.mon.ram,'#6366f1','RAM',S.mon.ram+'%')}</div>
+        <div class="card p-4 flex flex-col items-center" id="d-temp">${gauge(S.mon.temp,'#10b981','TEMP',S.mon.temp+'°C')}</div>
+        <div class="card p-4 flex flex-col items-center"><p class="text-3xl mb-2">🌀</p><p class="font-black text-white text-2xl" id="d-fan">${S.mon.rpm}</p><p class="text-[10px] text-slate-500 mt-1">RPM</p></div>
     </div>
 
-    <!-- Quick Actions -->
-    <div class="grid md:grid-cols-2 gap-4 mb-5">
-        <div class="card p-5">
-            ${hdr('🚀','Presets Rápidos','Optimización con 1 clic para tu '+hw.brand)}
-            <div class="space-y-2">
-                <button onclick="applyPreset('balanced')" class="w-full text-left bg-blue-900/12 hover:bg-blue-900/25 border border-blue-800/15 rounded-xl p-3 transition-all cursor-pointer group"><div class="flex items-center justify-between"><div><p class="font-bold text-blue-300 text-sm">⚖️ Equilibrado</p><p class="text-[10px] text-gray-500">Uso diario. Estable + rápido.</p></div><span class="text-blue-500 group-hover:translate-x-1 transition-transform">→</span></div></button>
-                <button onclick="applyPreset('max')" class="w-full text-left bg-amber-900/12 hover:bg-amber-900/25 border border-amber-800/15 rounded-xl p-3 transition-all cursor-pointer group"><div class="flex items-center justify-between"><div><p class="font-bold text-amber-300 text-sm">🔥 Máximo Rendimiento</p><p class="text-[10px] text-gray-500">100% potencia. Gaming y trabajo pesado.</p></div><span class="text-amber-500 group-hover:translate-x-1 transition-transform">→</span></div></button>
-                <button onclick="applyPreset('privacy')" class="w-full text-left bg-green-900/12 hover:bg-green-900/25 border border-green-800/15 rounded-xl p-3 transition-all cursor-pointer group"><div class="flex items-center justify-between"><div><p class="font-bold text-green-300 text-sm">🛡️ Máxima Privacidad</p><p class="text-[10px] text-gray-500">Sin telemetría ni tracking.</p></div><span class="text-green-500 group-hover:translate-x-1 transition-transform">→</span></div></button>
-                <button onclick="applyPreset('silent')" class="w-full text-left bg-purple-900/12 hover:bg-purple-900/25 border border-purple-800/15 rounded-xl p-3 transition-all cursor-pointer group"><div class="flex items-center justify-between"><div><p class="font-bold text-purple-300 text-sm">🤫 Silencioso</p><p class="text-[10px] text-gray-500">Ventiladores mínimos.</p></div><span class="text-purple-500 group-hover:translate-x-1 transition-transform">→</span></div></button>
-                <button onclick="applyPreset('battery')" class="w-full text-left bg-cyan-900/12 hover:bg-cyan-900/25 border border-cyan-800/15 rounded-xl p-3 transition-all cursor-pointer group"><div class="flex items-center justify-between"><div><p class="font-bold text-cyan-300 text-sm">🔋 Ahorro de Batería</p><p class="text-[10px] text-gray-500">Máxima duración de batería.</p></div><span class="text-cyan-500 group-hover:translate-x-1 transition-transform">→</span></div></button>
+    <div class="grid md:grid-cols-2 gap-5 mb-6">
+        <div class="card p-6">
+            ${hdr('🚀','Presets Rápidos','Optimización con 1 clic')}
+            <div class="space-y-2.5">
+                ${[['balanced','⚖️','Equilibrado','Uso diario. Estable y rápido.','indigo'],['max','🔥','Máx Rendimiento','100% potencia para gaming/trabajo.','amber'],['privacy','🛡️','Privacidad Total','Sin telemetría ni tracking.','emerald'],['silent','🤫','Silencioso','Ventiladores al mínimo.','violet'],['battery','🔋','Ahorro Batería','Máxima duración.','cyan']].map(([id,ic,n,d,col])=>`<button onclick="applyPreset('${id}')" class="preset-btn group"><div class="flex items-center justify-between"><div class="flex items-center gap-3"><span class="text-lg">${ic}</span><div><p class="font-bold text-${col}-300 text-sm">${n}</p><p class="text-[10px] text-slate-500">${d}</p></div></div><svg class="w-4 h-4 text-slate-600 group-hover:text-${col}-400 group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></div></button>`).join('')}
             </div>
         </div>
-        <div>
-            <div class="card p-5 mb-3">
-                ${hdr('🛡️','Windows Defender','Estado de protección')}
-                <div class="bg-green-900/10 border border-green-800/20 rounded-xl p-4 text-center mb-3">
-                    <p class="text-4xl mb-1">🛡️</p>
-                    <p class="font-bold text-green-400 text-sm">PROTEGIDO</p>
-                    <p class="text-[10px] text-gray-500 mt-1">Defender está activo y no será modificado</p>
+        <div class="space-y-4">
+            <div class="card p-6">
+                ${hdr('🛡️','Windows Defender','Siempre protegido')}
+                <div class="bg-emerald-500/5 border border-emerald-500/10 rounded-2xl p-5 text-center">
+                    <p class="text-5xl mb-2">🛡️</p>
+                    <p class="font-bold text-emerald-400 text-sm tracking-wide">PROTEGIDO</p>
+                    <p class="text-[10px] text-slate-500 mt-2">PCTuner <strong>nunca</strong> modifica Windows Defender</p>
                 </div>
-                <p class="text-[11px] text-green-300/80">✅ PCTuner Pro <strong>nunca</strong> toca Windows Defender. Tu seguridad es prioritaria.</p>
             </div>
-            <div class="card p-4 border-l-4 border-l-amber-500">
-                <div class="flex items-start gap-2"><span class="text-lg">⚠️</span><div><h4 class="font-bold text-amber-300 text-xs">Antes de ejecutar</h4><ul class="text-[10px] text-gray-400 mt-1 space-y-0.5"><li>• Se crea punto de restauración</li><li>• Ejecutar como Administrador</li><li>• Algunos cambios requieren reinicio</li></ul></div></div>
+            <div class="card p-4 border-l-4 border-l-amber-500/50">
+                <div class="flex items-start gap-3"><span class="text-xl mt-0.5">⚠️</span><div><h4 class="font-bold text-amber-300 text-xs mb-1">Antes de ejecutar</h4><ul class="text-[10px] text-slate-500 space-y-1"><li>• Punto de restauración automático</li><li>• Ejecutar como Administrador</li><li>• Algunos cambios requieren reinicio</li></ul></div></div>
             </div>
         </div>
     </div>
 
-    <!-- Execute button -->
-    <div class="card p-5 text-center">
-        <p class="text-sm text-gray-400 mb-3">Configura las opciones en cada sección y luego:</p>
+    <div class="card p-6 text-center">
+        <p class="text-sm text-slate-400 mb-4">Configura las opciones y luego:</p>
         <div class="flex justify-center gap-3 flex-wrap">
-            <button onclick="openExec()" class="btn btn-green px-8 py-3 text-sm flex items-center gap-2">▶ Ejecutar Optimizaciones</button>
-            <button onclick="openExport()" class="btn btn-blue px-6 py-3 text-sm flex items-center gap-2">📦 Exportar Script</button>
+            <button onclick="openExec()" class="btn btn-success px-8 py-3.5 text-sm">▶ Ejecutar Optimizaciones</button>
+            <button onclick="openExport()" class="btn btn-primary px-6 py-3.5 text-sm">📦 Exportar Script</button>
         </div>
-        <p class="text-[10px] text-gray-600 mt-2">${changeCount} opciones configuradas</p>
+        <p class="text-[10px] text-slate-600 mt-3">${cCount} opciones configuradas</p>
     </div>`;
 }
 
-// ======================== MONITOR ========================
+// ── MONITOR ──
 function pMon(){
-    const m=S.monitor;
-    return `${hdr('📊','Monitor del Sistema','Métricas en tiempo real de tu '+S.hw.brand)}
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
-        <div class="card p-4 flex flex-col items-center" id="mon-cpu">${gauge(m.cpu,'#22c55e','CPU',m.cpu+'%',120)}</div>
-        <div class="card p-4 flex flex-col items-center" id="mon-ram">${gauge(m.ram,'#3b82f6','RAM',m.ram+'%',120)}</div>
-        <div class="card p-4 flex flex-col items-center" id="mon-temp">${gauge(m.temp,'#22c55e','TEMP',m.temp+'°C',120)}</div>
-        <div class="card p-4 flex flex-col items-center" id="mon-disk">${gauge(m.disk,'#8b5cf6','DISCO',m.disk+'%',120)}</div>
+    const m=S.mon;
+    return `${hdr('📊','Monitor del Sistema','Métricas en tiempo real — '+S.hw.brand)}
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <div class="card p-5 flex flex-col items-center" id="m-cpu">${gauge(m.cpu,'#10b981','CPU',m.cpu+'%',130)}</div>
+        <div class="card p-5 flex flex-col items-center" id="m-ram">${gauge(m.ram,'#6366f1','RAM',m.ram+'%',130)}</div>
+        <div class="card p-5 flex flex-col items-center" id="m-temp">${gauge(m.temp,'#10b981','TEMP',m.temp+'°C',130)}</div>
+        <div class="card p-5 flex flex-col items-center" id="m-disk">${gauge(m.disk,'#8b5cf6','DISCO',m.disk+'%',130)}</div>
     </div>
-    <div class="grid md:grid-cols-4 gap-3">
-        <div class="stat-box p-3 flex items-center gap-2"><span class="text-xl">🌀</span><div><p class="text-[10px] text-gray-500">Fan</p><p class="font-bold text-white" id="mon-rpm">${m.fanRPM} RPM</p></div></div>
-        <div class="stat-box p-3 flex items-center gap-2"><span class="text-xl">⏱️</span><div><p class="text-[10px] text-gray-500">Uptime</p><p class="font-bold text-white" id="mon-up">${m.uptime}</p></div></div>
-        <div class="stat-box p-3 flex items-center gap-2"><span class="text-xl">🌐</span><div><p class="text-[10px] text-gray-500">Red</p><p class="font-bold text-white" id="mon-net">${m.network} MB/s</p></div></div>
-        <div class="stat-box p-3 flex items-center gap-2"><span class="text-xl">💻</span><div><p class="text-[10px] text-gray-500">Equipo</p><p class="font-bold text-white text-xs">${S.hw.brand} · ${S.hw.cores} cores</p></div></div>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div class="stat p-4 flex items-center gap-3"><span class="text-2xl">🌀</span><div><p class="text-[10px] text-slate-500">Ventilador</p><p class="font-bold text-white text-lg" id="m-rpm">${m.rpm} RPM</p></div></div>
+        <div class="stat p-4 flex items-center gap-3"><span class="text-2xl">⏱️</span><div><p class="text-[10px] text-slate-500">Uptime</p><p class="font-bold text-white" id="m-up">${m.up}</p></div></div>
+        <div class="stat p-4 flex items-center gap-3"><span class="text-2xl">🌐</span><div><p class="text-[10px] text-slate-500">Red</p><p class="font-bold text-white" id="m-net">${m.net} MB/s</p></div></div>
+        <div class="stat p-4 flex items-center gap-3"><span class="text-2xl">💻</span><div><p class="text-[10px] text-slate-500">Sistema</p><p class="font-bold text-white text-xs">${S.hw.brand} · ${S.hw.cores}C</p></div></div>
     </div>`;
 }
 
-// ======================== FANS ========================
+// ── FANS ──
 function pFans(){
-    const fp=S.fanProfile;
-    return `${hdr('🌀','Control de Ventiladores','Configura velocidad y curva')}
-    <div class="card p-3 mb-4 border-l-4 border-l-cyan-500"><p class="text-[11px] text-cyan-200">💡 Usa NBFC o el software de tu marca (${S.hw.brand}). El script configura todo automáticamente. <strong>Defender intacto.</strong></p></div>
+    const fp=S.fan.profile;
+    return `${hdr('🌀','Control de Ventiladores','Perfiles y curva personalizada')}
+    <div class="card p-4 mb-5 border-l-4 border-l-cyan-500/50"><p class="text-[11px] text-cyan-200/80">💡 Compatible con NBFC y software de ${S.hw.brand}. <strong>Defender intacto.</strong></p></div>
     <div class="grid grid-cols-2 gap-3 mb-5">
-        <div class="stat-box p-4 text-center"><p class="text-[10px] text-gray-500 mb-1">RPM</p><p class="text-2xl font-black text-white" id="fan-rpm">${S.monitor.fanRPM}</p></div>
-        <div class="stat-box p-4 text-center"><p class="text-[10px] text-gray-500 mb-1">CPU Temp</p><p class="text-2xl font-black text-white" id="fan-temp">${S.monitor.temp}°C</p></div>
+        <div class="stat p-5 text-center"><p class="text-[10px] text-slate-500 mb-1">RPM Actual</p><p class="text-3xl font-black text-white" id="f-rpm">${S.mon.rpm}</p></div>
+        <div class="stat p-5 text-center"><p class="text-[10px] text-slate-500 mb-1">Temperatura</p><p class="text-3xl font-black text-white" id="f-temp">${S.mon.temp}°C</p></div>
     </div>
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-2.5 mb-5">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
         ${['silent','balanced','performance','custom'].map(p=>{
-            const i={silent:{n:'Silencioso',d:'Mínimo ruido',r:'~1500'},balanced:{n:'Equilibrado',d:'Balance ideal',r:'~2800'},performance:{n:'Rendimiento',d:'Máx frío',r:'~4200'},custom:{n:'Custom',d:'Tu curva',r:'Variable'}};
-            const fc={silent:'fan-slow',balanced:'fan-med',performance:'fan-fast',custom:'fan-med'};
-            const d=i[p];
-            return `<button onclick="setFanP('${p}')" class="card p-3 text-center cursor-pointer ${fp===p?'active-card':''}"><div class="text-2xl mb-1 ${fp===p?(fc[p]||''):''}">🌀</div><p class="font-bold text-white text-[11px]">${d.n}</p><p class="text-[9px] text-gray-500">${d.d}</p><p class="text-[9px] text-blue-400 code-font mt-0.5">${d.r}</p></button>`;
+            const d={silent:{n:'Silencioso',d:'Mínimo ruido',r:'~1200',a:'spin-slow'},balanced:{n:'Equilibrado',d:'Balance ideal',r:'~2400',a:'spin-med'},performance:{n:'Rendimiento',d:'Máx frío',r:'~3800',a:'spin-fast'},custom:{n:'Custom',d:'Tu curva',r:'Variable',a:'spin-med'}}[p];
+            return `<button onclick="setFanP('${p}')" class="card p-4 text-center cursor-pointer ${fp===p?'on':''}"><div class="text-3xl mb-2 ${fp===p?d.a:''}">🌀</div><p class="font-bold text-white text-xs">${d.n}</p><p class="text-[9px] text-slate-500 mt-0.5">${d.d}</p><p class="text-[9px] text-indigo-400 mono mt-1">${d.r}</p></button>`;
         }).join('')}
     </div>
     ${divider('Curva Personalizada')}
-    <div class="card p-4 mb-4">
-        <div class="flex items-center justify-between mb-2"><p class="font-semibold text-white text-sm">Temp → Velocidad</p><button onclick="resetFC()" class="text-[10px] text-blue-400 hover:text-blue-300 cursor-pointer px-2 py-1 bg-blue-900/30 rounded-lg border border-blue-800/40">↺ Reset</button></div>
-        <div class="fan-canvas-box p-2" style="height:220px" id="fanWrap"><canvas id="fanCanvas" width="600" height="200"></canvas></div>
-        <div class="grid grid-cols-5 gap-2 mt-2" id="fanInputs"></div>
+    <div class="card p-5 mb-5">
+        <div class="flex items-center justify-between mb-3"><p class="font-semibold text-white text-sm">Temperatura → Velocidad</p><button onclick="resetFC()" class="btn btn-ghost px-3 py-1.5 text-[10px]">↺ Reset</button></div>
+        <div class="fan-box p-3" style="height:230px" id="fanWrap"><canvas id="fanCanvas" width="600" height="210"></canvas></div>
+        <div class="grid grid-cols-5 gap-2 mt-3" id="fanInputs"></div>
     </div>
-    ${divider('Config')}${grid(`
-        ${sli('fan_min','Vel mínima','RPM mínimas',0,50,10,'%')}
-        ${sli('fan_max','Vel máxima','RPM máximas',50,100,100,'%')}
-        ${tog('fan_smart','Modo inteligente','Ajusta según carga',true,'low')}
-        ${sel('fan_tool','Herramienta','Software de control',[{v:'nbfc',l:'NBFC'},{v:'brand',l:'Software de '+S.hw.brand},{v:'ps',l:'PowerShell'}],'nbfc')}
+    ${divider('Configuración')}${grid(`
+        ${sli('fan_min','Velocidad mínima','RPM mínimas del ventilador',0,50,10,'%')}
+        ${sli('fan_max','Velocidad máxima','RPM máximas del ventilador',50,100,100,'%')}
+        ${tog('fan_smart','Modo inteligente','Ajusta automáticamente según carga',true,'low')}
+        ${sel('fan_tool','Herramienta','Software de control de ventiladores',[{v:'nbfc',l:'NBFC'},{v:'brand',l:'Software '+S.hw.brand},{v:'ps',l:'PowerShell'}],'nbfc')}
     `)}`;
 }
-function setFanP(p){S.fanProfile=p;track('fan_profile',p);const curves={silent:[{t:30,s:8},{t:45,s:18},{t:60,s:30},{t:75,s:50},{t:90,s:65}],balanced:[{t:30,s:10},{t:45,s:25},{t:60,s:50},{t:75,s:80},{t:90,s:100}],performance:[{t:30,s:30},{t:45,s:50},{t:60,s:70},{t:75,s:90},{t:90,s:100}]};if(curves[p])S.fanCurve=curves[p];render('fans');}
-function resetFC(){S.fanCurve=[{t:30,s:10},{t:45,s:25},{t:60,s:50},{t:75,s:80},{t:90,s:100}];render('fans');}
-function initFanCanvas(){const c=document.getElementById('fanCanvas'),w=document.getElementById('fanWrap');if(!c||!w)return;c.width=w.clientWidth-16;c.height=200;drawFC();updFI();}
-function drawFC(){const c=document.getElementById('fanCanvas');if(!c)return;const ctx=c.getContext('2d'),w=c.width,h=c.height,p=32;ctx.clearRect(0,0,w,h);ctx.strokeStyle='rgba(59,130,246,0.06)';ctx.lineWidth=1;for(let i=0;i<=10;i++){const x=p+(w-p*2)*i/10;ctx.beginPath();ctx.moveTo(x,8);ctx.lineTo(x,h-p);ctx.stroke();const y=8+(h-p-8)*i/10;ctx.beginPath();ctx.moveTo(p,y);ctx.lineTo(w-p,y);ctx.stroke();}ctx.fillStyle='#475569';ctx.font='9px Inter';for(let t=30;t<=90;t+=15){const x=p+(t-20)/80*(w-p*2);ctx.fillText(t+'°',x-6,h-p+13);}for(let s=0;s<=100;s+=25){const y=h-p-s/100*(h-p-8);ctx.fillText(s+'%',2,y+3);}const pts=S.fanCurve.map(pt=>({x:p+(pt.t-20)/80*(w-p*2),y:h-p-pt.s/100*(h-p-8)}));ctx.beginPath();ctx.moveTo(pts[0].x,h-p);pts.forEach(pt=>ctx.lineTo(pt.x,pt.y));ctx.lineTo(pts[pts.length-1].x,h-p);ctx.closePath();const g=ctx.createLinearGradient(0,0,0,h);g.addColorStop(0,'rgba(59,130,246,0.12)');g.addColorStop(1,'rgba(59,130,246,0)');ctx.fillStyle=g;ctx.fill();ctx.beginPath();pts.forEach((pt,i)=>i===0?ctx.moveTo(pt.x,pt.y):ctx.lineTo(pt.x,pt.y));ctx.strokeStyle='#3b82f6';ctx.lineWidth=2;ctx.stroke();pts.forEach((pt,i)=>{ctx.beginPath();ctx.arc(pt.x,pt.y,5,0,Math.PI*2);ctx.fillStyle='#3b82f6';ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=1.5;ctx.stroke();ctx.fillStyle='#e2e8f0';ctx.font='bold 8px Inter';ctx.fillText(S.fanCurve[i].t+'°→'+S.fanCurve[i].s+'%',pt.x-15,pt.y-10);});}
-function updFI(){const d=document.getElementById('fanInputs');if(!d)return;d.innerHTML=S.fanCurve.map((pt,i)=>`<div class="stat-box p-1.5 text-center"><p class="text-[8px] text-gray-600 mb-0.5">P${i+1}</p><div class="flex items-center gap-0.5 justify-center"><input type="number" value="${pt.t}" min="20" max="100" class="w-9 bg-slate-900 border border-slate-700 rounded px-0.5 py-0.5 text-[9px] text-center text-white" onchange="updFP(${i},'t',this.value)"><span class="text-gray-600 text-[8px]">→</span><input type="number" value="${pt.s}" min="0" max="100" class="w-9 bg-slate-900 border border-slate-700 rounded px-0.5 py-0.5 text-[9px] text-center text-white" onchange="updFP(${i},'s',this.value)"><span class="text-gray-600 text-[8px]">%</span></div></div>`).join('');}
-function updFP(i,k,v){S.fanCurve[i][k]=parseInt(v);track('fan_curve','custom');S.fanProfile='custom';drawFC();updFI();}
+function setFanP(p){S.fan.profile=p;track('fan_profile',p);const c={silent:[{t:30,s:8},{t:45,s:18},{t:60,s:30},{t:75,s:50},{t:90,s:65}],balanced:[{t:30,s:10},{t:45,s:25},{t:60,s:50},{t:75,s:80},{t:90,s:100}],performance:[{t:30,s:30},{t:45,s:50},{t:60,s:70},{t:75,s:90},{t:90,s:100}]};if(c[p])S.fan.curve=c[p];render('fans');}
+function resetFC(){S.fan.curve=[{t:30,s:10},{t:45,s:25},{t:60,s:50},{t:75,s:80},{t:90,s:100}];render('fans');}
+function initFanCanvas(){const c=document.getElementById('fanCanvas'),w=document.getElementById('fanWrap');if(!c||!w)return;c.width=w.clientWidth-24;c.height=210;drawFC();updFI();}
+function drawFC(){const c=document.getElementById('fanCanvas');if(!c)return;const ctx=c.getContext('2d'),w=c.width,h=c.height,p=36;ctx.clearRect(0,0,w,h);ctx.strokeStyle='rgba(99,102,241,0.04)';ctx.lineWidth=1;for(let i=0;i<=10;i++){const x=p+(w-p*2)*i/10;ctx.beginPath();ctx.moveTo(x,8);ctx.lineTo(x,h-p);ctx.stroke();const y=8+(h-p-8)*i/10;ctx.beginPath();ctx.moveTo(p,y);ctx.lineTo(w-p,y);ctx.stroke();}
+ctx.fillStyle='#3d4a63';ctx.font='10px Inter';for(let t=30;t<=90;t+=15){const x=p+(t-20)/80*(w-p*2);ctx.fillText(t+'°',x-8,h-p+16);}for(let s=0;s<=100;s+=25){const y=h-p-s/100*(h-p-8);ctx.fillText(s+'%',2,y+4);}
+const pts=S.fan.curve.map(pt=>({x:p+(pt.t-20)/80*(w-p*2),y:h-p-pt.s/100*(h-p-8)}));
+ctx.beginPath();ctx.moveTo(pts[0].x,h-p);pts.forEach(pt=>ctx.lineTo(pt.x,pt.y));ctx.lineTo(pts[pts.length-1].x,h-p);ctx.closePath();const g=ctx.createLinearGradient(0,0,0,h);g.addColorStop(0,'rgba(99,102,241,0.1)');g.addColorStop(1,'rgba(99,102,241,0)');ctx.fillStyle=g;ctx.fill();
+ctx.beginPath();pts.forEach((pt,i)=>i===0?ctx.moveTo(pt.x,pt.y):ctx.lineTo(pt.x,pt.y));ctx.strokeStyle='#6366f1';ctx.lineWidth=2.5;ctx.stroke();
+pts.forEach((pt,i)=>{ctx.beginPath();ctx.arc(pt.x,pt.y,6,0,Math.PI*2);ctx.fillStyle='#6366f1';ctx.fill();ctx.strokeStyle='#c7d2fe';ctx.lineWidth=2;ctx.stroke();ctx.fillStyle='#e0e7ff';ctx.font='bold 9px Inter';ctx.fillText(S.fan.curve[i].t+'°→'+S.fan.curve[i].s+'%',pt.x-18,pt.y-12);});}
+function updFI(){const d=document.getElementById('fanInputs');if(!d)return;d.innerHTML=S.fan.curve.map((pt,i)=>`<div class="stat p-2 text-center"><p class="text-[8px] text-slate-600 mb-1">P${i+1}</p><div class="flex items-center gap-1 justify-center"><input type="number" value="${pt.t}" min="20" max="100" class="w-10 bg-slate-900/80 border border-slate-700/50 rounded-lg px-1 py-1 text-[10px] text-center text-white focus:outline-none focus:border-indigo-500" onchange="updFP(${i},'t',this.value)"><span class="text-slate-600 text-[8px]">→</span><input type="number" value="${pt.s}" min="0" max="100" class="w-10 bg-slate-900/80 border border-slate-700/50 rounded-lg px-1 py-1 text-[10px] text-center text-white focus:outline-none focus:border-indigo-500" onchange="updFP(${i},'s',this.value)"><span class="text-slate-600 text-[8px]">%</span></div></div>`).join('');}
+function updFP(i,k,v){S.fan.curve[i][k]=parseInt(v);track('fan_curve','custom');S.fan.profile='custom';drawFC();updFI();}
 
-// ======================== PAGES ========================
-function pPerf(){return `${hdr('⚡','Rendimiento','Optimiza CPU, RAM y disco para tu '+S.hw.brand+' ('+S.hw.cores+' núcleos)')}${grid(`
-    ${tog('p_sysmain','Desactivar SysMain','Libera RAM y disco',true,'med')}
-    ${tog('p_prefetch','Desactivar Prefetch','Reduce escrituras',false,'med')}
-    ${tog('p_indexing','Desactivar Windows Search','Reduce CPU/disco',true,'low')}
-    ${tog('p_visual','Optimizar efectos visuales','Sin animaciones',true,'low')}
-    ${tog('p_transparency','Sin transparencias','Reduce carga GPU',true,'low')}
-    ${tog('p_startup_delay','Sin delay de inicio','Menú inicio rápido',true,'low')}
-    ${tog('p_menu_delay','Menús rápidos','Menús contextuales ágiles',true,'low')}
-    ${tog('p_tips','Sin tips Windows','Sin notificaciones',true,'low')}
-    ${tog('p_cpu_priority','Priorizar primer plano','Más CPU a ventana activa',true,'low')}
-    ${tog('p_ntfs_last','Desactivar último acceso NTFS','Reduce escrituras',true,'low')}
-    ${tog('p_core_parking','Sin Core Parking','Todos los ${S.hw.cores} núcleos activos',false,'med')}
-    ${tog('p_timer_res','Alta resolución timer','Mejor precisión',false,'med')}
-    ${tog('p_split','Optimizar umbral RAM','Mejor gestión memoria',false,'med')}
-    ${tog('p_cache','Optimizar caché sistema','Cache para laptops',false,'med')}
-`)}`;}
+// ── PAGES ──
+function pPerf(){return `${hdr('⚡','Rendimiento',S.hw.brand+' · '+S.hw.cores+' núcleos')}${grid(`${tog('p_sysmain','Desactivar SysMain','Libera RAM y reduce uso de disco',true,'med')}${tog('p_prefetch','Desactivar Prefetch','Reduce escrituras en disco',false,'med')}${tog('p_indexing','Desactivar Windows Search','Reduce CPU y uso de disco',true,'low')}${tog('p_visual','Optimizar efectos visuales','Sin animaciones innecesarias',true,'low')}${tog('p_transparency','Sin transparencias','Reduce carga de GPU',true,'low')}${tog('p_startup_delay','Sin delay de inicio','Menú de inicio más rápido',true,'low')}${tog('p_menu_delay','Menús rápidos','Menús contextuales ágiles',true,'low')}${tog('p_tips','Sin tips de Windows','Sin notificaciones innecesarias',true,'low')}${tog('p_cpu_priority','Priorizar primer plano','Más CPU a la ventana activa',true,'low')}${tog('p_ntfs_last','Desactivar último acceso NTFS','Reduce escrituras en disco',true,'low')}${tog('p_core_parking','Sin Core Parking','Todos los ${S.hw.cores} núcleos activos',false,'med')}${tog('p_timer_res','Alta resolución timer','Mejor precisión temporal',false,'med')}`)}`;}
 
-function pClean(){return `${hdr('🧹','Limpieza','Elimina archivos innecesarios')}${grid(`
-    ${tog('c_temp','Limpiar temporales','%TEMP%, Prefetch',true,'low')}
-    ${tog('c_recycle','Vaciar papelera','Elimina archivos',true,'low')}
-    ${tog('c_update','Caché de Updates','Borra updates instalados',true,'med')}
-    ${tog('c_thumb','Miniaturas','Cache thumbnails',true,'low')}
-    ${tog('c_logs','Logs del sistema','Logs antiguos',true,'low')}
-    ${tog('c_dns','Caché DNS','Renueva DNS',true,'low')}
-    ${tog('c_bloatware','Remover bloatware','Apps preinstaladas',false,'high')}
-    ${tog('c_delivery','Delivery Optimization','Archivos de updates',true,'low')}
-    ${tog('c_error','Reportes de error','Windows Error Reports',true,'low')}
-    ${tog('c_font','Caché de fuentes','Repara fuentes',false,'low')}
-`)}`;}
+function pClean(){return `${hdr('🧹','Limpieza','Elimina archivos innecesarios')}${grid(`${tog('c_temp','Limpiar temporales','%TEMP%, Prefetch, cache',true,'low')}${tog('c_recycle','Vaciar papelera','Elimina archivos borrados',true,'low')}${tog('c_update','Caché de Updates','Borra updates ya instalados',true,'med')}${tog('c_thumb','Miniaturas','Cache de thumbnails',true,'low')}${tog('c_logs','Logs del sistema','Registros antiguos',true,'low')}${tog('c_dns','Caché DNS','Renueva resolución DNS',true,'low')}${tog('c_bloatware','Remover bloatware','Apps preinstaladas de Windows',false,'high')}${tog('c_delivery','Delivery Optimization','Archivos de distribución',true,'low')}${tog('c_error','Reportes de error','Windows Error Reports',true,'low')}`)}`;}
 
-function pNet(){return `${hdr('🌐','Red e Internet','Optimiza tu conexión')}${grid(`
-    ${tog('n_flush','Flush DNS','Limpia caché DNS',true,'low')}
-    ${tog('n_winsock','Reset Winsock','Restablece red',false,'med')}
-    ${tog('n_tcpip','Reset TCP/IP','Reinicia config',false,'med')}
-    ${tog('n_nagle','Desactivar Nagle','Reduce latencia',false,'med')}
-    ${tog('n_qos','Sin QoS reservado','Libera ancho de banda',true,'low')}
-    ${tog('n_autotuning','Sin Auto-Tuning','Estabiliza WiFi',false,'med')}
-    ${tog('n_rss','Activar RSS','Receive Side Scaling',true,'low')}
-    ${tog('n_offload','Task Offload','Descarga a NIC',true,'low')}
-`)}${divider('DNS')}${grid(`
-    ${sel('n_dns','DNS','Proveedor rápido',[{v:'default',l:'ISP (auto)'},{v:'google',l:'Google 8.8.8.8'},{v:'cloudflare',l:'Cloudflare 1.1.1.1'},{v:'quad9',l:'Quad9 9.9.9.9'}],'cloudflare')}
-    ${sel('n_adapter','Adaptador','Conexión principal',[{v:'wifi',l:'Wi-Fi'},{v:'ethernet',l:'Ethernet'}],'wifi')}
-`)}`;}
+function pNet(){return `${hdr('🌐','Red e Internet','Optimiza tu conexión')}${grid(`${tog('n_flush','Flush DNS','Limpia caché de DNS',true,'low')}${tog('n_winsock','Reset Winsock','Restablece config de red',false,'med')}${tog('n_tcpip','Reset TCP/IP','Reinicia la pila TCP',false,'med')}${tog('n_nagle','Desactivar Nagle','Reduce latencia en juegos',false,'med')}${tog('n_qos','Sin QoS reservado','Libera ancho de banda',true,'low')}${tog('n_autotuning','Sin Auto-Tuning','Estabiliza conexión WiFi',false,'med')}`)}${divider('DNS')}${grid(`${sel('n_dns','Servidor DNS','Proveedor DNS rápido',[{v:'default',l:'ISP (automático)'},{v:'google',l:'Google 8.8.8.8'},{v:'cloudflare',l:'Cloudflare 1.1.1.1'},{v:'quad9',l:'Quad9 9.9.9.9'}],'cloudflare')}${sel('n_adapter','Adaptador','Conexión principal',[{v:'wifi',l:'Wi-Fi'},{v:'ethernet',l:'Ethernet'}],'wifi')}`)}`;}
 
-function pPow(){return `${hdr('🔋','Energía','Plan de energía'+(S.hw.battery?' · Batería '+S.hw.batteryLevel+'%':''))}${grid(`
-    ${tog('pw_high','Plan Alto Rendimiento','Energía máxima',true,'low')}
-    ${tog('pw_hibernate','Sin hibernación','Libera ~4GB disco',true,'low')}
-    ${tog('pw_fast_start','Sin inicio rápido','Inicio limpio',false,'low')}
-    ${tog('pw_usb','Sin USB Suspend','No apagar USB',true,'low')}
-    ${tog('pw_disk','Nunca apagar disco','Evita lag',true,'low')}
-    ${tog('pw_cpu_max','CPU 100% siempre','Máx rendimiento',false,'med')}
-`)}${divider('Tiempos')}${grid(`
-    ${sli('pw_screen_ac','Pantalla (AC)','Min para apagar',0,60,15,' min')}
-    ${sli('pw_screen_dc','Pantalla (batería)','Min para apagar',0,30,5,' min')}
-    ${sli('pw_sleep_ac','Suspender (AC)','0=nunca',0,120,30,' min')}
-    ${sli('pw_sleep_dc','Suspender (batería)','Minutos',0,60,15,' min')}
-`)}`;}
+function pPow(){return `${hdr('🔋','Energía','Plan de energía'+(S.hw.battery?' · Batería '+S.hw.batteryLevel+'%':''))}${grid(`${tog('pw_high','Plan Alto Rendimiento','Energía máxima disponible',true,'low')}${tog('pw_hibernate','Sin hibernación','Libera ~4GB de disco',true,'low')}${tog('pw_fast_start','Sin inicio rápido','Arranque más limpio',false,'low')}${tog('pw_usb','Sin USB Suspend','No apagar dispositivos USB',true,'low')}${tog('pw_disk','Nunca apagar disco','Evita lag al acceder',true,'low')}${tog('pw_cpu_max','CPU 100% siempre','Máximo rendimiento constante',false,'med')}`)}${divider('Tiempos')}${grid(`${sli('pw_screen_ac','Pantalla (AC)','Minutos para apagar',0,60,15,' min')}${sli('pw_screen_dc','Pantalla (batería)','Minutos para apagar',0,30,5,' min')}${sli('pw_sleep_ac','Suspender (AC)','0 = nunca suspender',0,120,30,' min')}${sli('pw_sleep_dc','Suspender (batería)','Minutos para suspender',0,60,15,' min')}`)}`;}
 
-function pStart(){return `${hdr('🚀','Arranque','Control de inicio')}${grid(`
-    ${tog('b_delay','Sin delay apps','Inicio rápido',true,'low')}
-    ${tog('b_numlock','NumLock auto','Activa NumLock',true,'low')}
-    ${tog('b_verbose','Boot verbose','Detalles en boot',false,'low')}
-`)}${divider('Apps de Inicio')}${grid(`
-    ${tog('b_onedrive','Sin OneDrive','No abrir al inicio',true,'low')}
-    ${tog('b_teams','Sin Teams','No abrir al inicio',true,'low')}
-    ${tog('b_edge','Sin Edge precarga','No precargar',true,'low')}
-    ${tog('b_spotify','Sin Spotify','No abrir al inicio',true,'low')}
-    ${tog('b_discord','Sin Discord','No abrir al inicio',false,'low')}
-    ${tog('b_cortana','Sin Cortana','No iniciar',true,'low')}
-    ${tog('b_adobe','Sin Adobe updater','Sin actualizador',true,'low')}
-    ${tog('b_skype','Sin Skype','No abrir al inicio',true,'low')}
-`)}`;}
+function pStart(){return `${hdr('🚀','Arranque','Control de programas de inicio')}${grid(`${tog('b_delay','Sin delay de apps','Inicio más rápido',true,'low')}${tog('b_numlock','NumLock automático','Activa NumLock al inicio',true,'low')}${tog('b_verbose','Boot verbose','Muestra detalles en boot',false,'low')}`)}${divider('Apps de Inicio')}${grid(`${tog('b_onedrive','Sin OneDrive','No abrir al iniciar',true,'low')}${tog('b_teams','Sin Teams','No abrir al iniciar',true,'low')}${tog('b_edge','Sin Edge precarga','No precargar Edge',true,'low')}${tog('b_spotify','Sin Spotify','No abrir al iniciar',true,'low')}${tog('b_discord','Sin Discord','No abrir al iniciar',false,'low')}${tog('b_cortana','Sin Cortana','No iniciar Cortana',true,'low')}${tog('b_adobe','Sin Adobe updater','Sin actualizador Adobe',true,'low')}${tog('b_skype','Sin Skype','No abrir al iniciar',true,'low')}`)}`;}
 
-function pGame(){return `${hdr('🎮','Gaming','Optimiza FPS y latencia')}${grid(`
-    ${tog('g_mode','Game Mode','Prioriza juegos',true,'low')}
-    ${tog('g_dvr','Sin Game DVR','Sin grabación fondo',true,'low')}
-    ${tog('g_fullscreen','Sin opt fullscreen','Puede mejorar FPS',true,'low')}
-    ${tog('g_mouse','Sin aceleración mouse','Movimiento 1:1',true,'low')}
-    ${tog('g_nagle','Sin Nagle gaming','Reduce ping',true,'med')}
-    ${tog('g_hpet','Sin HPET','Mejor rendimiento',false,'high')}
-    ${tog('g_throttle','Sin Power Throttling','CPU no baja',true,'low')}
-    ${tog('g_notif','Sin notif en juegos','Bloquea popups',true,'low')}
-    ${tog('g_xbox','Sin Xbox Game Bar','Libera recursos',true,'low')}
-    ${tog('g_standby','Limpiar Standby RAM','Libera RAM periódica',false,'med')}
-`)}${divider('GPU')}${grid(`
-    ${sel('g_gpu_sched','GPU Scheduling','Hardware scheduling',[{v:'off',l:'Off'},{v:'on',l:'On'}],'on')}
-    ${sel('g_gpu_mode','Modo GPU','Preferencia',[{v:'balanced',l:'Equilibrado'},{v:'high',l:'Alto rendimiento'}],'high')}
-`)}`;}
+function pGame(){return `${hdr('🎮','Gaming','Optimiza FPS y reduce latencia')}${grid(`${tog('g_mode','Game Mode','Prioriza juegos automáticamente',true,'low')}${tog('g_dvr','Sin Game DVR','Sin grabación en segundo plano',true,'low')}${tog('g_fullscreen','Sin opt fullscreen','Puede mejorar FPS en juegos',true,'low')}${tog('g_mouse','Sin aceleración mouse','Movimiento 1:1 preciso',true,'low')}${tog('g_nagle','Sin Nagle en gaming','Reduce ping en juegos online',true,'med')}${tog('g_hpet','Sin HPET','Mejor rendimiento en juegos',false,'high')}${tog('g_throttle','Sin Power Throttling','CPU no baja rendimiento',true,'low')}${tog('g_notif','Sin notificaciones','Bloquea popups durante juegos',true,'low')}${tog('g_xbox','Sin Xbox Game Bar','Libera recursos del sistema',true,'low')}${tog('g_standby','Limpiar Standby RAM','Libera RAM periódicamente',false,'med')}`)}${divider('GPU')}${grid(`${sel('g_gpu_sched','GPU Scheduling','Hardware-accelerated scheduling',[{v:'off',l:'Desactivado'},{v:'on',l:'Activado'}],'on')}${sel('g_gpu_mode','Modo GPU','Preferencia de rendimiento',[{v:'balanced',l:'Equilibrado'},{v:'high',l:'Alto rendimiento'}],'high')}`)}`;}
 
-function pKeys(){return `${hdr('⌨️','Keybinds','Clic en campo y presiona teclas')}
-    <div class="card p-3 mb-4 border-l-4 border-l-amber-500"><p class="text-[11px] text-amber-200">💡 Genera un script <strong>AutoHotkey</strong> con tus atajos. Exporta como .AHK.</p></div>
-    ${divider('Sistema')}${grid(`
-    ${kb('k_screenshot','Screenshot','Captura pantalla','Win + Shift + S')}
-    ${kb('k_taskmgr','Task Manager','Admin tareas','Ctrl + Shift + Escape')}
-    ${kb('k_run','Ejecutar','Diálogo ejecutar','Win + R')}
-    ${kb('k_explorer','Explorador','Abrir archivos','Win + E')}
-    ${kb('k_cmd','Terminal Admin','CMD admin','Ctrl + Shift + T')}
-    ${kb('k_desktop','Escritorio','Mostrar escritorio','Win + D')}
-    ${kb('k_close','Cerrar ventana','Cerrar activa','Alt + F4')}
-    ${kb('k_minimize','Minimizar todo','Minimiza todo','Win + M')}
-    `)}${divider('Multimedia')}${grid(`
-    ${kb('k_vol_up','Vol +','Subir volumen','Ctrl + Up')}
-    ${kb('k_vol_down','Vol -','Bajar volumen','Ctrl + Down')}
-    ${kb('k_mute','Silenciar','Toggle mute','Ctrl + M')}
-    ${kb('k_play','Play/Pausa','Multimedia','Ctrl + Space')}
-    `)}${divider('Apps')}${grid(`
-    ${kb('k_calc','Calculadora','Abrir calc','Ctrl + Alt + C')}
-    ${kb('k_notepad','Notepad','Bloc notas','Ctrl + Alt + N')}
-    ${kb('k_lock','Bloquear','Lock screen','Win + L')}
-    ${kb('k_browser','Navegador','Abrir browser','Ctrl + Alt + B')}
-    `)}`;}
+function pKeys(){return `${hdr('⌨️','Keybinds','Clic en el campo y presiona las teclas')}
+    <div class="card p-4 mb-5 border-l-4 border-l-amber-500/50"><p class="text-[11px] text-amber-200/80">💡 Los atajos se exportan como script <strong>AutoHotkey (.AHK)</strong></p></div>
+    ${divider('Sistema')}${grid(`${kb('k_screenshot','Screenshot','Captura de pantalla','Win + Shift + S')}${kb('k_taskmgr','Task Manager','Administrador de tareas','Ctrl + Shift + Escape')}${kb('k_run','Ejecutar','Diálogo ejecutar','Win + R')}${kb('k_explorer','Explorador','Abrir archivos','Win + E')}${kb('k_cmd','Terminal Admin','CMD como admin','Ctrl + Shift + T')}${kb('k_desktop','Escritorio','Mostrar escritorio','Win + D')}${kb('k_close','Cerrar ventana','Cerrar ventana activa','Alt + F4')}${kb('k_minimize','Minimizar todo','Minimizar todas','Win + M')}`)}
+    ${divider('Multimedia')}${grid(`${kb('k_vol_up','Volumen +','Subir volumen','Ctrl + Up')}${kb('k_vol_down','Volumen -','Bajar volumen','Ctrl + Down')}${kb('k_mute','Silenciar','Toggle mute','Ctrl + M')}${kb('k_play','Play/Pausa','Control multimedia','Ctrl + Space')}`)}
+    ${divider('Apps')}${grid(`${kb('k_calc','Calculadora','Abrir calculadora','Ctrl + Alt + C')}${kb('k_notepad','Notepad','Bloc de notas','Ctrl + Alt + N')}${kb('k_lock','Bloquear PC','Bloquear pantalla','Win + L')}${kb('k_browser','Navegador','Abrir navegador','Ctrl + Alt + B')}`)}`;}
 
-function pVis(){return `${hdr('🎨','Visual y UI','Personaliza Windows')}${grid(`
-    ${tog('v_dark','Modo oscuro sistema','Tema oscuro',true,'low')}
-    ${tog('v_dark_apps','Modo oscuro apps','Apps oscuras',true,'low')}
-    ${tog('v_no_anim','Sin animaciones','Más rápido',true,'low')}
-    ${tog('v_no_trans','Sin transparencias','Menos GPU',true,'low')}
-    ${tog('v_no_shadow','Sin sombras','Sin sombras ventanas',false,'low')}
-    ${tog('v_ext','Mostrar extensiones','.exe .jpg visibles',true,'low')}
-    ${tog('v_smooth_font','Suavizado fuentes','ClearType',true,'low')}
-    ${tog('v_wallpaper','Wallpaper HD','Sin compresión',true,'low')}
-`)}${divider('Cursor')}${grid(`
-    ${sli('v_cursor','Velocidad cursor','Mouse speed',1,20,10,'')}
-    ${tog('v_no_accel','Sin aceleración mouse','1:1 para gaming',false,'low')}
-`)}`;}
+function pVis(){return `${hdr('🎨','Visual y UI','Personaliza la apariencia de Windows')}${grid(`${tog('v_dark','Modo oscuro sistema','Tema oscuro del sistema',true,'low')}${tog('v_dark_apps','Modo oscuro apps','Apps con tema oscuro',true,'low')}${tog('v_no_anim','Sin animaciones','Interfaz más rápida',true,'low')}${tog('v_no_trans','Sin transparencias','Reduce uso de GPU',true,'low')}${tog('v_no_shadow','Sin sombras','Sin sombras en ventanas',false,'low')}${tog('v_ext','Mostrar extensiones','Archivos .exe .jpg visibles',true,'low')}${tog('v_smooth_font','Suavizado de fuentes','ClearType activado',true,'low')}${tog('v_wallpaper','Wallpaper HD','Sin compresión de fondo',true,'low')}`)}${divider('Cursor')}${grid(`${sli('v_cursor','Velocidad cursor','Velocidad del mouse',1,20,10,'')}${tog('v_no_accel','Sin aceleración mouse','Movimiento 1:1 para gaming',false,'low')}`)}`;}
 
-function pTask(){return `${hdr('📌','Barra de Tareas','Configura taskbar')}${grid(`
-    ${tog('t_search','Ocultar búsqueda','Sin barra búsqueda',true,'low')}
-    ${tog('t_taskview','Sin Vista tareas','Sin botón',true,'low')}
-    ${tog('t_widgets','Sin Widgets','Sin widgets Win11',true,'low')}
-    ${tog('t_chat','Sin Chat/Teams','Sin ícono',true,'low')}
-    ${tog('t_copilot','Sin Copilot','Sin botón Copilot',true,'low')}
-    ${tog('t_small','Iconos pequeños','Más compacto',false,'low')}
-    ${tog('t_never_combine','No combinar','Ventanas separadas',false,'low')}
-    ${tog('t_tray','Todos los iconos','Bandeja visible',false,'low')}
-`)}${divider('Posición')}${grid(`
-    ${sel('t_align','Alineación Win11','Posición iconos',[{v:'center',l:'Centro'},{v:'left',l:'Izquierda'}],'left')}
-`)}`;}
+function pTask(){return `${hdr('📌','Barra de Tareas','Configura la taskbar de Windows')}${grid(`${tog('t_search','Ocultar búsqueda','Sin barra de búsqueda',true,'low')}${tog('t_taskview','Sin Vista de tareas','Sin botón Task View',true,'low')}${tog('t_widgets','Sin Widgets','Sin widgets de Win11',true,'low')}${tog('t_chat','Sin Chat/Teams','Sin ícono de chat',true,'low')}${tog('t_copilot','Sin Copilot','Sin botón de Copilot',true,'low')}${tog('t_small','Iconos pequeños','Taskbar más compacta',false,'low')}${tog('t_never_combine','No combinar ventanas','Ventanas separadas',false,'low')}${tog('t_tray','Todos los iconos tray','Bandeja del sistema visible',false,'low')}`)}${divider('Posición')}${grid(`${sel('t_align','Alineación Win11','Posición de los iconos',[{v:'center',l:'Centro (default)'},{v:'left',l:'Izquierda'}],'left')}`)}`;}
 
-function pExp(){return `${hdr('📁','Explorador','Personaliza explorador')}${grid(`
-    ${tog('e_ext','Extensiones visibles','Muestra extensiones',true,'low')}
-    ${tog('e_hidden','Archivos ocultos','Muestra ocultos',true,'low')}
-    ${tog('e_thispc','Abrir en Este PC','No en Recientes',true,'low')}
-    ${tog('e_classic','Menú clásico Win11','Sin "Mostrar más"',true,'low')}
-    ${tog('e_no_recent','Sin recientes','No mostrar',true,'low')}
-    ${tog('e_full_path','Ruta completa','En barra título',true,'low')}
-    ${tog('e_compact','Vista compacta','Menos espacio Win11',true,'low')}
-    ${tog('e_no_ads','Sin anuncios','Sin tips explorer',true,'low')}
-`)}`;}
+function pExp(){return `${hdr('📁','Explorador','Personaliza el explorador de archivos')}${grid(`${tog('e_ext','Extensiones visibles','Muestra extensiones de archivo',true,'low')}${tog('e_hidden','Archivos ocultos','Muestra archivos ocultos',true,'low')}${tog('e_thispc','Abrir en Este PC','No abrir en Recientes',true,'low')}${tog('e_classic','Menú clásico Win11','Sin "Mostrar más opciones"',true,'low')}${tog('e_no_recent','Sin recientes','No mostrar archivos recientes',true,'low')}${tog('e_full_path','Ruta completa','Muestra ruta en la barra',true,'low')}${tog('e_compact','Vista compacta','Menos espacio en Win11',true,'low')}${tog('e_no_ads','Sin anuncios','Sin tips del explorador',true,'low')}`)}`;}
 
-function pSnd(){return `${hdr('🔊','Sonido','Config audio')}${grid(`
-    ${tog('s_no_startup','Sin sonido inicio','Silencia Windows',true,'low')}
-    ${tog('s_no_notif','Sin sonido notif','Notif silenciosas',false,'low')}
-    ${tog('s_exclusive','Modo exclusivo off','Apps no toman control',false,'med')}
-    ${tog('s_comms','Sin reducción comms','No baja vol en llamadas',true,'low')}
-    ${tog('s_loudness','Ecualización','Normaliza volumen',false,'low')}
-`)}${divider('Formato')}${grid(`
-    ${sli('s_vol','Volumen default','Vol al iniciar',0,100,50,'%')}
-    ${sel('s_format','Formato audio','Calidad',[{v:'16_44',l:'16bit 44.1kHz'},{v:'16_48',l:'16bit 48kHz'},{v:'24_48',l:'24bit 48kHz'},{v:'24_96',l:'24bit 96kHz Hi-Res'}],'16_48')}
-`)}`;}
+function pSnd(){return `${hdr('🔊','Sonido','Configuración de audio')}${grid(`${tog('s_no_startup','Sin sonido de inicio','Silencia el inicio de Windows',true,'low')}${tog('s_no_notif','Sin sonido de notif','Notificaciones silenciosas',false,'low')}${tog('s_exclusive','Modo exclusivo off','Apps no toman control del audio',false,'med')}${tog('s_comms','Sin reducción comms','No baja volumen en llamadas',true,'low')}${tog('s_loudness','Ecualización','Normaliza el volumen',false,'low')}`)}${divider('Formato')}${grid(`${sli('s_vol','Volumen default','Volumen al iniciar Windows',0,100,50,'%')}${sel('s_format','Formato de audio','Calidad de reproducción',[{v:'16_44',l:'16bit 44.1kHz'},{v:'16_48',l:'16bit 48kHz'},{v:'24_48',l:'24bit 48kHz'},{v:'24_96',l:'24bit 96kHz Hi-Res'}],'16_48')}`)}`;}
 
-function pPriv(){return `${hdr('🛡️','Privacidad','Controla telemetría')}
-    <div class="card p-3 mb-4 border-l-4 border-l-green-500"><p class="text-[11px] text-green-200">✅ <strong>Defender NO se toca.</strong> Solo telemetría y tracking.</p></div>
-    ${grid(`
-    ${tog('pr_telemetry','Sin telemetría','Bloquea diagnósticos',true,'med')}
-    ${tog('pr_cortana','Sin Cortana','Deshabilita Cortana',true,'low')}
-    ${tog('pr_activity','Sin historial','No guardar actividad',true,'low')}
-    ${tog('pr_ad_id','Sin ID publicidad','Sin anuncios personalizados',true,'low')}
-    ${tog('pr_location','Sin ubicación','No compartir',true,'low')}
-    ${tog('pr_diag','Diagnóstico mínimo','Solo obligatorio',true,'low')}
-    ${tog('pr_feedback','Sin feedback','No pedir opiniones',true,'low')}
-    ${tog('pr_suggestions','Sin sugerencias','Sin apps sugeridas',true,'low')}
-    ${tog('pr_lockscreen','Sin tips lock','Sin anuncios bloqueo',true,'low')}
-    ${tog('pr_timeline','Sin Timeline','Sin línea tiempo',true,'low')}
-    ${tog('pr_clipboard','Sin sync clipboard','No sincronizar',true,'low')}
-    ${tog('pr_input','Sin datos escritura','No enviar typing',true,'low')}
-`)}`;}
+function pPriv(){return `${hdr('🛡️','Privacidad','Control de telemetría y tracking')}
+    <div class="card p-4 mb-5 border-l-4 border-l-emerald-500/50"><p class="text-[11px] text-emerald-200/80">✅ <strong>Defender NO se toca.</strong> Solo telemetría y tracking.</p></div>
+    ${grid(`${tog('pr_telemetry','Sin telemetría','Bloquea diagnósticos de Windows',true,'med')}${tog('pr_cortana','Sin Cortana','Deshabilita Cortana completamente',true,'low')}${tog('pr_activity','Sin historial','No guardar historial de actividad',true,'low')}${tog('pr_ad_id','Sin ID publicidad','Sin anuncios personalizados',true,'low')}${tog('pr_location','Sin ubicación','No compartir ubicación',true,'low')}${tog('pr_diag','Diagnóstico mínimo','Solo datos obligatorios',true,'low')}${tog('pr_feedback','Sin feedback','No pedir opiniones',true,'low')}${tog('pr_suggestions','Sin sugerencias','Sin apps sugeridas',true,'low')}${tog('pr_lockscreen','Sin tips en lock','Sin anuncios en pantalla de bloqueo',true,'low')}${tog('pr_timeline','Sin Timeline','Sin línea de tiempo',true,'low')}${tog('pr_clipboard','Sin sync clipboard','No sincronizar portapapeles',true,'low')}${tog('pr_input','Sin datos de escritura','No enviar datos de typing',true,'low')}`)}`;}
 
-function pSvc(){return `${hdr('⚙️','Servicios','Desactiva innecesarios')}
-    <div class="card p-3 mb-4 border-l-4 border-l-red-500"><p class="text-[11px] text-red-200">⚠️ <strong>Defender NO incluido.</strong> Solo servicios seguros.</p></div>
-    ${grid(`
-    ${tog('sv_diagtrack','DiagTrack','Telemetría principal',true,'med')}
-    ${tog('sv_dmwap','dmwappushservice','Telemetría WAP',true,'med')}
-    ${tog('sv_sysmain','SysMain','Pre-carga RAM',true,'med')}
-    ${tog('sv_wsearch','Windows Search','Indexación',true,'med')}
-    ${tog('sv_xbox','Servicios Xbox','Xbox services',true,'low')}
-    ${tog('sv_maps','Mapas','Mapas offline',true,'low')}
-    ${tog('sv_fax','Fax','Servicio fax',true,'low')}
-    ${tog('sv_print','Impresión','Solo si usas impresora',false,'med')}
-    ${tog('sv_remote','Registro remoto','Acceso remoto',true,'low')}
-    ${tog('sv_phone','PhoneSvc','Teléfono',true,'low')}
-    ${tog('sv_retail','RetailDemo','Demo tienda',true,'low')}
-    ${tog('sv_wallet','WalletService','Billetera',true,'low')}
-`)}`;}
+function pSvc(){return `${hdr('⚙️','Servicios','Desactiva servicios innecesarios')}
+    <div class="card p-4 mb-5 border-l-4 border-l-red-500/50"><p class="text-[11px] text-red-200/80">⚠️ <strong>Defender NO incluido.</strong> Solo servicios seguros de desactivar.</p></div>
+    ${grid(`${tog('sv_diagtrack','DiagTrack','Telemetría principal de Windows',true,'med')}${tog('sv_dmwap','dmwappushservice','Telemetría WAP push',true,'med')}${tog('sv_sysmain','SysMain','Pre-carga de RAM (Superfetch)',true,'med')}${tog('sv_wsearch','Windows Search','Indexación de archivos',true,'med')}${tog('sv_xbox','Servicios Xbox','Xbox Auth, Game Save',true,'low')}${tog('sv_maps','Mapas','Servicio de mapas offline',true,'low')}${tog('sv_fax','Fax','Servicio de fax',true,'low')}${tog('sv_print','Impresión','Solo si usas impresora',false,'med')}${tog('sv_remote','Registro remoto','Acceso remoto al registro',true,'low')}${tog('sv_phone','PhoneSvc','Servicio de teléfono',true,'low')}${tog('sv_retail','RetailDemo','Modo demo de tienda',true,'low')}${tog('sv_wallet','WalletService','Billetera de Windows',true,'low')}`)}`;}
 
-function pUpd(){return `${hdr('🔄','Windows Update','Control de actualizaciones')}${grid(`
-    ${tog('wu_no_restart','Sin reinicio auto','No reiniciar sin permiso',true,'low')}
-    ${tog('wu_no_driver','Sin actualizar drivers','Windows no toca drivers',false,'med')}
-    ${tog('wu_no_feature','Sin Feature Updates','Bloquea 22H2/23H2',false,'high')}
-    ${tog('wu_metered','Conexión medida','Reduce descargas',false,'med')}
-    ${tog('wu_no_peer','Sin P2P updates','No compartir',true,'low')}
-    ${tog('wu_notify','Solo notificar','No descargar auto',false,'med')}
-    ${tog('wu_no_store','Sin auto-update Store','Store no actualiza',false,'low')}
-`)}${divider('Horas Activas')}${grid(`
-    ${sli('wu_start','Inicio','Hora inicio (24h)',0,23,8,'h')}
-    ${sli('wu_end','Fin','Hora fin (24h)',0,23,23,'h')}
-`)}`;}
+function pUpd(){return `${hdr('🔄','Windows Update','Control de actualizaciones')}${grid(`${tog('wu_no_restart','Sin reinicio auto','No reiniciar sin tu permiso',true,'low')}${tog('wu_no_driver','Sin actualizar drivers','Windows no toca tus drivers',false,'med')}${tog('wu_no_feature','Sin Feature Updates','Bloquea actualizaciones grandes',false,'high')}${tog('wu_metered','Conexión medida','Reduce descargas automáticas',false,'med')}${tog('wu_no_peer','Sin P2P updates','No compartir updates con otros',true,'low')}${tog('wu_notify','Solo notificar','No descargar automáticamente',false,'med')}${tog('wu_no_store','Sin auto-update Store','Store no actualiza solo',false,'low')}`)}${divider('Horas Activas')}${grid(`${sli('wu_start','Hora inicio','Inicio de horas activas (24h)',0,23,8,'h')}${sli('wu_end','Hora fin','Fin de horas activas (24h)',0,23,23,'h')}`)}`;}
 
-function pSec(){return `${hdr('🔒','Seguridad','Config seguridad')}
-    <div class="bg-green-900/10 border border-green-800/20 rounded-xl p-3 mb-4 flex items-center gap-2"><span class="text-2xl">🛡️</span><div><p class="font-bold text-green-400 text-xs">Defender PROTEGIDO</p><p class="text-[10px] text-gray-400">NO se modifica ni desactiva Windows Defender.</p></div></div>
-    ${grid(`
-    ${tog('sec_smb1','Sin SMBv1','Protocolo vulnerable',true,'low')}
-    ${tog('sec_remote','Sin Escritorio Remoto','Si no lo usas',true,'low')}
-    ${tog('sec_assist','Sin Asistencia Remota','Si no lo usas',true,'low')}
-    ${tog('sec_autoplay','Sin AutoPlay','No ejecutar USB auto',true,'low')}
-    ${tog('sec_netbios','Sin NetBIOS','Legacy protocol',true,'low')}
-    ${tog('sec_null','Restringir sesiones nulas','Bloquea anónimo',true,'low')}
-    ${tog('sec_lm','Sin LM Hash','Hash más seguro',true,'low')}
-    ${tog('sec_wpad','Sin WPAD','Sin proxy auto',true,'low')}
-`)}`;}
+function pSec(){return `${hdr('🔒','Seguridad','Configuración de seguridad')}
+    <div class="bg-emerald-500/5 border border-emerald-500/10 rounded-2xl p-4 mb-5 flex items-center gap-3"><span class="text-3xl">🛡️</span><div><p class="font-bold text-emerald-400 text-sm">Defender PROTEGIDO</p><p class="text-[10px] text-slate-400">NO se modifica ni desactiva Windows Defender.</p></div></div>
+    ${grid(`${tog('sec_smb1','Sin SMBv1','Protocolo vulnerable antiguo',true,'low')}${tog('sec_remote','Sin Escritorio Remoto','Desactiva si no lo usas',true,'low')}${tog('sec_assist','Sin Asistencia Remota','Desactiva si no lo usas',true,'low')}${tog('sec_autoplay','Sin AutoPlay','No ejecutar USB automáticamente',true,'low')}${tog('sec_netbios','Sin NetBIOS','Protocolo legacy inseguro',true,'low')}${tog('sec_null','Restringir sesiones nulas','Bloquea acceso anónimo',true,'low')}${tog('sec_lm','Sin LM Hash','Hash de contraseña más seguro',true,'low')}${tog('sec_wpad','Sin WPAD','Sin proxy auto-discovery',true,'low')}`)}`;}
 
-function pMaint(){return `${hdr('🔧','Mantenimiento','Reparación del sistema')}${grid(`
-    ${tog('m_sfc','SFC /scannow','Repara archivos sistema',true,'low')}
-    ${tog('m_dism','DISM RestoreHealth','Repara imagen Windows',true,'low')}
-    ${tog('m_chkdsk','Verificar disco','Busca errores',false,'med')}
-    ${tog('m_defrag','Optimizar disco','Desfrag HDD / TRIM SSD',true,'low')}
-    ${tog('m_restore','Punto de restauración','Crear antes de cambios',true,'low')}
-    ${tog('m_logs','Limpiar logs','Borra registros eventos',false,'low')}
-    ${tog('m_store','Reset Store','Repara Microsoft Store',false,'low')}
-    ${tog('m_network','Reset red completo','Reinstala adaptadores',false,'med')}
-    ${tog('m_winsxs','Limpiar WinSxS','Componentes obsoletos',false,'med')}
-    ${tog('m_icon','Rebuild iconos','Repara iconos corruptos',false,'low')}
-`)}`;}
+function pMaint(){return `${hdr('🔧','Mantenimiento','Reparación y limpieza del sistema')}${grid(`${tog('m_sfc','SFC /scannow','Repara archivos del sistema',true,'low')}${tog('m_dism','DISM RestoreHealth','Repara imagen de Windows',true,'low')}${tog('m_chkdsk','Verificar disco','Busca errores en el disco',false,'med')}${tog('m_defrag','Optimizar disco','Desfrag HDD / TRIM SSD',true,'low')}${tog('m_restore','Punto de restauración','Crear antes de los cambios',true,'low')}${tog('m_logs','Limpiar logs','Borra registros de eventos',false,'low')}${tog('m_store','Reset Microsoft Store','Repara problemas de Store',false,'low')}${tog('m_network','Reset red completo','Reinstala adaptadores de red',false,'med')}${tog('m_winsxs','Limpiar WinSxS','Componentes obsoletos del SO',false,'med')}${tog('m_icon','Rebuild iconos','Repara iconos corruptos',false,'low')}`)}`;}
 
-function pTerm(){return `${hdr('💻','Terminal','Ejecuta comandos')}
-    <div class="terminal mb-4"><div class="terminal-header"><div class="flex gap-1.5"><div class="w-3 h-3 bg-red-500 rounded-full"></div><div class="w-3 h-3 bg-yellow-500 rounded-full"></div><div class="w-3 h-3 bg-green-500 rounded-full"></div></div><span class="text-gray-400 text-xs ml-2">PCTuner Terminal · ${S.hw.brand}</span></div>
-    <div class="terminal-body" id="termBody" style="min-height:180px"><p class="text-green-400">PCTuner Pro v5 — ${S.hw.brand} ${S.hw.os}</p><p class="text-gray-500 text-[10px] mt-1">Simulación. Exporta el script para ejecutar en tu PC.</p><p class="text-green-400 mt-2">C:\\PCTuner> <span class="animate-pulse">_</span></p></div></div>
-    <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
-        ${[['sfc /scannow','🔍','SFC Scan','Verificar archivos'],['ipconfig /flushdns','🌐','Flush DNS','Limpiar DNS'],['systeminfo','💻','System Info','Info del sistema'],['cleanmgr','🧹','Limpieza','Disk Cleanup'],['powercfg /batteryreport','🔋','Batería','Salud batería'],['netsh wlan show profiles','📡','WiFi','Redes guardadas']].map(([cmd,ico,name,desc])=>`<button onclick="termRun('${cmd}')" class="card p-3 text-center cursor-pointer hover:border-blue-500/20"><p class="text-xl mb-0.5">${ico}</p><p class="font-bold text-white text-[11px]">${name}</p><p class="text-[9px] text-gray-500">${desc}</p></button>`).join('')}
+function pTerm(){return `${hdr('💻','Terminal','Ejecuta comandos del sistema')}
+    <div class="term mb-5"><div class="term-head"><div class="flex gap-2"><div class="w-3 h-3 bg-red-500 rounded-full"></div><div class="w-3 h-3 bg-yellow-500 rounded-full"></div><div class="w-3 h-3 bg-green-500 rounded-full"></div></div><span class="text-slate-400 text-xs ml-3 mono">PCTuner Terminal · ${S.hw.brand}</span></div>
+    <div class="term-body" id="tBody"><p class="text-emerald-400">PCTuner Pro v6 — ${S.hw.brand} ${S.hw.os}</p><p class="text-slate-600 text-[10px] mt-1">Simulación. Exporta el script para ejecutar en tu PC real.</p><p class="text-emerald-400 mt-3">C:\\PCTuner> <span class="animate-pulse">_</span></p></div></div>
+    <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+        ${[['sfc /scannow','🔍','SFC Scan','Verificar archivos'],['ipconfig /flushdns','🌐','Flush DNS','Limpiar caché DNS'],['systeminfo','💻','System Info','Info del sistema'],['cleanmgr','🧹','Limpieza','Disk Cleanup'],['powercfg /batteryreport','🔋','Batería','Reporte de batería'],['netsh wlan show profiles','📡','WiFi','Redes guardadas']].map(([cmd,ic,n,d])=>`<button onclick="tRun('${cmd}')" class="card p-4 text-center cursor-pointer hover:border-indigo-500/20"><p class="text-2xl mb-1">${ic}</p><p class="font-bold text-white text-xs">${n}</p><p class="text-[9px] text-slate-500 mt-0.5">${d}</p></button>`).join('')}
     </div>`;}
+function tRun(cmd){const el=document.getElementById('tBody');if(!el)return;const o={'sfc /scannow':'Examen del sistema...\n[========= 100% =========]\nArchivos verificados correctamente.','ipconfig /flushdns':'Configuración IP de Windows\nSe vació correctamente la caché DNS.','systeminfo':`Nombre: ${S.hw.brand}\nSO: ${S.hw.osVer||S.hw.os}\nArquitectura: ${S.hw.arch}\nNúcleos: ${S.hw.cores}\nRAM: ${S.hw.ram||'?'}GB\nGPU: ${S.hw.gpu?S.hw.gpu.substring(0,50):'N/A'}`,'cleanmgr':'Analizando C:\\\nTemp: 2.1 GB\nPapelera: 650 MB\nTotal liberado: 2.75 GB','powercfg /batteryreport':`Batería: ${S.hw.battery?S.hw.batteryLevel+'%':'No detectada'}\nSalud: 87%`,'netsh wlan show profiles':'Perfiles WiFi:\n  MiRed_5G\n  CafeGratis'};
+const out=o[cmd]||'OK';el.innerHTML+=`<p class="text-cyan-400 mt-3">C:\\PCTuner> <span class="text-white">${cmd}</span></p>`;out.split('\n').forEach((l,i)=>{setTimeout(()=>{el.innerHTML+=`<p class="text-emerald-400 fade-up">${l}</p>`;el.scrollTop=el.scrollHeight;},i*120);});setTimeout(()=>{el.innerHTML+=`<p class="text-emerald-400 mt-2">C:\\PCTuner> <span class="animate-pulse">_</span></p>`;el.scrollTop=el.scrollHeight;},out.split('\n').length*120+200);}
 
-function termRun(cmd){
-    const el=document.getElementById('termBody');if(!el)return;
-    const outs={'sfc /scannow':'Examen del sistema...\n[=========100%=========]\nArchivos verificados correctamente.','ipconfig /flushdns':'Cache DNS vaciado correctamente.','systeminfo':`Nombre: ${S.hw.brand}\nSO: ${S.hw.osVer||S.hw.os}\nArquitectura: ${S.hw.arch}\nNucleos: ${S.hw.cores}\nRAM: ${S.hw.ram||'?'}GB\nGPU: ${S.hw.gpu?S.hw.gpu.substring(0,50):'N/A'}\nPantalla: ${S.hw.screenW}x${S.hw.screenH}`,'cleanmgr':'Analizando C:\\\nTemp: 2.1 GB\nPapelera: 650 MB\nTotal: 2.7 GB liberados.','powercfg /batteryreport':`Batería: ${S.hw.battery?S.hw.batteryLevel+'%':'No detectada'}\nCargando: ${S.hw.charging?'Sí':'No'}\nSalud estimada: 87%`,'netsh wlan show profiles':'Perfiles WiFi:\n    MiRed_5G\n    CafeGratis\n    MOVISTAR_4521'};
-    const out=outs[cmd]||'Ejecutado correctamente.';
-    el.innerHTML+=`<p class="text-cyan-400 mt-2">C:\\PCTuner> <span class="text-white">${cmd}</span></p>`;
-    out.split('\n').forEach((l,i)=>{setTimeout(()=>{el.innerHTML+=`<p class="text-green-400 terminal-line" style="animation-delay:${i*0.04}s">${l}</p>`;el.scrollTop=el.scrollHeight;},i*100);});
-    setTimeout(()=>{el.innerHTML+=`<p class="text-green-400 mt-1">C:\\PCTuner> <span class="animate-pulse">_</span></p>`;el.scrollTop=el.scrollHeight;},out.split('\n').length*100+150);
-}
-
-function pProf(){return `${hdr('💾','Perfiles','Guarda configuraciones')}
-    <div class="grid md:grid-cols-2 gap-3 mb-4">
-        <div class="card p-4"><h4 class="font-bold text-white text-sm mb-2">💾 Guardar</h4><input type="text" id="profName" placeholder="Nombre..." class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm mb-2 focus:border-blue-500 focus:outline-none text-white"><button onclick="saveProf()" class="w-full btn btn-blue py-2 text-sm">Guardar</button></div>
-        <div class="card p-4"><h4 class="font-bold text-white text-sm mb-2">📂 Import/Export</h4><div class="flex gap-2"><button onclick="expJSON()" class="flex-1 btn btn-green py-2 text-sm">📤 Export</button><label class="flex-1 btn btn-blue py-2 text-sm text-center cursor-pointer">📥 Import<input type="file" accept=".json" class="hidden" onchange="impJSON(event)"></label></div></div>
+function pProf(){return `${hdr('💾','Perfiles','Guarda y carga configuraciones')}
+    <div class="grid md:grid-cols-2 gap-4 mb-5">
+        <div class="card p-5"><h4 class="font-bold text-white text-sm mb-3">💾 Guardar Perfil</h4><input type="text" id="pName" placeholder="Nombre del perfil..." class="w-full bg-slate-900/80 border border-slate-700/50 rounded-xl px-4 py-2.5 text-sm mb-3 focus:border-indigo-500 focus:outline-none text-white placeholder-slate-600"><button onclick="saveProf()" class="w-full btn btn-primary py-2.5 text-sm">Guardar</button></div>
+        <div class="card p-5"><h4 class="font-bold text-white text-sm mb-3">📂 Import / Export</h4><div class="flex gap-2"><button onclick="expJSON()" class="flex-1 btn btn-success py-2.5 text-sm">📤 Export JSON</button><label class="flex-1 btn btn-primary py-2.5 text-sm text-center cursor-pointer">📥 Import<input type="file" accept=".json" class="hidden" onchange="impJSON(event)"></label></div></div>
     </div>`;}
-function saveProf(){const n=document.getElementById('profName')?.value?.trim();if(!n)return;const p=JSON.parse(localStorage.getItem('pct_profiles')||'{}');p[n]={toggles:{...S.toggles},sliders:{...S.sliders},selects:{...S.selects},keybinds:{...S.keybinds},fanCurve:[...S.fanCurve],fanProfile:S.fanProfile};localStorage.setItem('pct_profiles',JSON.stringify(p));alert('✅ Perfil "'+n+'" guardado!');}
-function expJSON(){dl('pctuner_config.json',JSON.stringify({toggles:S.toggles,sliders:S.sliders,selects:S.selects,keybinds:S.keybinds,fanCurve:S.fanCurve,fanProfile:S.fanProfile},null,2));}
-function impJSON(ev){const f=ev.target.files[0];if(!f)return;const r=new FileReader();r.onload=e=>{try{const d=JSON.parse(e.target.result);Object.assign(S.toggles,d.toggles||{});Object.assign(S.sliders,d.sliders||{});Object.assign(S.selects,d.selects||{});Object.assign(S.keybinds,d.keybinds||{});if(d.fanCurve)S.fanCurve=d.fanCurve;if(d.fanProfile)S.fanProfile=d.fanProfile;alert('✅ Importado!');render(S.page);}catch(e){alert('❌ Error');}};r.readAsText(f);}
+function saveProf(){const n=document.getElementById('pName')?.value?.trim();if(!n)return;const p=JSON.parse(localStorage.getItem('pct6')||'{}');p[n]={t:{...S.toggles},s:{...S.sliders},se:{...S.selects},k:{...S.keybinds},fc:[...S.fan.curve],fp:S.fan.profile};localStorage.setItem('pct6',JSON.stringify(p));notify('✅ Perfil "'+n+'" guardado!','#10b981');}
+function expJSON(){dl('pctuner_config.json',JSON.stringify({toggles:S.toggles,sliders:S.sliders,selects:S.selects,keybinds:S.keybinds,fanCurve:S.fan.curve,fanProfile:S.fan.profile},null,2));}
+function impJSON(ev){const f=ev.target.files[0];if(!f)return;const r=new FileReader();r.onload=e=>{try{const d=JSON.parse(e.target.result);Object.assign(S.toggles,d.toggles||{});Object.assign(S.sliders,d.sliders||{});Object.assign(S.selects,d.selects||{});Object.assign(S.keybinds,d.keybinds||{});if(d.fanCurve)S.fan.curve=d.fanCurve;if(d.fanProfile)S.fan.profile=d.fanProfile;notify('✅ Config importada!','#10b981');render(S.page);}catch(e){notify('❌ Error al importar','#ef4444');}};r.readAsText(f);}
 
 function pAbout(){return `${hdr('ℹ️','Acerca de PCTuner Pro','Información de la aplicación')}
-    <div class="card p-6 text-center mb-4">
-        <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-violet-500 rounded-2xl flex items-center justify-center text-2xl font-black text-white mx-auto mb-3">PC</div>
-        <h2 class="text-xl font-black text-white">PCTuner Pro v5.0</h2>
-        <p class="text-sm text-gray-400 mt-1">Optimizador Universal de PC</p>
-        <p class="text-xs text-gray-500 mt-3">Detecta automáticamente tu hardware y genera scripts optimizados para tu equipo específico.</p>
+    <div class="card p-8 text-center mb-5">
+        <div class="w-20 h-20 bg-gradient-to-br from-indigo-500 to-violet-600 rounded-[22px] flex items-center justify-center text-3xl font-black text-white mx-auto mb-4 shadow-xl shadow-indigo-500/20">PC</div>
+        <h2 class="text-2xl font-black text-white">PCTuner Pro v6.0</h2>
+        <p class="text-sm text-slate-400 mt-1">Optimizador Universal de PC</p>
+        <p class="text-xs text-slate-500 mt-3 max-w-md mx-auto">Detecta automáticamente tu hardware y genera scripts optimizados para tu equipo.</p>
+        <p class="text-xs mt-3">Creado por <span class="credit-gradient font-bold cursor-pointer" onclick="go('credits')">mueblesito</span> ✨</p>
     </div>
-    <div class="card p-5 mb-4">
-        <h4 class="font-bold text-white text-sm mb-3">🖥️ Tu Sistema Detectado</h4>
-        <div class="grid grid-cols-2 gap-2 text-xs">
-            ${[['Marca',S.hw.brand],['SO',S.hw.osVer||S.hw.os],['Arch',S.hw.arch],['CPU Cores',S.hw.cores],['RAM',S.hw.ram?S.hw.ram+'GB':'N/A'],['GPU',S.hw.gpu?S.hw.gpu.substring(0,35):'N/A'],['Pantalla',S.hw.screenW+'×'+S.hw.screenH],['DPR',S.hw.dpr+'x'],['Touch',S.hw.touchscreen?'Sí':'No'],['Batería',S.hw.battery?S.hw.batteryLevel+'%':'No'],['Conexión',S.hw.connection||'N/A'],['Idioma',S.hw.lang]].map(([k,v])=>`<div class="stat-box p-2"><span class="text-gray-500">${k}:</span> <span class="text-white font-medium">${v}</span></div>`).join('')}
+    <div class="card p-6 mb-5">
+        <h4 class="font-bold text-white text-sm mb-4">🖥️ Sistema Detectado</h4>
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-2.5 text-xs">
+            ${[['Marca',S.hw.brand],['SO',(S.hw.osVer?'Windows '+S.hw.osVer:S.hw.os)],['Arch',S.hw.arch],['Núcleos',S.hw.cores],['RAM',S.hw.ram?S.hw.ram+'GB':'N/A'],['GPU',S.hw.gpu?S.hw.gpu.substring(0,30):'N/A'],['Pantalla',S.hw.screenW+'×'+S.hw.screenH],['DPR',S.hw.dpr+'x'],['Touch',S.hw.touch?'Sí':'No'],['Batería',S.hw.battery?S.hw.batteryLevel+'%':'No'],['Red',S.hw.connection||'N/A'],['Idioma',S.hw.lang]].map(([k,v])=>`<div class="stat p-3"><span class="text-slate-500">${k}</span><p class="text-white font-medium mt-0.5">${v}</p></div>`).join('')}
         </div>
     </div>
-    <div class="card p-4 border-l-4 border-l-green-500">
-        <p class="text-xs text-green-300">🛡️ <strong>Windows Defender nunca se modifica.</strong> Todas las optimizaciones son seguras y reversibles con punto de restauración.</p>
-    </div>`;}
+    <div class="card p-5 border-l-4 border-l-emerald-500/50"><p class="text-xs text-emerald-300/80">🛡️ <strong>Windows Defender nunca se modifica.</strong> Todas las optimizaciones son seguras y reversibles.</p></div>`;}
 
-// ======================== PRESETS ========================
+// ── CREDITS ──
+function pCredits(){
+    const stars=Array.from({length:20},()=>`<div class="star" style="top:${Math.random()*100}%;left:${Math.random()*100}%;animation-delay:${Math.random()*3}s;opacity:${Math.random()*0.5+0.2}"></div>`).join('');
+    const buildDate=new Date().toLocaleDateString('es-ES',{year:'numeric',month:'long',day:'numeric'});
+    return `
+    <div class="relative" style="min-height:80vh">
+        <!-- Orbs flotantes -->
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+        ${stars}
+
+        <!-- Hero Card -->
+        <div class="card p-8 md:p-12 text-center mb-8 hover-glow credit-card-anim relative overflow-visible" style="background:linear-gradient(135deg,rgba(14,17,28,0.95),rgba(20,15,40,0.9))">
+            <div class="credit-avatar w-24 h-24 md:w-28 md:h-28 bg-gradient-to-br from-indigo-500 via-violet-500 to-pink-500 rounded-[28px] flex items-center justify-center text-4xl md:text-5xl font-black text-white mx-auto mb-6 shadow-2xl shadow-indigo-500/25" style="perspective:500px">
+                🪑
+            </div>
+            <h2 class="text-3xl md:text-4xl font-black credit-gradient mb-2">mueblesito</h2>
+            <p class="text-slate-400 text-sm md:text-base font-medium">Creador & Desarrollador</p>
+            <div class="flex items-center justify-center gap-2 mt-3">
+                <span class="w-2 h-2 bg-emerald-400 rounded-full pulse-anim"></span>
+                <span class="text-[11px] text-emerald-400 font-semibold tracking-wide">Activo</span>
+            </div>
+            <p class="text-xs text-slate-500 mt-5 max-w-lg mx-auto leading-relaxed">
+                Diseñé y desarrollé <strong class="text-indigo-400">PCTuner Pro v6</strong> con la misión de hacer la optimización de PC accesible para todos — sin tocar lo que importa. 🛡️
+            </p>
+        </div>
+
+        <!-- Stats rápidas -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
+            ${[
+                ['✨','v6.0','Versión','indigo'],
+                ['⚡',Object.keys(META).length+'','Secciones','violet'],
+                ['🔧','140+','Opciones','pink'],
+                ['🛡️','100%','Defender Safe','emerald']
+            ].map(([ic,val,label,col],i)=>`
+                <div class="card p-5 text-center hover-glow credit-card-anim" style="animation-delay:${0.1+i*0.08}s">
+                    <p class="text-2xl mb-2">${ic}</p>
+                    <p class="text-xl font-black text-${col}-400">${val}</p>
+                    <p class="text-[10px] text-slate-500 mt-1 font-medium">${label}</p>
+                </div>
+            `).join('')}
+        </div>
+
+        <!-- Sobre el proyecto -->
+        <div class="grid md:grid-cols-2 gap-5 mb-8">
+            <div class="card p-6 hover-glow credit-card-anim" style="animation-delay:0.15s">
+                <h4 class="font-bold text-white text-sm mb-4 flex items-center gap-2">💡 <span>Filosofía del Proyecto</span></h4>
+                <div class="space-y-3">
+                    ${[
+                        ['🎯','Simplicidad','Interfaz intuitiva que cualquiera puede usar'],
+                        ['🛡️','Seguridad','Windows Defender siempre intacto, sin excepciones'],
+                        ['🔍','Transparencia','Todo el código es visible y verificable'],
+                        ['🌍','Universal','Detecta y se adapta a cualquier hardware'],
+                        ['⚡','Eficiencia','Scripts optimizados sin basura innecesaria']
+                    ].map(([ic,title,desc])=>`
+                        <div class="flex items-start gap-3">
+                            <span class="text-base mt-0.5">${ic}</span>
+                            <div>
+                                <p class="text-xs font-bold text-white">${title}</p>
+                                <p class="text-[10px] text-slate-500 leading-relaxed">${desc}</p>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+
+            <div class="card p-6 hover-glow credit-card-anim" style="animation-delay:0.2s">
+                <h4 class="font-bold text-white text-sm mb-4 flex items-center gap-2">🛠️ <span>Stack Tecnológico</span></h4>
+                <div class="flex flex-wrap gap-2 mb-5">
+                    ${[
+                        ['HTML5','#e34f26','📄'],['CSS3','#1572b6','🎨'],['JavaScript','#f7df1e','⚡'],
+                        ['Tailwind CSS','#06b6d4','🌊'],['Canvas API','#8b5cf6','🖌️'],['Web APIs','#10b981','🔌'],
+                        ['Batch Script','#4d4d4d','📜'],['PowerShell','#012456','🔷'],['Registry','#cc6699','🗝️'],
+                        ['AutoHotkey','#334455','⌨️']
+                    ].map(([name,color,ic])=>`
+                        <span class="tech-badge" style="color:${color};border-color:${color}30;background:${color}08">
+                            <span>${ic}</span>${name}
+                        </span>
+                    `).join('')}
+                </div>
+                <div class="stat p-3 text-center">
+                    <p class="text-[9px] text-slate-600 mb-1">Líneas de código</p>
+                    <p class="text-lg font-black text-indigo-400 mono">~3,500+</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Timeline -->
+        <div class="card p-6 mb-8 hover-glow credit-card-anim" style="animation-delay:0.25s">
+            <h4 class="font-bold text-white text-sm mb-5 flex items-center gap-2">📅 <span>Evolución del Proyecto</span></h4>
+            <div class="relative ml-1">
+                <div class="timeline-line"></div>
+                <div class="space-y-5">
+                    ${[
+                        ['v1.0','Script básico .bat','Optimizaciones simples para Lenovo IdeaPad','indigo'],
+                        ['v2.0','Página web interactiva','Interfaz visual con opciones seleccionables','violet'],
+                        ['v3.0','Sistema completo','Dashboard, múltiples secciones, keybinds','purple'],
+                        ['v4.0','Detección de hardware','Auto-detecta marca, GPU, RAM, SO','blue'],
+                        ['v5.0','App universal','Compatible con cualquier PC, monitor en vivo','cyan'],
+                        ['v6.0','Edición Pro','UI premium, ventiladores, 140+ opciones, créditos','pink']
+                    ].map(([ver,title,desc,col])=>`
+                        <div class="flex items-start gap-4 relative">
+                            <div class="timeline-dot mt-0.5"></div>
+                            <div class="flex-1 pb-1">
+                                <div class="flex items-center gap-2 mb-0.5">
+                                    <span class="text-[10px] font-bold text-${col}-400 mono bg-${col}-500/10 px-2 py-0.5 rounded-full border border-${col}-500/15">${ver}</span>
+                                    <span class="font-bold text-white text-xs">${title}</span>
+                                </div>
+                                <p class="text-[10px] text-slate-500 leading-relaxed">${desc}</p>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        </div>
+
+        <!-- Mensaje final -->
+        <div class="card p-8 text-center hover-glow credit-card-anim" style="animation-delay:0.3s;background:linear-gradient(135deg,rgba(14,17,28,0.9),rgba(20,15,40,0.85))">
+            <p class="text-3xl mb-3">🪑✨</p>
+            <p class="text-sm text-slate-300 font-medium mb-1">Creado con <span class="text-red-400">❤️</span> por</p>
+            <h3 class="text-2xl font-black credit-gradient mb-3">mueblesito</h3>
+            <p class="text-[11px] text-slate-500 max-w-md mx-auto leading-relaxed mb-5">
+                Si este proyecto te fue útil, compártelo con alguien que lo necesite. Cada PC merece correr a su máximo potencial. 🚀
+            </p>
+            <div class="flex items-center justify-center gap-3 flex-wrap">
+                <div class="stat px-4 py-2 flex items-center gap-2">
+                    <span class="text-xs">📅</span>
+                    <span class="text-[10px] text-slate-400">${buildDate}</span>
+                </div>
+                <div class="stat px-4 py-2 flex items-center gap-2">
+                    <span class="text-xs">💻</span>
+                    <span class="text-[10px] text-slate-400">${S.hw.brand} · ${S.hw.osVer?'Win '+S.hw.osVer:S.hw.os}</span>
+                </div>
+                <div class="stat px-4 py-2 flex items-center gap-2">
+                    <span class="text-xs">🛡️</span>
+                    <span class="text-[10px] text-emerald-400 font-semibold">Defender Intacto</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer firma -->
+        <div class="text-center mt-8 mb-4">
+            <p class="text-[10px] text-slate-700 tracking-widest uppercase font-bold">PCTuner Pro v6.0 — Todos los derechos reservados</p>
+            <p class="text-[9px] text-slate-800 mt-1">mueblesito © ${new Date().getFullYear()}</p>
+        </div>
+    </div>`;
+}
+
+// ── PRESETS ──
 function applyPreset(p){
     Object.keys(S.toggles).forEach(k=>S.toggles[k]=false);
-    const presets={
+    const pr={
         balanced:['p_sysmain','p_indexing','p_visual','p_transparency','p_startup_delay','p_menu_delay','p_tips','p_cpu_priority','p_ntfs_last','c_temp','c_recycle','c_dns','n_flush','n_qos','pw_high','pw_hibernate','pr_telemetry','pr_cortana','pr_ad_id','pr_feedback','pr_suggestions','t_search','t_taskview','t_widgets','t_chat','t_copilot','e_ext','e_thispc','e_no_recent','v_dark','v_dark_apps','sv_diagtrack','sv_dmwap','m_restore','b_onedrive','b_teams','s_no_startup','wu_no_restart','sec_autoplay','g_mode'],
-        max:['p_sysmain','p_prefetch','p_indexing','p_visual','p_transparency','p_startup_delay','p_menu_delay','p_tips','p_cpu_priority','p_ntfs_last','p_core_parking','p_timer_res','p_split','p_cache','c_temp','c_recycle','c_update','c_thumb','c_logs','c_dns','c_bloatware','c_delivery','c_error','n_flush','n_nagle','n_qos','pw_high','pw_hibernate','pw_usb','pw_disk','pw_cpu_max','pr_telemetry','pr_cortana','pr_activity','pr_ad_id','pr_feedback','pr_suggestions','pr_lockscreen','t_search','t_taskview','t_widgets','t_chat','t_copilot','v_dark','v_dark_apps','v_no_anim','v_no_trans','v_no_shadow','sv_diagtrack','sv_dmwap','sv_sysmain','sv_wsearch','sv_xbox','sv_maps','sv_fax','sv_remote','sv_phone','sv_retail','sv_wallet','g_mode','g_dvr','g_fullscreen','g_mouse','g_nagle','g_throttle','g_xbox','g_notif','e_ext','e_thispc','e_classic','e_compact','e_no_ads','m_sfc','m_dism','m_defrag','m_restore','b_onedrive','b_teams','b_edge','b_skype','b_cortana','b_adobe','s_no_startup','wu_no_restart','wu_no_peer','sec_autoplay','sec_smb1'],
+        max:['p_sysmain','p_prefetch','p_indexing','p_visual','p_transparency','p_startup_delay','p_menu_delay','p_tips','p_cpu_priority','p_ntfs_last','p_core_parking','p_timer_res','c_temp','c_recycle','c_update','c_thumb','c_logs','c_dns','c_bloatware','c_delivery','c_error','n_flush','n_nagle','n_qos','pw_high','pw_hibernate','pw_usb','pw_disk','pw_cpu_max','pr_telemetry','pr_cortana','pr_activity','pr_ad_id','pr_feedback','pr_suggestions','pr_lockscreen','t_search','t_taskview','t_widgets','t_chat','t_copilot','v_dark','v_dark_apps','v_no_anim','v_no_trans','v_no_shadow','sv_diagtrack','sv_dmwap','sv_sysmain','sv_wsearch','sv_xbox','sv_maps','sv_fax','sv_remote','sv_phone','sv_retail','sv_wallet','g_mode','g_dvr','g_fullscreen','g_mouse','g_nagle','g_throttle','g_xbox','g_notif','e_ext','e_thispc','e_classic','e_compact','e_no_ads','m_sfc','m_dism','m_defrag','m_restore','b_onedrive','b_teams','b_edge','b_skype','b_cortana','b_adobe','s_no_startup','wu_no_restart','wu_no_peer','sec_autoplay','sec_smb1'],
         privacy:['pr_telemetry','pr_cortana','pr_activity','pr_ad_id','pr_location','pr_diag','pr_feedback','pr_suggestions','pr_lockscreen','pr_timeline','pr_clipboard','pr_input','sv_diagtrack','sv_dmwap','t_widgets','t_chat','t_copilot','wu_no_peer','sec_autoplay','sec_wpad','m_restore'],
         silent:['fan_smart','pw_high','m_restore','p_visual','p_transparency','v_no_anim'],
         battery:['p_sysmain','p_visual','p_transparency','p_indexing','v_no_anim','v_no_trans','pw_hibernate','sv_wsearch','sv_xbox','sv_maps','fan_smart','m_restore','b_onedrive','b_teams','b_spotify','b_edge','t_widgets']
     };
-    if(presets[p])presets[p].forEach(k=>{S.toggles[k]=true;track(k,true);});
-    if(p==='silent'){S.fanProfile='silent';S.fanCurve=[{t:30,s:8},{t:45,s:18},{t:60,s:30},{t:75,s:50},{t:90,s:65}];}
+    if(pr[p])pr[p].forEach(k=>{S.toggles[k]=true;track(k,true);});
+    if(p==='silent'){S.fan.profile='silent';S.fan.curve=[{t:30,s:8},{t:45,s:18},{t:60,s:30},{t:75,s:50},{t:90,s:65}];}
     render(S.page);
-    const names={balanced:'Equilibrado',max:'Máximo Rendimiento',privacy:'Máxima Privacidad',silent:'Silencioso',battery:'Ahorro Batería'};
-    showNotif('✅ Preset "'+names[p]+'" aplicado!');
+    const nm={balanced:'Equilibrado',max:'Máx Rendimiento',privacy:'Privacidad Total',silent:'Silencioso',battery:'Ahorro Batería'};
+    notify('✅ Preset "'+nm[p]+'" aplicado!','#10b981');
 }
 
-function showNotif(msg){
-    const d=document.createElement('div');
-    d.className='fixed bottom-5 right-5 z-[200] bg-green-600 text-white px-5 py-3 rounded-xl text-sm font-semibold shadow-2xl slide-up';
-    d.textContent=msg;document.body.appendChild(d);
-    setTimeout(()=>d.remove(),3000);
+function notify(msg,bg='#6366f1'){
+    const d=document.createElement('div');d.className='notif';d.style.background=bg;d.textContent=msg;
+    document.body.appendChild(d);setTimeout(()=>d.remove(),3200);
 }
 
-// ======================== EXECUTION ========================
+// ── EXECUTION ──
 function openExec(){document.getElementById('execModal').classList.remove('hidden');renderExec();}
 function closeExec(){document.getElementById('execModal').classList.add('hidden');}
-
 function renderExec(){
-    const active=Object.entries(S.toggles).filter(([k,v])=>v);
-    const body=document.getElementById('execBody');
-    if(active.length===0){
-        body.innerHTML=`<div class="text-center py-8"><p class="text-3xl mb-2">⚡</p><p class="text-sm text-gray-400">No hay optimizaciones activadas.</p><p class="text-xs text-gray-600 mt-1">Activa opciones en las secciones o usa un Preset.</p></div>`;
-        return;
-    }
-    body.innerHTML=`
-        <div class="mb-4"><p class="font-bold text-white text-sm">${active.length} optimizaciones activas</p><p class="text-xs text-gray-500">Sistema: ${S.hw.brand} · ${S.hw.osVer||S.hw.os}</p></div>
-        <div class="card p-3 mb-4 border-l-4 border-l-green-500"><p class="text-[11px] text-green-200">🛡️ Windows Defender <strong>NO será modificado</strong>.</p></div>
-        <div class="space-y-1.5 mb-5 max-h-[200px] overflow-y-auto">${active.map(([k])=>`<div class="flex items-center gap-2 text-xs"><span class="text-green-400">✓</span><span class="text-gray-300">${k}</span></div>`).join('')}</div>
-        <div class="grid grid-cols-2 gap-3">
-            <button onclick="execDirect('bat')" class="btn btn-green py-3 text-sm flex flex-col items-center gap-1"><span class="text-lg">⚡</span><span>Generar .BAT</span><span class="text-[9px] opacity-70">Descargar y ejecutar</span></button>
-            <button onclick="execDirect('ps1')" class="btn btn-blue py-3 text-sm flex flex-col items-center gap-1"><span class="text-lg">🔷</span><span>Generar .PS1</span><span class="text-[9px] opacity-70">PowerShell avanzado</span></button>
-            <button onclick="execDirect('reg')" class="btn btn-purple py-3 text-sm flex flex-col items-center gap-1"><span class="text-lg">🗝️</span><span>Generar .REG</span><span class="text-[9px] opacity-70">Solo registro</span></button>
-            <button onclick="execDirect('ahk')" class="btn btn-amber py-3 text-sm flex flex-col items-center gap-1"><span class="text-lg">⌨️</span><span>Generar .AHK</span><span class="text-[9px] opacity-70">Solo keybinds</span></button>
-        </div>
-        <div class="mt-4 text-center"><p class="text-[10px] text-gray-600">El archivo se descargará. Ejecútalo como <strong class="text-white">Administrador</strong> en tu PC.</p></div>`;
+    const a=Object.entries(S.toggles).filter(([,v])=>v);const b=document.getElementById('execBody');
+    if(!a.length){b.innerHTML=`<div class="text-center py-10"><p class="text-4xl mb-3">⚡</p><p class="text-sm text-slate-400">No hay optimizaciones activadas.</p><p class="text-xs text-slate-600 mt-2">Activa opciones o usa un Preset rápido.</p></div>`;return;}
+    b.innerHTML=`<div class="mb-5"><p class="font-bold text-white">${a.length} optimizaciones activas</p><p class="text-xs text-slate-500 mt-1">${S.hw.brand} · ${S.hw.osVer?'Windows '+S.hw.osVer:S.hw.os}</p></div>
+    <div class="card p-3 mb-5 border-l-4 border-l-emerald-500/50"><p class="text-[11px] text-emerald-200/80">🛡️ Windows Defender <strong>NO será modificado</strong></p></div>
+    <div class="space-y-1.5 mb-6 max-h-[180px] overflow-y-auto pr-2">${a.map(([k])=>`<div class="flex items-center gap-2 text-xs"><span class="text-emerald-400">✓</span><span class="text-slate-300 mono text-[11px]">${k}</span></div>`).join('')}</div>
+    <div class="grid grid-cols-2 gap-3">
+        <button onclick="execDl('bat')" class="btn btn-success py-3.5 flex flex-col items-center gap-1"><span class="text-lg">⚡</span><span class="text-sm">.BAT</span><span class="text-[9px] opacity-60">Batch script</span></button>
+        <button onclick="execDl('ps1')" class="btn btn-primary py-3.5 flex flex-col items-center gap-1"><span class="text-lg">🔷</span><span class="text-sm">.PS1</span><span class="text-[9px] opacity-60">PowerShell</span></button>
+        <button onclick="execDl('reg')" class="btn btn-violet py-3.5 flex flex-col items-center gap-1"><span class="text-lg">🗝️</span><span class="text-sm">.REG</span><span class="text-[9px] opacity-60">Registro</span></button>
+        <button onclick="execDl('ahk')" class="btn btn-amber py-3.5 flex flex-col items-center gap-1"><span class="text-lg">⌨️</span><span class="text-sm">.AHK</span><span class="text-[9px] opacity-60">AutoHotkey</span></button>
+    </div>
+    <p class="text-center text-[10px] text-slate-600 mt-4">Ejecuta como <strong class="text-white">Administrador</strong></p>`;
 }
+function execDl(f){const g={bat:genBAT,ps1:genPS1,reg:genREG,ahk:genAHK},x={bat:'.bat',ps1:'.ps1',reg:'.reg',ahk:'.ahk'};dl('PCTuner_'+S.hw.brand.replace(/\s/g,'')+'_'+f.toUpperCase()+x[f],g[f]());notify('⬇ Descargado! Ejecuta como Admin.','#10b981');closeExec();}
 
-function execDirect(fmt){
-    const gen={bat:genBAT,ps1:genPS1,reg:genREG,ahk:genAHK};
-    const ext={bat:'.bat',ps1:'.ps1',reg:'.reg',ahk:'.ahk'};
-    const code=gen[fmt]();
-    dl('PCTuner_'+S.hw.brand.replace(/\s/g,'')+'_'+fmt.toUpperCase()+ext[fmt],code);
-    showNotif('⬇ Archivo descargado! Ejecuta como Admin.');
-    closeExec();
-}
-
-// ======================== EXPORT MODAL ========================
+// ── EXPORT ──
 function openExport(){document.getElementById('exportModal').classList.remove('hidden');}
 function closeExport(){document.getElementById('exportModal').classList.add('hidden');}
-
-function genScript(){
-    const fmt=document.getElementById('exportFmt').value;
-    const gen={bat:genBAT,ps1:genPS1,reg:genREG,ahk:genAHK};
-    const ext={bat:'.bat',ps1:'.ps1',reg:'.reg',ahk:'.ahk'};
-    _code=gen[fmt]();_fn='PCTuner_'+S.hw.brand.replace(/\s/g,'')+ext[fmt];
-    document.getElementById('exportTitle').textContent=_fn;
-    document.getElementById('exportBody').innerHTML=`<pre class="p-4 text-[11px] text-green-400 code-font leading-relaxed">${esc(_code)}</pre>`;
-    document.getElementById('exportFooter').classList.remove('hidden');
-    document.getElementById('exportInfo').textContent=_code.split('\n').length+' líneas · '+(new Blob([_code]).size/1024).toFixed(1)+' KB';
-}
+function genScript(){const f=document.getElementById('expFmt').value,g={bat:genBAT,ps1:genPS1,reg:genREG,ahk:genAHK},x={bat:'.bat',ps1:'.ps1',reg:'.reg',ahk:'.ahk'};_code=g[f]();_fn='PCTuner_'+S.hw.brand.replace(/\s/g,'')+x[f];document.getElementById('expTitle').textContent=_fn;document.getElementById('expBody').innerHTML=`<pre class="p-5 text-[11px] text-emerald-400 mono leading-relaxed">${esc(_code)}</pre>`;document.getElementById('expFoot').classList.remove('hidden');document.getElementById('expInfo').textContent=_code.split('\n').length+' líneas · '+(new Blob([_code]).size/1024).toFixed(1)+' KB';}
 function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 function copyCode(){navigator.clipboard.writeText(_code).then(()=>{const b=document.getElementById('copyBtn');b.textContent='✅ Copiado!';setTimeout(()=>b.textContent='📋 Copiar',2000);});}
 function dlCode(){dl(_fn,_code);}
-function dl(fn,c){const b=new Blob([c],{type:'text/plain'});const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download=fn;document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(u);}
+function dl(n,c){const b=new Blob([c],{type:'text/plain'}),u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download=n;document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(u);}
 
-// ======================== GENERATORS ========================
+// ── GENERATORS ──
 function genBAT(){
-    const hw=S.hw;
-    let s=`@echo off\nchcp 65001 >nul\ntitle ══ PCTUNER PRO v5 ══ ${hw.brand} ══\ncolor 0A\necho.\necho  ╔══════════════════════════════════════════════════════╗\necho  ║   PCTUNER PRO v5 — Optimizador Universal             ║\necho  ║   Equipo: ${(hw.brand+' · '+hw.cores+' nucleos · '+(hw.osVer||hw.os)).padEnd(42)}║\necho  ║   Windows Defender: INTACTO (no se modifica)         ║\necho  ╚══════════════════════════════════════════════════════╝\necho.\nnet session >nul 2>&1\nif %errorlevel% neq 0 (echo [ERROR] Ejecuta como ADMINISTRADOR. & pause & exit /b 1)\necho [OK] Admin verificado — %date% %time%\necho.\n\n`;
-    if(T('m_restore'))s+=`echo [*] Creando punto de restauracion...\nPowerShell -Command "Checkpoint-Computer -Description 'PCTuner_v5' -RestorePointType 'MODIFY_SETTINGS'" 2>nul\necho [OK] Punto de restauracion creado.\necho.\n\n`;
-    s+=`echo ═══════ RENDIMIENTO ═══════\n`;
-    if(T('p_sysmain'))s+=`sc config "SysMain" start= disabled >nul 2>&1 & sc stop "SysMain" >nul 2>&1\necho [OK] SysMain desactivado.\n`;
+    const h=S.hw;let s=`@echo off\nchcp 65001 >nul\ntitle PCTUNER PRO v6 — ${h.brand}\ncolor 0A\necho.\necho  ╔═══════════════════════════════════════════════╗\necho  ║  PCTUNER PRO v6 — Optimizador Universal      ║\necho  ║  ${(h.brand+' · '+h.cores+' nucleos · '+(h.osVer?'Win '+h.osVer:h.os)).padEnd(44)}║\necho  ║  Windows Defender: INTACTO                   ║\necho  ╚═══════════════════════════════════════════════╝\necho.\nnet session >nul 2>&1\nif %errorlevel% neq 0 (echo [!] Ejecuta como ADMINISTRADOR & pause & exit /b 1)\necho [OK] Admin — %date% %time%\necho.\n\n`;
+    if(T('m_restore'))s+=`echo [*] Creando punto de restauracion...\nPowerShell -Command "Checkpoint-Computer -Description 'PCTuner_v6' -RestorePointType 'MODIFY_SETTINGS'" 2>nul\necho [OK] Punto creado.\n\n`;
+    if(T('p_sysmain'))s+=`sc config "SysMain" start= disabled >nul 2>&1 & sc stop "SysMain" >nul 2>&1\necho [OK] SysMain off\n`;
     if(T('p_prefetch'))s+=`reg add "HKLM\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Memory Management\\PrefetchParameters" /v EnablePrefetcher /t REG_DWORD /d 0 /f >nul\n`;
-    if(T('p_indexing'))s+=`sc config "WSearch" start= disabled >nul 2>&1 & sc stop "WSearch" >nul 2>&1\necho [OK] Windows Search desactivado.\n`;
+    if(T('p_indexing'))s+=`sc config "WSearch" start= disabled >nul 2>&1 & sc stop "WSearch" >nul 2>&1\n`;
     if(T('p_visual'))s+=`reg add "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\VisualEffects" /v VisualFXSetting /t REG_DWORD /d 2 /f >nul\n`;
     if(T('p_transparency'))s+=`reg add "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize" /v EnableTransparency /t REG_DWORD /d 0 /f >nul\n`;
     if(T('p_startup_delay'))s+=`reg add "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Serialize" /v StartupDelayInMSec /t REG_DWORD /d 0 /f >nul\n`;
@@ -965,41 +1016,28 @@ function genBAT(){
     if(T('p_cpu_priority'))s+=`reg add "HKLM\\SYSTEM\\CurrentControlSet\\Control\\PriorityControl" /v Win32PrioritySeparation /t REG_DWORD /d 38 /f >nul\n`;
     if(T('p_ntfs_last'))s+=`fsutil behavior set disablelastaccess 1 >nul\n`;
     if(T('p_core_parking'))s+=`powercfg -setacvalueindex SCHEME_CURRENT SUB_PROCESSOR CPMINCORES 100 >nul 2>&1\n`;
-
-    s+=`\necho ═══════ LIMPIEZA ═══════\n`;
-    if(T('c_temp'))s+=`del /q /f /s "%TEMP%\\*" 2>nul\ndel /q /f /s "C:\\Windows\\Temp\\*" 2>nul\ndel /q /f /s "C:\\Windows\\Prefetch\\*" 2>nul\necho [OK] Temporales limpiados.\n`;
-    if(T('c_recycle'))s+=`rd /s /q C:\\$Recycle.Bin 2>nul\necho [OK] Papelera vaciada.\n`;
+    if(T('c_temp'))s+=`del /q /f /s "%TEMP%\\*" 2>nul\ndel /q /f /s "C:\\Windows\\Temp\\*" 2>nul\ndel /q /f /s "C:\\Windows\\Prefetch\\*" 2>nul\necho [OK] Temp limpio\n`;
+    if(T('c_recycle'))s+=`rd /s /q C:\\$Recycle.Bin 2>nul\n`;
     if(T('c_update'))s+=`net stop wuauserv >nul 2>&1\ndel /q /f /s "C:\\Windows\\SoftwareDistribution\\Download\\*" 2>nul\nnet start wuauserv >nul 2>&1\n`;
-    if(T('c_dns'))s+=`ipconfig /flushdns >nul\necho [OK] Cache DNS limpiado.\n`;
-    if(T('c_bloatware'))s+=`PowerShell -Command "Get-AppxPackage *3dbuilder*,*solitaire*,*bingfinance*,*bingnews*,*bingsports*,*bingweather*,*zunevideo*,*zunemusic*,*xboxapp*,*officehub*,*skypeapp*,*windowsmaps*,*clipchamp*,*todos*,*people*,*feedback* | Remove-AppxPackage -EA SilentlyContinue" 2>nul\necho [OK] Bloatware removido.\n`;
-    if(T('c_delivery'))s+=`del /q /f /s "C:\\Windows\\SoftwareDistribution\\DeliveryOptimization\\*" 2>nul\n`;
-    if(T('c_error'))s+=`del /q /f /s "C:\\ProgramData\\Microsoft\\Windows\\WER\\*" 2>nul\n`;
-
-    s+=`\necho ═══════ RED ═══════\n`;
+    if(T('c_dns'))s+=`ipconfig /flushdns >nul\n`;
+    if(T('c_bloatware'))s+=`PowerShell -Command "Get-AppxPackage *3dbuilder*,*solitaire*,*bingfinance*,*bingnews*,*bingsports*,*bingweather*,*zunevideo*,*zunemusic*,*xboxapp*,*officehub*,*skypeapp*,*windowsmaps*,*clipchamp*,*people*,*feedback* | Remove-AppxPackage -EA SilentlyContinue" 2>nul\n`;
     if(T('n_flush'))s+=`ipconfig /flushdns >nul & ipconfig /registerdns >nul\n`;
     if(T('n_winsock'))s+=`netsh winsock reset >nul\n`;
     if(T('n_tcpip'))s+=`netsh int ip reset >nul\n`;
     if(T('n_nagle'))s+=`reg add "HKLM\\SOFTWARE\\Microsoft\\MSMQ\\Parameters" /v TCPNoDelay /t REG_DWORD /d 1 /f >nul\n`;
     if(T('n_qos'))s+=`reg add "HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows\\Psched" /v NonBestEffortLimit /t REG_DWORD /d 0 /f >nul\n`;
     if(T('n_autotuning'))s+=`netsh int tcp set global autotuninglevel=disabled >nul\n`;
-    const dnsMap={google:['8.8.8.8','8.8.4.4'],cloudflare:['1.1.1.1','1.0.0.1'],quad9:['9.9.9.9','149.112.112.112']};
-    const dns=SE('n_dns')||'cloudflare',adp=SE('n_adapter')==='ethernet'?'Ethernet':'Wi-Fi';
-    if(dns!=='default'&&dnsMap[dns])s+=`netsh interface ip set dns "${adp}" static ${dnsMap[dns][0]} primary >nul\nnetsh interface ip add dns "${adp}" ${dnsMap[dns][1]} index=2 >nul\necho [OK] DNS: ${dns}\n`;
-
-    s+=`\necho ═══════ ENERGIA ═══════\n`;
-    if(T('pw_high'))s+=`powercfg /setactive 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c >nul 2>&1\necho [OK] Plan alto rendimiento.\n`;
+    const dm={google:['8.8.8.8','8.8.4.4'],cloudflare:['1.1.1.1','1.0.0.1'],quad9:['9.9.9.9','149.112.112.112']},dns=SE('n_dns')||'cloudflare',adp=SE('n_adapter')==='ethernet'?'Ethernet':'Wi-Fi';
+    if(dns!=='default'&&dm[dns])s+=`netsh interface ip set dns "${adp}" static ${dm[dns][0]} primary >nul\nnetsh interface ip add dns "${adp}" ${dm[dns][1]} index=2 >nul\n`;
+    if(T('pw_high'))s+=`powercfg /setactive 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c >nul 2>&1\n`;
     if(T('pw_hibernate'))s+=`powercfg /hibernate off >nul\n`;
-
-    s+=`\necho ═══════ PRIVACIDAD ═══════\n`;
-    if(T('pr_telemetry'))s+=`reg add "HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows\\DataCollection" /v AllowTelemetry /t REG_DWORD /d 0 /f >nul\nsc config "DiagTrack" start= disabled >nul 2>&1 & sc stop "DiagTrack" >nul 2>&1\necho [OK] Telemetria desactivada.\n`;
+    if(T('pr_telemetry'))s+=`reg add "HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows\\DataCollection" /v AllowTelemetry /t REG_DWORD /d 0 /f >nul\nsc config "DiagTrack" start= disabled >nul 2>&1 & sc stop "DiagTrack" >nul 2>&1\n`;
     if(T('pr_cortana'))s+=`reg add "HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows\\Windows Search" /v AllowCortana /t REG_DWORD /d 0 /f >nul\n`;
     if(T('pr_ad_id'))s+=`reg add "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\AdvertisingInfo" /v Enabled /t REG_DWORD /d 0 /f >nul\n`;
     if(T('pr_activity'))s+=`reg add "HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows\\System" /v EnableActivityFeed /t REG_DWORD /d 0 /f >nul\n`;
     if(T('pr_location'))s+=`reg add "HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows\\LocationAndSensors" /v DisableLocation /t REG_DWORD /d 1 /f >nul\n`;
     if(T('pr_feedback'))s+=`reg add "HKCU\\Software\\Microsoft\\Siuf\\Rules" /v NumberOfSIUFInPeriod /t REG_DWORD /d 0 /f >nul\n`;
     if(T('pr_suggestions'))s+=`reg add "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager" /v SystemPaneSuggestionsEnabled /t REG_DWORD /d 0 /f >nul\nreg add "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager" /v SilentInstalledAppsEnabled /t REG_DWORD /d 0 /f >nul\n`;
-
-    s+=`\necho ═══════ INTERFAZ ═══════\n`;
     if(T('t_search'))s+=`reg add "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Search" /v SearchboxTaskbarMode /t REG_DWORD /d 0 /f >nul\n`;
     if(T('t_taskview'))s+=`reg add "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced" /v ShowTaskViewButton /t REG_DWORD /d 0 /f >nul\n`;
     if(T('t_widgets'))s+=`reg add "HKLM\\SOFTWARE\\Policies\\Microsoft\\Dsh" /v AllowNewsAndInterests /t REG_DWORD /d 0 /f >nul\n`;
@@ -1009,8 +1047,6 @@ function genBAT(){
     if(T('v_dark_apps'))s+=`reg add "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize" /v AppsUseLightTheme /t REG_DWORD /d 0 /f >nul\n`;
     if(T('e_ext'))s+=`reg add "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced" /v HideFileExt /t REG_DWORD /d 0 /f >nul\n`;
     if(T('e_classic'))s+=`reg add "HKCU\\Software\\Classes\\CLSID\\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\\InprocServer32" /f /ve >nul 2>&1\n`;
-
-    s+=`\necho ═══════ SERVICIOS ═══════\n`;
     if(T('sv_diagtrack'))s+=`sc config "DiagTrack" start= disabled >nul 2>&1\n`;
     if(T('sv_dmwap'))s+=`sc config "dmwappushservice" start= disabled >nul 2>&1\n`;
     if(T('sv_xbox'))s+=`sc config "XblAuthManager" start= disabled >nul 2>&1\nsc config "XblGameSave" start= disabled >nul 2>&1\n`;
@@ -1019,79 +1055,113 @@ function genBAT(){
     if(T('sv_retail'))s+=`sc config "RetailDemo" start= disabled >nul 2>&1\n`;
     if(T('sv_wallet'))s+=`sc config "WalletService" start= disabled >nul 2>&1\n`;
     if(T('sv_phone'))s+=`sc config "PhoneSvc" start= disabled >nul 2>&1\n`;
-
-    s+=`\necho ═══════ GAMING ═══════\n`;
     if(T('g_mode'))s+=`reg add "HKCU\\Software\\Microsoft\\GameBar" /v AllowAutoGameMode /t REG_DWORD /d 1 /f >nul\n`;
     if(T('g_dvr'))s+=`reg add "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\GameDVR" /v AppCaptureEnabled /t REG_DWORD /d 0 /f >nul\nreg add "HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows\\GameDVR" /v AllowGameDVR /t REG_DWORD /d 0 /f >nul\n`;
     if(T('g_xbox'))s+=`reg add "HKCU\\Software\\Microsoft\\GameBar" /v UseNexusForGameBarEnabled /t REG_DWORD /d 0 /f >nul\n`;
-
-    if(T('b_onedrive'))s+=`\nreg delete "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run" /v OneDrive /f >nul 2>&1\n`;
+    if(T('b_onedrive'))s+=`reg delete "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run" /v OneDrive /f >nul 2>&1\n`;
     if(T('b_teams'))s+=`reg delete "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run" /v "com.squirrel.Teams.Teams" /f >nul 2>&1\n`;
     if(T('b_edge'))s+=`reg add "HKLM\\SOFTWARE\\Policies\\Microsoft\\Edge" /v StartupBoostEnabled /t REG_DWORD /d 0 /f >nul\n`;
-
-    if(T('wu_no_restart'))s+=`\nreg add "HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate\\AU" /v NoAutoRebootWithLoggedOnUsers /t REG_DWORD /d 1 /f >nul\n`;
+    if(T('wu_no_restart'))s+=`reg add "HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate\\AU" /v NoAutoRebootWithLoggedOnUsers /t REG_DWORD /d 1 /f >nul\n`;
     if(T('wu_no_peer'))s+=`reg add "HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows\\DeliveryOptimization" /v DODownloadMode /t REG_DWORD /d 0 /f >nul\n`;
-    if(T('sec_autoplay'))s+=`\nreg add "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\AutoplayHandlers" /v DisableAutoplay /t REG_DWORD /d 1 /f >nul\n`;
+    if(T('sec_autoplay'))s+=`reg add "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\AutoplayHandlers" /v DisableAutoplay /t REG_DWORD /d 1 /f >nul\n`;
     if(T('sec_smb1'))s+=`PowerShell -Command "Disable-WindowsOptionalFeature -Online -FeatureName SMB1Protocol -NoRestart" >nul 2>&1\n`;
-
-    s+=`\necho ═══════ VENTILADORES ═══════\necho [INFO] Perfil: ${S.fanProfile}\necho [INFO] Instala NBFC para control avanzado: github.com/hirschmann/nbfc\n`;
-
-    s+=`\necho ═══════ MANTENIMIENTO ═══════\n`;
     if(T('m_dism'))s+=`DISM /Online /Cleanup-Image /RestoreHealth\n`;
     if(T('m_sfc'))s+=`sfc /scannow\n`;
     if(T('m_defrag'))s+=`defrag C: /O\n`;
     if(T('m_winsxs'))s+=`DISM /Online /Cleanup-Image /StartComponentCleanup >nul 2>&1\n`;
-    if(T('s_no_startup'))s+=`\nreg add "HKCU\\AppEvents\\Schemes" /ve /t REG_SZ /d ".None" /f >nul\n`;
-
-    s+=`\necho.\necho ═══════════════════════════════════════════\necho   PCTUNER PRO v5 — COMPLETADO\necho   Equipo: ${hw.brand}\necho   Windows Defender: NO MODIFICADO ✓\necho   Reinicia para aplicar todos los cambios.\necho ═══════════════════════════════════════════\necho.\nset /p r="Reiniciar ahora? (S/N): "\nif /i "%r%"=="S" (shutdown /r /t 10 /c "PCTuner Pro v5")\npause\n`;
+    if(T('s_no_startup'))s+=`reg add "HKCU\\AppEvents\\Schemes" /ve /t REG_SZ /d ".None" /f >nul\n`;
+    s+=`\necho.\necho  ══════════════════════════════════\necho   PCTUNER PRO v6 — COMPLETADO\necho   ${h.brand} · Defender INTACTO\necho   Reinicia para aplicar cambios.\necho  ══════════════════════════════════\necho.\nset /p r="Reiniciar ahora? (S/N): "\nif /i "%r%"=="S" (shutdown /r /t 10 /c "PCTuner Pro v6")\npause\n`;
     return s;
 }
+function genPS1(){let s=`# PCTuner Pro v6 — PowerShell\n# ${S.hw.brand} · Defender: INTACTO\n\nif(-NOT([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]"Administrator")){Write-Host "[!] Ejecuta como Admin" -FG Red;exit}\nWrite-Host "PCTuner Pro v6 — ${S.hw.brand}" -FG Cyan\n\n`;if(T('m_restore'))s+=`Checkpoint-Computer -Description "PCTuner_v6" -RestorePointType "MODIFY_SETTINGS" -EA SilentlyContinue\n`;if(T('p_sysmain'))s+=`Stop-Service "SysMain" -Force -EA SilentlyContinue;Set-Service "SysMain" -StartupType Disabled\n`;if(T('pr_telemetry'))s+=`Set-ItemProperty "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\DataCollection" -Name "AllowTelemetry" -Value 0 -Type DWord -Force\nStop-Service "DiagTrack" -Force -EA SilentlyContinue;Set-Service "DiagTrack" -StartupType Disabled\n`;if(T('c_temp'))s+=`Remove-Item "$env:TEMP\\*" -Recurse -Force -EA SilentlyContinue\nRemove-Item "C:\\Windows\\Temp\\*" -Recurse -Force -EA SilentlyContinue\n`;if(T('c_bloatware'))s+=`$b=@("*3dbuilder*","*solitaire*","*bingnews*","*bingweather*","*zunevideo*","*xboxapp*","*officehub*","*skypeapp*","*windowsmaps*","*clipchamp*","*people*","*feedback*")\nforeach($a in $b){Get-AppxPackage $a|Remove-AppxPackage -EA SilentlyContinue}\n`;s+=`\nWrite-Host "Completado. Reinicia." -FG Green\nWrite-Host "Defender: NO MODIFICADO" -FG Green\nRead-Host "Enter para salir"\n`;return s;}
+function genREG(){let s=`Windows Registry Editor Version 5.00\n\n; PCTuner Pro v6 — ${S.hw.brand}\n; Defender NO se modifica\n\n`;if(T('p_visual'))s+=`[HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\VisualEffects]\n"VisualFXSetting"=dword:00000002\n\n`;if(T('v_dark'))s+=`[HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize]\n"SystemUsesLightTheme"=dword:00000000\n\n`;if(T('v_dark_apps'))s+=`[HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize]\n"AppsUseLightTheme"=dword:00000000\n\n`;if(T('pr_telemetry'))s+=`[HKEY_LOCAL_MACHINE\\SOFTWARE\\Policies\\Microsoft\\Windows\\DataCollection]\n"AllowTelemetry"=dword:00000000\n\n`;if(T('pr_cortana'))s+=`[HKEY_LOCAL_MACHINE\\SOFTWARE\\Policies\\Microsoft\\Windows\\Windows Search]\n"AllowCortana"=dword:00000000\n\n`;if(T('pr_ad_id'))s+=`[HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\AdvertisingInfo]\n"Enabled"=dword:00000000\n\n`;if(T('t_search'))s+=`[HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Search]\n"SearchboxTaskbarMode"=dword:00000000\n\n`;if(T('e_ext'))s+=`[HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced]\n"HideFileExt"=dword:00000000\n\n`;if(T('g_dvr'))s+=`[HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\GameDVR]\n"AppCaptureEnabled"=dword:00000000\n\n`;return s;}
+function genAHK(){let s=`; PCTuner Pro v6 — AutoHotkey · ${S.hw.brand}\n#Requires AutoHotkey v2.0\n#SingleInstance Force\n\n`;const m={k_screenshot:'Send "{PrintScreen}"',k_taskmgr:'Run "taskmgr.exe"',k_run:'Send "#r"',k_explorer:'Run "explorer.exe"',k_cmd:'Run "*RunAs cmd.exe"',k_desktop:'Send "#d"',k_vol_up:'Send "{Volume_Up}"',k_vol_down:'Send "{Volume_Down}"',k_mute:'Send "{Volume_Mute}"',k_play:'Send "{Media_Play_Pause}"',k_calc:'Run "calc.exe"',k_notepad:'Run "notepad.exe"',k_lock:'DllCall("LockWorkStation")',k_browser:'Run "msedge.exe"',k_close:'Send "!{F4}"',k_minimize:'Send "#m"'};Object.entries(S.keybinds).forEach(([id,combo])=>{const a=m[id];if(!a)return;let h=combo.replace(/Ctrl/g,'^').replace(/Alt/g,'!').replace(/Shift/g,'+').replace(/Win/g,'#').replace(/ \+ /g,'');h=h.replace(/([A-Z])$/,x=>x.toLowerCase());s+=`${h}:: {\n    ${a}\n}\n\n`;});s+=`ToolTip "PCTuner Pro — Keybinds activos!"\nSetTimer () => ToolTip(), -2000\n`;return s;}
 
-function genPS1(){
-    let s=`# PCTuner Pro v5 — PowerShell\n# Equipo: ${S.hw.brand} · ${S.hw.osVer||S.hw.os}\n# Defender: INTACTO\n\nif(-NOT([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]"Administrator")){Write-Host "[ERROR] Ejecuta como Admin" -FG Red;exit}\nWrite-Host "PCTuner Pro v5 — ${S.hw.brand}" -FG Cyan\n\n`;
-    if(T('m_restore'))s+=`Checkpoint-Computer -Description "PCTuner_v5" -RestorePointType "MODIFY_SETTINGS" -EA SilentlyContinue\n`;
-    if(T('p_sysmain'))s+=`Stop-Service "SysMain" -Force -EA SilentlyContinue;Set-Service "SysMain" -StartupType Disabled\n`;
-    if(T('pr_telemetry'))s+=`Set-ItemProperty -Path "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\DataCollection" -Name "AllowTelemetry" -Value 0 -Type DWord -Force\nStop-Service "DiagTrack" -Force -EA SilentlyContinue;Set-Service "DiagTrack" -StartupType Disabled\n`;
-    if(T('c_temp'))s+=`Remove-Item "$env:TEMP\\*" -Recurse -Force -EA SilentlyContinue\nRemove-Item "C:\\Windows\\Temp\\*" -Recurse -Force -EA SilentlyContinue\n`;
-    if(T('c_bloatware'))s+=`$b=@("*3dbuilder*","*solitaire*","*bingnews*","*bingweather*","*zunevideo*","*xboxapp*","*officehub*","*skypeapp*","*windowsmaps*","*clipchamp*","*people*","*feedback*")\nforeach($a in $b){Get-AppxPackage $a|Remove-AppxPackage -EA SilentlyContinue}\n`;
-    s+=`\nWrite-Host "\\nCompletado. Reinicia." -FG Green\nWrite-Host "Defender: NO MODIFICADO ✓" -FG Green\nRead-Host "Enter para salir"\n`;
-    return s;
+// ── PARTICLES ──
+function initParticles(){
+    const c=document.getElementById('particles');if(!c)return;
+    setInterval(()=>{
+        if(document.hidden)return;
+        const p=document.createElement('div');p.className='particle';
+        const sz=Math.random()*3+1,x=Math.random()*100,dur=Math.random()*8+6;
+        const colors=['rgba(99,102,241,0.3)','rgba(139,92,246,0.25)','rgba(59,130,246,0.2)','rgba(16,185,129,0.2)'];
+        p.style.cssText=`width:${sz}px;height:${sz}px;left:${x}%;bottom:-10px;background:${colors[Math.floor(Math.random()*colors.length)]};animation:floatUp ${dur}s ease-out forwards;box-shadow:0 0 ${sz*3}px ${colors[0]}`;
+        c.appendChild(p);setTimeout(()=>p.remove(),(dur+1)*1000);
+    },800);
 }
 
-function genREG(){
-    let s=`Windows Registry Editor Version 5.00\n\n; PCTuner Pro v5 — ${S.hw.brand}\n; Defender NO se modifica\n\n`;
-    if(T('p_visual'))s+=`[HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\VisualEffects]\n"VisualFXSetting"=dword:00000002\n\n`;
-    if(T('v_dark'))s+=`[HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize]\n"SystemUsesLightTheme"=dword:00000000\n\n`;
-    if(T('v_dark_apps'))s+=`[HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize]\n"AppsUseLightTheme"=dword:00000000\n\n`;
-    if(T('pr_telemetry'))s+=`[HKEY_LOCAL_MACHINE\\SOFTWARE\\Policies\\Microsoft\\Windows\\DataCollection]\n"AllowTelemetry"=dword:00000000\n\n`;
-    if(T('pr_cortana'))s+=`[HKEY_LOCAL_MACHINE\\SOFTWARE\\Policies\\Microsoft\\Windows\\Windows Search]\n"AllowCortana"=dword:00000000\n\n`;
-    if(T('pr_ad_id'))s+=`[HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\AdvertisingInfo]\n"Enabled"=dword:00000000\n\n`;
-    if(T('t_search'))s+=`[HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Search]\n"SearchboxTaskbarMode"=dword:00000000\n\n`;
-    if(T('e_ext'))s+=`[HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced]\n"HideFileExt"=dword:00000000\n\n`;
-    if(T('g_dvr'))s+=`[HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\GameDVR]\n"AppCaptureEnabled"=dword:00000000\n\n`;
-    return s;
+// ── CLOCK ──
+function updClock(){
+    const n=new Date(),h=n.getHours().toString().padStart(2,'0'),m=n.getMinutes().toString().padStart(2,'0'),s=n.getSeconds().toString().padStart(2,'0');
+    const el=document.getElementById('clock');if(el)el.textContent=h+':'+m+':'+s;
 }
 
-function genAHK(){
-    let s=`; PCTuner Pro v5 — AutoHotkey · ${S.hw.brand}\n#Requires AutoHotkey v2.0\n#SingleInstance Force\n\n`;
-    const map={k_screenshot:'Send "{PrintScreen}"',k_taskmgr:'Run "taskmgr.exe"',k_run:'Send "#r"',k_explorer:'Run "explorer.exe"',k_cmd:'Run "*RunAs cmd.exe"',k_desktop:'Send "#d"',k_vol_up:'Send "{Volume_Up}"',k_vol_down:'Send "{Volume_Down}"',k_mute:'Send "{Volume_Mute}"',k_play:'Send "{Media_Play_Pause}"',k_calc:'Run "calc.exe"',k_notepad:'Run "notepad.exe"',k_lock:'DllCall("LockWorkStation")',k_browser:'Run "msedge.exe"',k_close:'Send "!{F4}"',k_minimize:'Send "#m"'};
-    Object.entries(S.keybinds).forEach(([id,combo])=>{
-        const action=map[id];if(!action)return;
-        let ahk=combo.replace(/Ctrl/g,'^').replace(/Alt/g,'!').replace(/Shift/g,'+').replace(/Win/g,'#').replace(/ \+ /g,'');
-        ahk=ahk.replace(/([A-Z])$/,m=>m.toLowerCase());
-        s+=`${ahk}:: {\n    ${action}\n}\n\n`;
-    });
-    s+=`ToolTip "PCTuner Pro — Keybinds activos!"\nSetTimer () => ToolTip(), -2000\n`;
-    return s;
+// ── RIPPLE ──
+document.addEventListener('click',e=>{
+    const t=e.target.closest('.ripple-wrap,.btn,.preset-btn,.nav-btn');if(!t)return;
+    const r=document.createElement('span');r.className='ripple';
+    const rect=t.getBoundingClientRect(),sz=Math.max(rect.width,rect.height)*2;
+    r.style.width=r.style.height=sz+'px';
+    r.style.left=(e.clientX-rect.left-sz/2)+'px';
+    r.style.top=(e.clientY-rect.top-sz/2)+'px';
+    t.style.position=t.style.position||'relative';t.style.overflow='hidden';
+    t.appendChild(r);setTimeout(()=>r.remove(),600);
+});
+
+// ── PERFORMANCE SCORE ──
+function calcScore(){
+    const active=Object.values(S.toggles).filter(v=>v).length;
+    const total=Object.keys(S.toggles).length;
+    if(total===0)return 50;
+    return Math.min(99,Math.round(40+active/total*59));
+}
+function updScore(){
+    const s=calcScore();
+    const el=document.getElementById('scoreVal');if(el)el.textContent=s;
+    const ring=document.getElementById('scoreRing');
+    if(ring){const circ=2*Math.PI*14,off=circ-(s/100)*circ;ring.setAttribute('stroke-dashoffset',off);
+        ring.setAttribute('stroke',s>=75?'#10b981':s>=50?'#f59e0b':'#ef4444');
+    }
+    const ps=document.getElementById('perfScore');if(ps)ps.classList.remove('hidden');
 }
 
-// ======================== INIT ========================
+// ── KEYBOARD SHORTCUTS ──
+document.addEventListener('keydown',e=>{
+    if(_recId)return; // don't intercept keybind recording
+    if(e.ctrlKey&&e.key==='e'){e.preventDefault();openExport();}
+    if(e.ctrlKey&&e.key==='r'&&!e.shiftKey){/* allow refresh */}
+    if(e.key==='Escape'){closeExec();closeExport();}
+    // Num keys for quick nav
+    if(!e.ctrlKey&&!e.altKey&&!e.shiftKey&&document.activeElement.tagName!=='INPUT'){
+        const qn={'1':'dashboard','2':'monitor','3':'fans','4':'performance','5':'cleanup','6':'network','7':'gaming','8':'keybinds','9':'privacy','0':'about'};
+        if(e.key in qn&&!e.repeat){/* optional: go(qn[e.key]); */}
+    }
+});
+
+// ── STATUS BAR UPDATE ──
+function updStatusBar(){
+    const hw=document.getElementById('sbHw');
+    if(hw)hw.textContent=S.hw.brand+' · '+(S.hw.osVer?'Win '+S.hw.osVer:S.hw.os)+' · '+S.hw.cores+'C'+(S.hw.ram?' · '+S.hw.ram+'GB':'');
+    const ch=document.getElementById('sbChanges');
+    if(ch)ch.textContent=cCount+' cambios';
+}
+
+// ── LOADING SCREEN ──
+function hideLoader(){
+    const l=document.getElementById('loaderScreen');
+    if(l){l.classList.add('hide');setTimeout(()=>l.remove(),600);}
+}
+
+// ── INIT ──
 async function init(){
     buildNav();
     await detectHW();
+    updClock();setInterval(updClock,1000);
+    initParticles();
     go('dashboard');
-    simMon();
-    setInterval(simMon,2500);
+    simMon();setInterval(simMon,2500);
+    updScore();updStatusBar();
+    setTimeout(hideLoader,800);
 }
 init();
 window.addEventListener('resize',()=>{if(S.page==='fans')initFanCanvas();});

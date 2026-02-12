@@ -139,18 +139,66 @@
 
 <!-- PANTALLA DE BLOQUEO -->
 <div id="blockScreen" class="block-screen">
-    <div class="w-14 h-14 bg-gradient-to-br from-indigo-500 to-violet-600 rounded-2xl flex items-center justify-center text-xl font-black text-white mb-4">PC</div>
-    <h2 class="text-lg font-black text-white mb-2">PCTuner Pro v6</h2>
-    <p class="text-sm text-slate-400 mb-4">Esta aplicación debe ejecutarse desde PCTuner.exe</p>
-    <div class="card p-4 max-w-sm">
-        <p class="text-[10px] text-slate-500 mb-3">Para usar PCTuner:</p>
-        <div class="space-y-2 text-left">
-            <div class="flex items-center gap-2"><div class="w-5 h-5 bg-indigo-500/15 rounded-full flex items-center justify-center text-[8px] font-black text-indigo-400">1</div><p class="text-[10px] text-slate-300">Descarga <strong class="text-indigo-400">Crear_EXE.ps1</strong></p></div>
-            <div class="flex items-center gap-2"><div class="w-5 h-5 bg-indigo-500/15 rounded-full flex items-center justify-center text-[8px] font-black text-indigo-400">2</div><p class="text-[10px] text-slate-300">Clic derecho → Ejecutar con PowerShell</p></div>
-            <div class="flex items-center gap-2"><div class="w-5 h-5 bg-emerald-500/15 rounded-full flex items-center justify-center text-[8px] font-black text-emerald-400">3</div><p class="text-[10px] text-slate-300">Ejecuta <strong class="text-emerald-400">PCTuner.exe</strong></p></div>
+    <div class="w-16 h-16 bg-gradient-to-br from-indigo-500 to-violet-600 rounded-2xl flex items-center justify-center text-2xl font-black text-white mb-5 shadow-lg shadow-indigo-500/20" style="animation:float 3s ease-in-out infinite">PC</div>
+    <h2 class="text-xl font-black text-white mb-1">PCTuner Pro v6</h2>
+    <p class="text-[11px] text-slate-500 mb-5">Optimizador de PC Universal</p>
+
+    <div class="card p-5 max-w-md w-full mb-4" style="background:linear-gradient(135deg,rgba(12,15,24,0.95),rgba(16,12,30,0.9))">
+        <div class="text-center mb-4">
+            <p class="text-3xl mb-2">🚀</p>
+            <h3 class="text-sm font-bold text-white mb-1">Instalar PCTuner Pro</h3>
+            <p class="text-[9px] text-slate-500">Descarga e instala en 2 clics</p>
+        </div>
+
+        <div class="space-y-3 mb-4">
+            <div class="flex items-start gap-3">
+                <div class="w-7 h-7 bg-indigo-500/15 rounded-lg flex items-center justify-center text-xs font-black text-indigo-400 flex-shrink-0 mt-0.5">1</div>
+                <div class="flex-1">
+                    <p class="text-[10px] text-white font-bold mb-1">Descarga los 2 archivos</p>
+                    <p class="text-[8px] text-slate-500 mb-2">Guárdalos en la <strong class="text-slate-300">misma carpeta</strong></p>
+                    <div class="flex gap-2">
+                        <button onclick="blockDlPS1()" class="flex-1 py-2 px-3 rounded-lg text-[10px] font-bold text-white cursor-pointer border-none" style="background:linear-gradient(135deg,#8b5cf6,#7c3aed)">⬇ Crear_EXE.ps1</button>
+                        <button onclick="blockDlHTML()" class="flex-1 py-2 px-3 rounded-lg text-[10px] font-bold text-white cursor-pointer border-none" style="background:linear-gradient(135deg,#6366f1,#4f46e5)">⬇ index.html</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex items-start gap-3">
+                <div class="w-7 h-7 bg-indigo-500/15 rounded-lg flex items-center justify-center text-xs font-black text-indigo-400 flex-shrink-0 mt-0.5">2</div>
+                <div>
+                    <p class="text-[10px] text-white font-bold">Clic derecho en Crear_EXE.ps1</p>
+                    <p class="text-[8px] text-slate-500">→ <strong class="text-indigo-400">Ejecutar con PowerShell</strong></p>
+                </div>
+            </div>
+
+            <div class="flex items-start gap-3">
+                <div class="w-7 h-7 bg-emerald-500/15 rounded-lg flex items-center justify-center text-xs font-black text-emerald-400 flex-shrink-0 mt-0.5">✓</div>
+                <div>
+                    <p class="text-[10px] text-white font-bold">¡Listo! Se instala y abre solo</p>
+                    <p class="text-[8px] text-slate-500">Acceso directo en Escritorio y Menú Inicio</p>
+                </div>
+            </div>
+        </div>
+
+        <button onclick="blockDlAll()" class="w-full py-3 px-4 rounded-xl text-[12px] font-bold text-white cursor-pointer border-none shadow-lg" style="background:linear-gradient(135deg,#10b981,#059669);shadow:0 4px 15px rgba(16,185,129,0.3)">
+            ⬇ Descargar Todo e Instalar
+        </button>
+        <p class="text-[7px] text-slate-700 text-center mt-2">Descarga ambos → Ejecuta Crear_EXE.ps1 → PCTuner se instala solo</p>
+    </div>
+
+    <div class="card p-3 max-w-md w-full mb-3" style="border-left:2px solid rgba(245,158,11,0.3)">
+        <div class="flex items-start gap-2">
+            <span class="text-sm">💡</span>
+            <div>
+                <p class="text-[8px] text-amber-200/70">Si PowerShell bloquea la ejecución, abre PowerShell como Admin y ejecuta:</p>
+                <p class="text-[9px] text-amber-400 font-bold mt-0.5 cursor-pointer" style="font-family:'JetBrains Mono',monospace" onclick="navigator.clipboard&&navigator.clipboard.writeText('Set-ExecutionPolicy RemoteSigned -Scope CurrentUser')">Set-ExecutionPolicy RemoteSigned -Scope CurrentUser <span class="text-[7px] text-slate-600">(clic para copiar)</span></p>
+            </div>
         </div>
     </div>
-    <p class="text-[7px] text-slate-800 mt-6">PCTuner Pro v6 · mueblesito</p>
+
+    <div id="blockNotif" class="hidden" style="position:fixed;bottom:20px;right:20px;padding:10px 18px;border-radius:10px;background:#10b981;color:white;font-size:11px;font-weight:600;box-shadow:0 4px 15px rgba(0,0,0,0.3);animation:fadeUp 0.2s ease"></div>
+
+    <p class="text-[7px] text-slate-800 mt-4">PCTuner Pro v6 · mueblesito</p>
 </div>
 
 <!-- LOADER -->
@@ -263,7 +311,6 @@
 <script>
 // ==================== PROTECCIÓN ====================
 (function(){
-    // Detectar si se ejecuta desde la app (.exe) o directamente
     const isApp = window.navigator.standalone
         || window.matchMedia('(display-mode:standalone)').matches
         || window.matchMedia('(display-mode:fullscreen)').matches
@@ -272,17 +319,14 @@
         || (document.referrer === '' && window.opener === null);
 
     if(!isApp){
-        // Bloquear acceso directo — mostrar pantalla de bloqueo
         document.getElementById('blockScreen').style.display = 'flex';
         document.getElementById('loader').style.display = 'none';
         return;
     }
 
-    // Si es la app, ocultar bloqueo y mostrar loader
     document.getElementById('blockScreen').style.display = 'none';
     document.getElementById('loader').style.display = 'flex';
 
-    // Bloquear inspección
     document.addEventListener('contextmenu', e => e.preventDefault());
     document.addEventListener('keydown', e => {
         if(e.key === 'F12'
@@ -292,6 +336,117 @@
             e.preventDefault();
     });
 })();
+
+// ==================== FUNCIONES DE DESCARGA (BLOCK SCREEN) ====================
+function blockNotify(msg){const n=document.getElementById('blockNotif');if(!n)return;n.textContent=msg;n.classList.remove('hidden');setTimeout(()=>n.classList.add('hidden'),2500);}
+function blockDlFile(name,content){const b=new Blob([content],{type:'text/plain'}),u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(u);}
+function blockDlHTML(){const b=new Blob([document.documentElement.outerHTML],{type:'text/html'}),u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download='index.html';document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(u);blockNotify('✅ index.html descargado');}
+function blockDlPS1(){blockDlFile('Crear_EXE.ps1',getPS1Content());blockNotify('✅ Crear_EXE.ps1 descargado');}
+function blockDlAll(){blockDlPS1();setTimeout(()=>blockDlHTML(),500);}
+function getPS1Content(){return `# ============================================
+# PCTuner Pro v6 — Instalador Automatico
+# Solo ejecuta este archivo con PowerShell
+# ============================================
+
+Write-Host ""
+Write-Host "  ╔══════════════════════════════════════╗" -ForegroundColor Cyan
+Write-Host "  ║     PCTuner Pro v6 — Instalador      ║" -ForegroundColor Cyan
+Write-Host "  ╚══════════════════════════════════════╝" -ForegroundColor Cyan
+Write-Host ""
+
+$scriptDir = $PSScriptRoot
+$htmlFile = Join-Path $scriptDir "index.html"
+
+if (-not (Test-Path $htmlFile)) {
+    Write-Host "  [ERROR] index.html no encontrado!" -ForegroundColor Red
+    Write-Host "  Coloca index.html junto a este archivo." -ForegroundColor Yellow
+    Read-Host "  Presiona Enter para cerrar"
+    exit
+}
+
+Write-Host "  [1/5] Creando carpeta de instalacion..." -ForegroundColor Yellow
+$installDir = Join-Path $env:LOCALAPPDATA "PCTuner"
+if (-not (Test-Path $installDir)) { New-Item -Path $installDir -ItemType Directory -Force | Out-Null }
+
+Write-Host "  [2/5] Copiando archivos..." -ForegroundColor Yellow
+Copy-Item $htmlFile (Join-Path $installDir "index.html") -Force
+
+Write-Host "  [3/5] Compilando PCTuner.exe..." -ForegroundColor Yellow
+
+$exeSrc = @"
+using System;
+using System.Diagnostics;
+using System.IO;
+using System.Runtime.InteropServices;
+
+class PCTuner {
+    [DllImport("kernel32.dll")] static extern IntPtr GetConsoleWindow();
+    [DllImport("user32.dll")] static extern bool ShowWindow(IntPtr h, int s);
+
+    static void Main() {
+        ShowWindow(GetConsoleWindow(), 0);
+        string dir = AppDomain.CurrentDomain.BaseDirectory;
+        string html = Path.Combine(dir, "index.html");
+        if (!File.Exists(html)) { return; }
+        string url = "file:///" + html.Replace("\\\\", "/");
+        string[] browsers = { "chrome", "msedge" };
+        foreach (var b in browsers) {
+            try {
+                var psi = new ProcessStartInfo(b);
+                psi.Arguments = "--app=\\"" + url + "\\" --window-size=1300,850 --disable-extensions --disable-sync --no-first-run --disable-default-apps";
+                psi.UseShellExecute = false;
+                psi.CreateNoWindow = true;
+                Process.Start(psi);
+                return;
+            } catch {}
+        }
+        Process.Start(html);
+    }
+}
+"@
+
+try {
+    Add-Type -TypeDefinition $exeSrc -OutputAssembly (Join-Path $installDir "PCTuner.exe") -OutputType ConsoleApplication -ErrorAction Stop
+    Write-Host "  [3/5] PCTuner.exe compilado OK!" -ForegroundColor Green
+} catch {
+    Write-Host "  [3/5] Usando launcher alternativo..." -ForegroundColor Yellow
+    $bat = "@echo off`nstart /b """" chrome --app=""file:///$($installDir.Replace('\\','/'))/index.html"" --window-size=1300,850 2>nul || start /b """" msedge --app=""file:///$($installDir.Replace('\\','/'))/index.html"" --window-size=1300,850"
+    Set-Content (Join-Path $installDir "PCTuner.bat") $bat
+}
+
+Write-Host "  [4/5] Creando acceso directo en Escritorio..." -ForegroundColor Yellow
+$desktop = [Environment]::GetFolderPath("Desktop")
+$exePath = Join-Path $installDir "PCTuner.exe"
+if (-not (Test-Path $exePath)) { $exePath = Join-Path $installDir "PCTuner.bat" }
+
+$shell = New-Object -ComObject WScript.Shell
+$shortcut = $shell.CreateShortcut((Join-Path $desktop "PCTuner Pro.lnk"))
+$shortcut.TargetPath = $exePath
+$shortcut.WorkingDirectory = $installDir
+$shortcut.Description = "PCTuner Pro v6"
+$shortcut.Save()
+
+Write-Host "  [5/5] Creando acceso en Menu Inicio..." -ForegroundColor Yellow
+$startMenu = Join-Path $env:APPDATA "Microsoft\\Windows\\Start Menu\\Programs"
+$shortcut2 = $shell.CreateShortcut((Join-Path $startMenu "PCTuner Pro.lnk"))
+$shortcut2.TargetPath = $exePath
+$shortcut2.WorkingDirectory = $installDir
+$shortcut2.Description = "PCTuner Pro v6"
+$shortcut2.Save()
+
+Write-Host ""
+Write-Host "  ╔══════════════════════════════════════╗" -ForegroundColor Green
+Write-Host "  ║  INSTALACION COMPLETADA!             ║" -ForegroundColor Green
+Write-Host "  ║  Acceso directo en Escritorio        ║" -ForegroundColor Green
+Write-Host "  ║  Acceso en Menu Inicio               ║" -ForegroundColor Green
+Write-Host "  ╚══════════════════════════════════════╝" -ForegroundColor Green
+Write-Host ""
+
+Write-Host "  Abriendo PCTuner Pro..." -ForegroundColor Cyan
+Start-Process $exePath -WorkingDirectory $installDir
+
+Start-Sleep -Seconds 3
+`;}
 
 // ==================== ESTADO GLOBAL ====================
 const S={page:'dashboard',hw:{},toggles:{},sliders:{},selects:{},keybinds:{},fan:{profiles:{silent:{curve:[{t:30,s:8},{t:45,s:18},{t:60,s:30},{t:75,s:50},{t:90,s:65}],min:5,max:70},balanced:{curve:[{t:30,s:10},{t:45,s:25},{t:60,s:50},{t:75,s:80},{t:90,s:100}],min:10,max:100},performance:{curve:[{t:30,s:30},{t:45,s:50},{t:60,s:70},{t:75,s:90},{t:90,s:100}],min:25,max:100},custom:{curve:[{t:30,s:10},{t:45,s:25},{t:60,s:50},{t:75,s:80},{t:90,s:100}],min:10,max:100}},profile:'balanced',get curve(){return this.profiles[this.profile].curve},set curve(v){this.profiles[this.profile].curve=v}},changes:{},mon:{cpu:0,ram:0,temp:0,rpm:0,disk:0,up:'0h 0m',net:0},hist:{cpu:[],ram:[],temp:[]}};
@@ -395,8 +550,7 @@ function updFI(){const d=document.getElementById('fanInputs');if(!d)return;d.inn
 function updFP(i,k,v){S.fan.profiles[S.fan.profile].curve[i][k]=parseInt(v);track('fan_curve',S.fan.profile);drawFC();updFI();}
 
 // ==================== SECCIONES DE OPTIMIZACIÓN ====================
-function pPerf(){return`${hdr('⚡','Rendimiento',S.hw.brand+' · '+S.hw.cores+' núcleos')}${grid(`${tog('p_sysmain','Desactivar SysMain','Libera RAM',true,'med')}${tog('p_prefetch','Desactivar Prefetch','Reduce escrituras',false,'med')}${tog('p_indexing','Sin Windows Search','Reduce CPU',true,'low')}${tog('p_visual','Optimizar efectos','Sin animaciones',true,'low')}${tog('p_transparency','Sin transparencias','Reduce GPU',true,'low')}${tog('p_startup_delay','Sin delay inicio','Menú rápido',true,'low')}${tog('p_menu_delay','Menús rápidos','Contextuales ágiles',true,'low')}${tog('p_tips','Sin tips Windows','Sin notif extras',true,'low')}${tog('p_cpu_priority','Priorizar ventana','Más CPU al activo',true,'low')}${tog('p_ntfs_last','Sin acceso NTFS','Reduce escrituras',true,'low')}${tog('p_core_parking','Sin Core Parking','Todos los núcleos',false,'med')}${tog('p_timer_res','Alta res timer','Mejor precisión',false,'med')}`)}`;}
-function pClean(){
+function pPerf(){return`${hdr('⚡','Rendimiento',S.hw.brand+' · '+S.hw.cores+' núcleos')}${grid(`${tog('p_sysmain','Desactivar SysMain','Libera RAM',true,'med')}${tog('p_prefetch','Desactivar Prefetch','Reduce escrituras',false,'med')}${tog('p_indexing','Sin Windows Search','Reduce CPU',true,'low')}${tog('p_visual','Optimizar efectos','Sin animaciones',true,'low')}${tog('p_transparency','Sin transparencias','Reduce GPU',true,'low')}${tog('p_startup_delay','Sin delay inicio','Menú rápido',true,'low')}${tog('p_menu_delay','Menús rápidos','Contextuales ágiles',true,'low')}${tog('p_tips','Sin tips Windows','Sin notif extras',true,'low')}${tog('p_cpu_priority','Priorizar ventana','Más CPU al activo',true,'low')}${tog('p_ntfs_last','Sin acceso NTFS','Reduce escrituras',true,'low')}${tog('p_core_parking','Sin Core Parking','Todos los núcleos',false,'med')}${tog('p_timer_res','Alta res timer','Mejor precisión',false,'med')}`)}`;} function pClean(){
 const sizeMap={c_temp:850,c_recycle:1200,c_update:3500,c_thumb:120,c_logs:200,c_dns:2,c_bloatware:2800,c_delivery:500,c_error:150,c_prefetch:80,c_font_cache:30,c_installer:1500,c_downloads:500,c_browser:600,c_cortana:50};
 const sizeLabels={c_temp:'~850 MB',c_recycle:'~1.2 GB',c_update:'~3.5 GB',c_thumb:'~120 MB',c_logs:'~200 MB',c_dns:'~2 MB',c_bloatware:'~2.8 GB',c_delivery:'~500 MB',c_error:'~150 MB',c_prefetch:'~80 MB',c_font_cache:'~30 MB',c_installer:'~1.5 GB',c_downloads:'Variable',c_browser:'~600 MB',c_cortana:'~50 MB'};
 let totalMB=0;Object.entries(sizeMap).forEach(([k,v])=>{if(S.toggles[k])totalMB+=v;});
@@ -430,21 +584,7 @@ function cleanQuick(){const safe=['c_temp','c_recycle','c_thumb','c_dns','c_logs
 function cleanAll(){Object.keys({c_temp:1,c_recycle:1,c_update:1,c_thumb:1,c_logs:1,c_dns:1,c_bloatware:1,c_delivery:1,c_error:1,c_prefetch:1,c_font_cache:1,c_installer:1,c_downloads:1,c_browser:1,c_cortana:1}).forEach(k=>{S.toggles[k]=true;track(k,true);});notify('🧹 Todo seleccionado','#6366f1');render('cleanup');}
 function cleanNone(){Object.keys({c_temp:1,c_recycle:1,c_update:1,c_thumb:1,c_logs:1,c_dns:1,c_bloatware:1,c_delivery:1,c_error:1,c_prefetch:1,c_font_cache:1,c_installer:1,c_downloads:1,c_browser:1,c_cortana:1}).forEach(k=>{S.toggles[k]=false;track(k,false);});notify('❌ Todo deseleccionado','#ef4444');render('cleanup');}
 function cleanSafe(){Object.keys({c_temp:1,c_recycle:1,c_update:1,c_thumb:1,c_logs:1,c_dns:1,c_bloatware:1,c_delivery:1,c_error:1,c_prefetch:1,c_font_cache:1,c_installer:1,c_downloads:1,c_browser:1,c_cortana:1}).forEach(k=>{S.toggles[k]=false;track(k,false);});['c_temp','c_recycle','c_thumb','c_dns','c_logs','c_error','c_delivery','c_cortana','c_font_cache'].forEach(k=>{S.toggles[k]=true;track(k,true);});notify('🛡️ Solo opciones seguras','#10b981');render('cleanup');}
-function pNet(){return`${hdr('🌐','Red','Optimiza conexión')}${grid(`${tog('n_flush','Flush DNS','Limpia caché',true,'low')}${tog('n_winsock','Reset Winsock','Restablece config',false,'med')}${tog('n_tcpip','Reset TCP/IP','Reinicia pila',false,'med')}${tog('n_nagle','Sin Nagle','Reduce latencia',false,'med')}${tog('n_qos','Sin QoS','Libera ancho banda',true,'low')}${tog('n_autotuning','Sin Auto-Tuning','Estabiliza WiFi',false,'med')}`)}${divider('DNS')}${grid(`${sel('n_dns','DNS','Proveedor',[{v:'default',l:'ISP'},{v:'google',l:'Google 8.8.8.8'},{v:'cloudflare',l:'Cloudflare 1.1.1.1'},{v:'quad9',l:'Quad9'}],'cloudflare')}${sel('n_adapter','Adaptador','Conexión',[{v:'wifi',l:'Wi-Fi'},{v:'ethernet',l:'Ethernet'}],'wifi')}`)}`;}
-function pPow(){return`${hdr('🔋','Energía','Plan'+(S.hw.battery?' · '+S.hw.batteryLevel+'%':''))}${grid(`${tog('pw_high','Alto Rendimiento','Máxima energía',true,'low')}${tog('pw_hibernate','Sin hibernación','Libera ~4GB',true,'low')}${tog('pw_fast_start','Sin inicio rápido','Arranque limpio',false,'low')}${tog('pw_usb','Sin USB Suspend','No apagar USB',true,'low')}${tog('pw_disk','Nunca apagar disco','Sin lag',true,'low')}${tog('pw_cpu_max','CPU 100%','Máx constante',false,'med')}`)}${divider('Tiempos')}${grid(`${sli('pw_screen_ac','Pantalla AC','Min apagar',0,60,15,' min')}${sli('pw_sleep_ac','Suspender AC','0=nunca',0,120,30,' min')}`)}`;}
-function pStart(){return`${hdr('🚀','Arranque','Programas de inicio')}${grid(`${tog('b_delay','Sin delay apps','Inicio rápido',true,'low')}${tog('b_numlock','NumLock auto','Activa al inicio',true,'low')}${tog('b_onedrive','Sin OneDrive','No abrir',true,'low')}${tog('b_teams','Sin Teams','No abrir',true,'low')}${tog('b_edge','Sin Edge','No precargar',true,'low')}${tog('b_spotify','Sin Spotify','No abrir',true,'low')}${tog('b_discord','Sin Discord','No abrir',false,'low')}${tog('b_cortana','Sin Cortana','No iniciar',true,'low')}${tog('b_adobe','Sin Adobe upd','Sin actualizador',true,'low')}${tog('b_skype','Sin Skype','No abrir',true,'low')}`)}`;}
-function pGame(){return`${hdr('🎮','Gaming','FPS y latencia')}${grid(`${tog('g_mode','Game Mode','Prioriza juegos',true,'low')}${tog('g_dvr','Sin Game DVR','Sin grabación',true,'low')}${tog('g_fullscreen','Sin opt fullscreen','Mejora FPS',true,'low')}${tog('g_mouse','Sin aceleración','Mouse 1:1',true,'low')}${tog('g_nagle','Sin Nagle gaming','Reduce ping',true,'med')}${tog('g_hpet','Sin HPET','Mejor rendimiento',false,'high')}${tog('g_throttle','Sin Throttling','CPU no baja',true,'low')}${tog('g_notif','Sin notificaciones','Sin popups',true,'low')}${tog('g_xbox','Sin Xbox Bar','Libera recursos',true,'low')}${tog('g_standby','Limpiar RAM','Libera periódicamente',false,'med')}`)}${divider('GPU')}${grid(`${sel('g_gpu_sched','GPU Scheduling','HW scheduling',[{v:'off',l:'Off'},{v:'on',l:'On'}],'on')}${sel('g_gpu_mode','Modo GPU','Preferencia',[{v:'balanced',l:'Equilibrado'},{v:'high',l:'Alto rendimiento'}],'high')}`)}`;}
-function pKeys(){return`${hdr('⌨️','Keybinds','Clic y presiona teclas')}<div class="card p-2 mb-2.5 border-l-2 border-l-amber-500/30"><p class="text-[8px] text-amber-200/70">💡 Se exportan como <strong>AutoHotkey (.AHK)</strong></p></div>${divider('Sistema')}${grid(`${kb('k_screenshot','Screenshot','Captura','Win + Shift + S')}${kb('k_taskmgr','Task Manager','Admin tareas','Ctrl + Shift + Escape')}${kb('k_run','Ejecutar','Diálogo','Win + R')}${kb('k_explorer','Explorador','Archivos','Win + E')}${kb('k_cmd','Terminal','CMD admin','Ctrl + Shift + T')}${kb('k_desktop','Escritorio','Mostrar','Win + D')}`)}${divider('Multimedia')}${grid(`${kb('k_vol_up','Vol +','Subir','Ctrl + Up')}${kb('k_vol_down','Vol -','Bajar','Ctrl + Down')}${kb('k_mute','Mute','Toggle','Ctrl + M')}${kb('k_play','Play/Pausa','Media','Ctrl + Space')}`)}${divider('Apps')}${grid(`${kb('k_calc','Calculadora','Abrir','Ctrl + Alt + C')}${kb('k_notepad','Notepad','Bloc notas','Ctrl + Alt + N')}${kb('k_lock','Bloquear','Pantalla','Win + L')}${kb('k_browser','Navegador','Abrir','Ctrl + Alt + B')}`)}`;}
-function pVis(){return`${hdr('🎨','Visual','Apariencia')}${grid(`${tog('v_dark','Modo oscuro','Tema oscuro',true,'low')}${tog('v_dark_apps','Oscuro apps','Apps oscuras',true,'low')}${tog('v_no_anim','Sin animaciones','Más rápido',true,'low')}${tog('v_no_trans','Sin transparencias','Reduce GPU',true,'low')}${tog('v_no_shadow','Sin sombras','Sin sombras ventanas',false,'low')}${tog('v_ext','Extensiones','Archivos visibles',true,'low')}${tog('v_smooth_font','Suavizado fuentes','ClearType',true,'low')}${tog('v_wallpaper','Wallpaper HD','Sin compresión',true,'low')}`)}${divider('Cursor')}${grid(`${sli('v_cursor','Velocidad cursor','Mouse',1,20,10,'')}${tog('v_no_accel','Sin aceleración','1:1 gaming',false,'low')}`)}`;}
-function pTask(){return`${hdr('📌','Taskbar','Barra de tareas')}${grid(`${tog('t_search','Ocultar búsqueda','Sin barra',true,'low')}${tog('t_taskview','Sin Task View','Sin botón',true,'low')}${tog('t_widgets','Sin Widgets','Sin widgets',true,'low')}${tog('t_chat','Sin Chat','Sin ícono',true,'low')}${tog('t_copilot','Sin Copilot','Sin botón',true,'low')}${tog('t_small','Iconos pequeños','Compacta',false,'low')}${tog('t_never_combine','No combinar','Separadas',false,'low')}`)}${divider('Posición')}${grid(`${sel('t_align','Alineación','Iconos',[{v:'center',l:'Centro'},{v:'left',l:'Izquierda'}],'left')}`)}`;}
-function pExp(){return`${hdr('📁','Explorador','Archivos')}${grid(`${tog('e_ext','Extensiones','Muestra extensiones',true,'low')}${tog('e_hidden','Ocultos','Muestra ocultos',true,'low')}${tog('e_thispc','Este PC','No Recientes',true,'low')}${tog('e_classic','Menú clásico','Sin "Más opciones"',true,'low')}${tog('e_no_recent','Sin recientes','No recientes',true,'low')}${tog('e_full_path','Ruta completa','En barra',true,'low')}${tog('e_compact','Vista compacta','Menos espacio',true,'low')}${tog('e_no_ads','Sin anuncios','Sin tips',true,'low')}`)}`;}
-function pSnd(){return`${hdr('🔊','Sonido','Audio')}${grid(`${tog('s_no_startup','Sin sonido inicio','Silencia inicio',true,'low')}${tog('s_no_notif','Sin sonido notif','Silenciosas',false,'low')}${tog('s_exclusive','Exclusivo off','Apps no toman audio',false,'med')}${tog('s_comms','Sin reducción','No baja vol en llamadas',true,'low')}${tog('s_loudness','Ecualización','Normaliza vol',false,'low')}`)}${divider('Formato')}${grid(`${sli('s_vol','Volumen default','Vol al iniciar',0,100,50,'%')}${sel('s_format','Formato','Calidad',[{v:'16_44',l:'16bit 44.1kHz'},{v:'16_48',l:'16bit 48kHz'},{v:'24_48',l:'24bit 48kHz'},{v:'24_96',l:'24bit 96kHz'}],'16_48')}`)}`;}
-function pPriv(){return`${hdr('🛡️','Privacidad','Telemetría')}<div class="card p-2 mb-2.5 border-l-2 border-l-emerald-500/30"><p class="text-[8px] text-emerald-200/70">✅ <strong>Defender NO se toca.</strong></p></div>${grid(`${tog('pr_telemetry','Sin telemetría','Bloquea diagnósticos',true,'med')}${tog('pr_cortana','Sin Cortana','Deshabilita',true,'low')}${tog('pr_activity','Sin historial','No guardar actividad',true,'low')}${tog('pr_ad_id','Sin ID publicidad','Sin anuncios',true,'low')}${tog('pr_location','Sin ubicación','No compartir',true,'low')}${tog('pr_diag','Diagnóstico mín','Solo obligatorios',true,'low')}${tog('pr_feedback','Sin feedback','No pedir opiniones',true,'low')}${tog('pr_suggestions','Sin sugerencias','Sin apps sugeridas',true,'low')}${tog('pr_lockscreen','Sin tips lock','Sin anuncios lock',true,'low')}${tog('pr_timeline','Sin Timeline','Sin línea tiempo',true,'low')}${tog('pr_clipboard','Sin sync clip','No sincronizar',true,'low')}${tog('pr_input','Sin datos escrit','No enviar typing',true,'low')}`)}`;}
-function pSvc(){return`${hdr('⚙️','Servicios','Desactiva innecesarios')}<div class="card p-2 mb-2.5 border-l-2 border-l-red-500/30"><p class="text-[8px] text-red-200/70">⚠️ <strong>Defender NO incluido.</strong></p></div>${grid(`${tog('sv_diagtrack','DiagTrack','Telemetría',true,'med')}${tog('sv_dmwap','dmwappush','WAP push',true,'med')}${tog('sv_sysmain','SysMain','Superfetch',true,'med')}${tog('sv_wsearch','Windows Search','Indexación',true,'med')}${tog('sv_xbox','Servicios Xbox','Auth, Save',true,'low')}${tog('sv_maps','Mapas','Mapas offline',true,'low')}${tog('sv_fax','Fax','Servicio fax',true,'low')}${tog('sv_print','Impresión','Si usas impresora',false,'med')}${tog('sv_remote','Reg. remoto','Acceso remoto',true,'low')}${tog('sv_phone','PhoneSvc','Teléfono',true,'low')}${tog('sv_retail','RetailDemo','Demo tienda',true,'low')}${tog('sv_wallet','Wallet','Billetera',true,'low')}`)}`;}
-function pUpd(){return`${hdr('🔄','Updates','Actualizaciones')}${grid(`${tog('wu_no_restart','Sin reinicio auto','Sin permiso',true,'low')}${tog('wu_no_driver','Sin upd drivers','No toca drivers',false,'med')}${tog('wu_no_feature','Sin Feature Upd','Bloquea grandes',false,'high')}${tog('wu_metered','Conexión medida','Reduce descargas',false,'med')}${tog('wu_no_peer','Sin P2P','No compartir',true,'low')}${tog('wu_notify','Solo notificar','No auto descargar',false,'med')}${tog('wu_no_store','Sin auto Store','Store no actualiza',false,'low')}`)}${divider('Horas')}${grid(`${sli('wu_start','Hora inicio','Horas activas',0,23,8,'h')}${sli('wu_end','Hora fin','Horas activas',0,23,23,'h')}`)}`;}
-function pSec(){return`${hdr('🔒','Seguridad','Configuración')}<div class="bg-emerald-500/4 border border-emerald-500/6 rounded-lg p-2 mb-2.5 flex items-center gap-2"><span class="text-lg">🛡️</span><div><p class="font-bold text-emerald-400 text-[10px]">Defender PROTEGIDO</p><p class="text-[7px] text-slate-500">NO se modifica.</p></div></div>${grid(`${tog('sec_smb1','Sin SMBv1','Protocolo antiguo',true,'low')}${tog('sec_remote','Sin Escritorio Rem.','Desactiva',true,'low')}${tog('sec_assist','Sin Asistencia','Desactiva',true,'low')}${tog('sec_autoplay','Sin AutoPlay','No ejecutar USB',true,'low')}${tog('sec_netbios','Sin NetBIOS','Legacy inseguro',true,'low')}${tog('sec_null','Sesiones nulas','Bloquea anónimo',true,'low')}${tog('sec_lm','Sin LM Hash','Hash seguro',true,'low')}${tog('sec_wpad','Sin WPAD','Sin proxy auto',true,'low')}`)}`;}
-function pMaint(){return`${hdr('🔧','Mantenimiento','Reparación')}${grid(`${tog('m_sfc','SFC /scannow','Repara archivos',true,'low')}${tog('m_dism','DISM Restore','Repara imagen',true,'low')}${tog('m_chkdsk','Verificar disco','Errores disco',false,'med')}${tog('m_defrag','Optimizar disco','Desfrag/TRIM',true,'low')}${tog('m_restore','Punto restauración','Antes de cambios',true,'low')}${tog('m_logs','Limpiar logs','Registros eventos',false,'low')}${tog('m_store','Reset Store','Repara Store',false,'low')}${tog('m_network','Reset red','Reinstala adaptadores',false,'med')}${tog('m_winsxs','Limpiar WinSxS','Componentes obsoletos',false,'med')}${tog('m_icon','Rebuild iconos','Iconos corruptos',false,'low')}`)}`;}
-function pTerm(){return`${hdr('💻','Terminal','Comandos')}<div class="term mb-2.5"><div class="bg-[rgba(12,15,24,0.9)] px-3 py-1.5 flex items-center gap-1.5 border-b border-white/[0.03]"><div class="flex gap-1"><div class="w-2 h-2 bg-red-500 rounded-full"></div><div class="w-2 h-2 bg-yellow-500 rounded-full"></div><div class="w-2 h-2 bg-green-500 rounded-full"></div></div><span class="text-slate-500 text-[8px] ml-1.5 mono">PCTuner</span></div><div class="term-body" id="tBody"><p class="text-emerald-400">PCTuner Pro v6 — ${S.hw.brand} ${S.hw.os}</p><p class="text-slate-700 text-[7px]">Simulación. Exporta para ejecutar real.</p><p class="text-emerald-400 mt-1">C:\\> <span class="animate-pulse">_</span></p></div></div><div class="grid grid-cols-2 md:grid-cols-3 gap-1.5">${[['sfc /scannow','🔍','SFC'],['ipconfig /flushdns','🌐','DNS'],['systeminfo','💻','Info'],['cleanmgr','🧹','Limpiar'],['powercfg /batteryreport','🔋','Batería'],['netsh wlan show profiles','📡','WiFi']].map(([cmd,ic,n])=>`<button onclick="tRun('${cmd}')" class="card p-2 text-center cursor-pointer hover:border-indigo-500/12"><p class="text-sm">${ic}</p><p class="font-bold text-white text-[8px]">${n}</p></button>`).join('')}</div>`;}
+function pNet(){return`${hdr('🌐','Red','Optimiza conexión')}${grid(`${tog('n_flush','Flush DNS','Limpia caché',true,'low')}${tog('n_winsock','Reset Winsock','Restablece config',false,'med')}${tog('n_tcpip','Reset TCP/IP','Reinicia pila',false,'med')}${tog('n_nagle','Sin Nagle','Reduce latencia',false,'med')}${tog('n_qos','Sin QoS','Libera ancho banda',true,'low')}${tog('n_autotuning','Sin Auto-Tuning','Estabiliza WiFi',false,'med')}`)}${divider('DNS')}${grid(`${sel('n_dns','DNS','Proveedor',[{v:'default',l:'ISP'},{v:'google',l:'Google 8.8.8.8'},{v:'cloudflare',l:'Cloudflare 1.1.1.1'},{v:'quad9',l:'Quad9'}],'cloudflare')}${sel('n_adapter','Adaptador','Conexión',[{v:'wifi',l:'Wi-Fi'},{v:'ethernet',l:'Ethernet'}],'wifi')}`)}`;} function pPow(){return`${hdr('🔋','Energía','Plan'+(S.hw.battery?' · '+S.hw.batteryLevel+'%':''))}${grid(`${tog('pw_high','Alto Rendimiento','Máxima energía',true,'low')}${tog('pw_hibernate','Sin hibernación','Libera ~4GB',true,'low')}${tog('pw_fast_start','Sin inicio rápido','Arranque limpio',false,'low')}${tog('pw_usb','Sin USB Suspend','No apagar USB',true,'low')}${tog('pw_disk','Nunca apagar disco','Sin lag',true,'low')}${tog('pw_cpu_max','CPU 100%','Máx constante',false,'med')}`)}${divider('Tiempos')}${grid(`${sli('pw_screen_ac','Pantalla AC','Min apagar',0,60,15,' min')}${sli('pw_sleep_ac','Suspender AC','0=nunca',0,120,30,' min')}`)}`;} function pStart(){return`${hdr('🚀','Arranque','Programas de inicio')}${grid(`${tog('b_delay','Sin delay apps','Inicio rápido',true,'low')}${tog('b_numlock','NumLock auto','Activa al inicio',true,'low')}${tog('b_onedrive','Sin OneDrive','No abrir',true,'low')}${tog('b_teams','Sin Teams','No abrir',true,'low')}${tog('b_edge','Sin Edge','No precargar',true,'low')}${tog('b_spotify','Sin Spotify','No abrir',true,'low')}${tog('b_discord','Sin Discord','No abrir',false,'low')}${tog('b_cortana','Sin Cortana','No iniciar',true,'low')}${tog('b_adobe','Sin Adobe upd','Sin actualizador',true,'low')}${tog('b_skype','Sin Skype','No abrir',true,'low')}`)}`;} function pGame(){return`${hdr('🎮','Gaming','FPS y latencia')}${grid(`${tog('g_mode','Game Mode','Prioriza juegos',true,'low')}${tog('g_dvr','Sin Game DVR','Sin grabación',true,'low')}${tog('g_fullscreen','Sin opt fullscreen','Mejora FPS',true,'low')}${tog('g_mouse','Sin aceleración','Mouse 1:1',true,'low')}${tog('g_nagle','Sin Nagle gaming','Reduce ping',true,'med')}${tog('g_hpet','Sin HPET','Mejor rendimiento',false,'high')}${tog('g_throttle','Sin Throttling','CPU no baja',true,'low')}${tog('g_notif','Sin notificaciones','Sin popups',true,'low')}${tog('g_xbox','Sin Xbox Bar','Libera recursos',true,'low')}${tog('g_standby','Limpiar RAM','Libera periódicamente',false,'med')}`)}${divider('GPU')}${grid(`${sel('g_gpu_sched','GPU Scheduling','HW scheduling',[{v:'off',l:'Off'},{v:'on',l:'On'}],'on')}${sel('g_gpu_mode','Modo GPU','Preferencia',[{v:'balanced',l:'Equilibrado'},{v:'high',l:'Alto rendimiento'}],'high')}`)}`;} function pKeys(){return`${hdr('⌨️','Keybinds','Clic y presiona teclas')}<div class="card p-2 mb-2.5 border-l-2 border-l-amber-500/30"><p class="text-[8px] text-amber-200/70">💡 Se exportan como <strong>AutoHotkey (.AHK)</strong></p></div>${divider('Sistema')}${grid(`${kb('k_screenshot','Screenshot','Captura','Win + Shift + S')}${kb('k_taskmgr','Task Manager','Admin tareas','Ctrl + Shift + Escape')}${kb('k_run','Ejecutar','Diálogo','Win + R')}${kb('k_explorer','Explorador','Archivos','Win + E')}${kb('k_cmd','Terminal','CMD admin','Ctrl + Shift + T')}${kb('k_desktop','Escritorio','Mostrar','Win + D')}`)}${divider('Multimedia')}${grid(`${kb('k_vol_up','Vol +','Subir','Ctrl + Up')}${kb('k_vol_down','Vol -','Bajar','Ctrl + Down')}${kb('k_mute','Mute','Toggle','Ctrl + M')}${kb('k_play','Play/Pausa','Media','Ctrl + Space')}`)}${divider('Apps')}${grid(`${kb('k_calc','Calculadora','Abrir','Ctrl + Alt + C')}${kb('k_notepad','Notepad','Bloc notas','Ctrl + Alt + N')}${kb('k_lock','Bloquear','Pantalla','Win + L')}${kb('k_browser','Navegador','Abrir','Ctrl + Alt + B')}`)}`;} function pVis(){return`${hdr('🎨','Visual','Apariencia')}${grid(`${tog('v_dark','Modo oscuro','Tema oscuro',true,'low')}${tog('v_dark_apps','Oscuro apps','Apps oscuras',true,'low')}${tog('v_no_anim','Sin animaciones','Más rápido',true,'low')}${tog('v_no_trans','Sin transparencias','Reduce GPU',true,'low')}${tog('v_no_shadow','Sin sombras','Sin sombras ventanas',false,'low')}${tog('v_ext','Extensiones','Archivos visibles',true,'low')}${tog('v_smooth_font','Suavizado fuentes','ClearType',true,'low')}${tog('v_wallpaper','Wallpaper HD','Sin compresión',true,'low')}`)}${divider('Cursor')}${grid(`${sli('v_cursor','Velocidad cursor','Mouse',1,20,10,'')}${tog('v_no_accel','Sin aceleración','1:1 gaming',false,'low')}`)}`;} function pTask(){return`${hdr('📌','Taskbar','Barra de tareas')}${grid(`${tog('t_search','Ocultar búsqueda','Sin barra',true,'low')}${tog('t_taskview','Sin Task View','Sin botón',true,'low')}${tog('t_widgets','Sin Widgets','Sin widgets',true,'low')}${tog('t_chat','Sin Chat','Sin ícono',true,'low')}${tog('t_copilot','Sin Copilot','Sin botón',true,'low')}${tog('t_small','Iconos pequeños','Compacta',false,'low')}${tog('t_never_combine','No combinar','Separadas',false,'low')}`)}${divider('Posición')}${grid(`${sel('t_align','Alineación','Iconos',[{v:'center',l:'Centro'},{v:'left',l:'Izquierda'}],'left')}`)}`;} function pExp(){return`${hdr('📁','Explorador','Archivos')}${grid(`${tog('e_ext','Extensiones','Muestra extensiones',true,'low')}${tog('e_hidden','Ocultos','Muestra ocultos',true,'low')}${tog('e_thispc','Este PC','No Recientes',true,'low')}${tog('e_classic','Menú clásico','Sin "Más opciones"',true,'low')}${tog('e_no_recent','Sin recientes','No recientes',true,'low')}${tog('e_full_path','Ruta completa','En barra',true,'low')}${tog('e_compact','Vista compacta','Menos espacio',true,'low')}${tog('e_no_ads','Sin anuncios','Sin tips',true,'low')}`)}`;} function pSnd(){return`${hdr('🔊','Sonido','Audio')}${grid(`${tog('s_no_startup','Sin sonido inicio','Silencia inicio',true,'low')}${tog('s_no_notif','Sin sonido notif','Silenciosas',false,'low')}${tog('s_exclusive','Exclusivo off','Apps no toman audio',false,'med')}${tog('s_comms','Sin reducción','No baja vol en llamadas',true,'low')}${tog('s_loudness','Ecualización','Normaliza vol',false,'low')}`)}${divider('Formato')}${grid(`${sli('s_vol','Volumen default','Vol al iniciar',0,100,50,'%')}${sel('s_format','Formato','Calidad',[{v:'16_44',l:'16bit 44.1kHz'},{v:'16_48',l:'16bit 48kHz'},{v:'24_48',l:'24bit 48kHz'},{v:'24_96',l:'24bit 96kHz'}],'16_48')}`)}`;} function pPriv(){return`${hdr('🛡️','Privacidad','Telemetría')}<div class="card p-2 mb-2.5 border-l-2 border-l-emerald-500/30"><p class="text-[8px] text-emerald-200/70">✅ <strong>Defender NO se toca.</strong></p></div>${grid(`${tog('pr_telemetry','Sin telemetría','Bloquea diagnósticos',true,'med')}${tog('pr_cortana','Sin Cortana','Deshabilita',true,'low')}${tog('pr_activity','Sin historial','No guardar actividad',true,'low')}${tog('pr_ad_id','Sin ID publicidad','Sin anuncios',true,'low')}${tog('pr_location','Sin ubicación','No compartir',true,'low')}${tog('pr_diag','Diagnóstico mín','Solo obligatorios',true,'low')}${tog('pr_feedback','Sin feedback','No pedir opiniones',true,'low')}${tog('pr_suggestions','Sin sugerencias','Sin apps sugeridas',true,'low')}${tog('pr_lockscreen','Sin tips lock','Sin anuncios lock',true,'low')}${tog('pr_timeline','Sin Timeline','Sin línea tiempo',true,'low')}${tog('pr_clipboard','Sin sync clip','No sincronizar',true,'low')}${tog('pr_input','Sin datos escrit','No enviar typing',true,'low')}`)}`;} function pSvc(){return`${hdr('⚙️','Servicios','Desactiva innecesarios')}<div class="card p-2 mb-2.5 border-l-2 border-l-red-500/30"><p class="text-[8px] text-red-200/70">⚠️ <strong>Defender NO incluido.</strong></p></div>${grid(`${tog('sv_diagtrack','DiagTrack','Telemetría',true,'med')}${tog('sv_dmwap','dmwappush','WAP push',true,'med')}${tog('sv_sysmain','SysMain','Superfetch',true,'med')}${tog('sv_wsearch','Windows Search','Indexación',true,'med')}${tog('sv_xbox','Servicios Xbox','Auth, Save',true,'low')}${tog('sv_maps','Mapas','Mapas offline',true,'low')}${tog('sv_fax','Fax','Servicio fax',true,'low')}${tog('sv_print','Impresión','Si usas impresora',false,'med')}${tog('sv_remote','Reg. remoto','Acceso remoto',true,'low')}${tog('sv_phone','PhoneSvc','Teléfono',true,'low')}${tog('sv_retail','RetailDemo','Demo tienda',true,'low')}${tog('sv_wallet','Wallet','Billetera',true,'low')}`)}`;} function pUpd(){return`${hdr('🔄','Updates','Actualizaciones')}${grid(`${tog('wu_no_restart','Sin reinicio auto','Sin permiso',true,'low')}${tog('wu_no_driver','Sin upd drivers','No toca drivers',false,'med')}${tog('wu_no_feature','Sin Feature Upd','Bloquea grandes',false,'high')}${tog('wu_metered','Conexión medida','Reduce descargas',false,'med')}${tog('wu_no_peer','Sin P2P','No compartir',true,'low')}${tog('wu_notify','Solo notificar','No auto descargar',false,'med')}${tog('wu_no_store','Sin auto Store','Store no actualiza',false,'low')}`)}${divider('Horas')}${grid(`${sli('wu_start','Hora inicio','Horas activas',0,23,8,'h')}${sli('wu_end','Hora fin','Horas activas',0,23,23,'h')}`)}`;} function pSec(){return`${hdr('🔒','Seguridad','Configuración')}<div class="bg-emerald-500/4 border border-emerald-500/6 rounded-lg p-2 mb-2.5 flex items-center gap-2"><span class="text-lg">🛡️</span><div><p class="font-bold text-emerald-400 text-[10px]">Defender PROTEGIDO</p><p class="text-[7px] text-slate-500">NO se modifica.</p></div></div>${grid(`${tog('sec_smb1','Sin SMBv1','Protocolo antiguo',true,'low')}${tog('sec_remote','Sin Escritorio Rem.','Desactiva',true,'low')}${tog('sec_assist','Sin Asistencia','Desactiva',true,'low')}${tog('sec_autoplay','Sin AutoPlay','No ejecutar USB',true,'low')}${tog('sec_netbios','Sin NetBIOS','Legacy inseguro',true,'low')}${tog('sec_null','Sesiones nulas','Bloquea anónimo',true,'low')}${tog('sec_lm','Sin LM Hash','Hash seguro',true,'low')}${tog('sec_wpad','Sin WPAD','Sin proxy auto',true,'low')}`)}`;} function pMaint(){return`${hdr('🔧','Mantenimiento','Reparación')}${grid(`${tog('m_sfc','SFC /scannow','Repara archivos',true,'low')}${tog('m_dism','DISM Restore','Repara imagen',true,'low')}${tog('m_chkdsk','Verificar disco','Errores disco',false,'med')}${tog('m_defrag','Optimizar disco','Desfrag/TRIM',true,'low')}${tog('m_restore','Punto restauración','Antes de cambios',true,'low')}${tog('m_logs','Limpiar logs','Registros eventos',false,'low')}${tog('m_store','Reset Store','Repara Store',false,'low')}${tog('m_network','Reset red','Reinstala adaptadores',false,'med')}${tog('m_winsxs','Limpiar WinSxS','Componentes obsoletos',false,'med')}${tog('m_icon','Rebuild iconos','Iconos corruptos',false,'low')}`)}`;} function pTerm(){return`${hdr('💻','Terminal','Comandos')}<div class="term mb-2.5"><div class="bg-[rgba(12,15,24,0.9)] px-3 py-1.5 flex items-center gap-1.5 border-b border-white/[0.03]"><div class="flex gap-1"><div class="w-2 h-2 bg-red-500 rounded-full"></div><div class="w-2 h-2 bg-yellow-500 rounded-full"></div><div class="w-2 h-2 bg-green-500 rounded-full"></div></div><span class="text-slate-500 text-[8px] ml-1.5 mono">PCTuner</span></div><div class="term-body" id="tBody"><p class="text-emerald-400">PCTuner Pro v6 — ${S.hw.brand} ${S.hw.os}</p><p class="text-slate-700 text-[7px]">Simulación. Exporta para ejecutar real.</p><p class="text-emerald-400 mt-1">C:\\> <span class="animate-pulse">_</span></p></div></div><div class="grid grid-cols-2 md:grid-cols-3 gap-1.5">${[['sfc /scannow','🔍','SFC'],['ipconfig /flushdns','🌐','DNS'],['systeminfo','💻','Info'],['cleanmgr','🧹','Limpiar'],['powercfg /batteryreport','🔋','Batería'],['netsh wlan show profiles','📡','WiFi']].map(([cmd,ic,n])=>`<button onclick="tRun('${cmd}')" class="card p-2 text-center cursor-pointer hover:border-indigo-500/12"><p class="text-sm">${ic}</p><p class="font-bold text-white text-[8px]">${n}</p></button>`).join('')}</div>`;}
 function tRun(cmd){const el=document.getElementById('tBody');if(!el)return;const o={'sfc /scannow':'[========= 100% =========]\nOK.','ipconfig /flushdns':'Caché DNS vaciada.','systeminfo':`${S.hw.brand}\n${S.hw.os} ${S.hw.osVer||''} · ${S.hw.arch}\n${S.hw.cores} núcleos · ${S.hw.ram||'?'}GB`,'cleanmgr':'Liberado: 2.75 GB','powercfg /batteryreport':`Batería: ${S.hw.battery?S.hw.batteryLevel+'%':'N/A'}`,'netsh wlan show profiles':'WiFi:\n  MiRed_5G'};const out=o[cmd]||'OK';el.innerHTML+=`<p class="text-cyan-400 mt-1">C:\\> <span class="text-white">${cmd}</span></p>`;out.split('\n').forEach((l,i)=>{setTimeout(()=>{el.innerHTML+=`<p class="text-emerald-400 fade-up">${l}</p>`;el.scrollTop=el.scrollHeight;},i*60);});}
 function pProf(){const saved=JSON.parse(localStorage.getItem('pct6')||'{}'),names=Object.keys(saved);return`${hdr('💾','Perfiles','Guardar y cargar')}<div class="grid md:grid-cols-2 gap-2 mb-3"><div class="card p-3"><h4 class="font-bold text-white text-[10px] mb-1.5">💾 Guardar</h4><input type="text" id="pName" placeholder="Nombre..." class="w-full bg-slate-900/80 border border-slate-700/30 rounded-lg px-3 py-1.5 text-[10px] mb-1.5 focus:border-indigo-500 focus:outline-none text-white placeholder-slate-700"><button onclick="saveProf()" class="w-full btn btn-p py-1.5">Guardar</button></div><div class="card p-3"><h4 class="font-bold text-white text-[10px] mb-1.5">📂 Import/Export</h4><div class="flex gap-1.5"><button onclick="expJSON()" class="flex-1 btn btn-s py-1.5">📤 JSON</button><label class="flex-1 btn btn-p py-1.5 text-center cursor-pointer">📥 Import<input type="file" accept=".json" class="hidden" onchange="impJSON(event)"></label></div></div></div>${names.length?`${divider('Guardados')}<div class="section-grid stagger">${names.map(n=>`<div class="card p-2.5 flex items-center justify-between"><div><p class="font-semibold text-white text-[10px]">${n}</p><p class="text-[7px] text-slate-600">${Object.keys(saved[n].t||{}).length} opciones</p></div><div class="flex gap-1"><button onclick="loadProf('${n}')" class="btn btn-p px-2 py-1 text-[8px]">Cargar</button><button onclick="delProf('${n}')" class="btn btn-d px-1.5 py-1 text-[8px]">✕</button></div></div>`).join('')}</div>`:''}`;}
 function saveProf(){const n=document.getElementById('pName')?.value?.trim();if(!n)return;const p=JSON.parse(localStorage.getItem('pct6')||'{}');p[n]={t:{...S.toggles},s:{...S.sliders},se:{...S.selects},k:{...S.keybinds},fp:JSON.parse(JSON.stringify(S.fan.profiles)),fan:S.fan.profile};localStorage.setItem('pct6',JSON.stringify(p));notify('✅ Guardado','#10b981');render('profiles');}
@@ -454,29 +594,137 @@ function expJSON(){dl('pctuner_config.json',JSON.stringify({t:S.toggles,s:S.slid
 function impJSON(ev){const f=ev.target.files[0];if(!f)return;const r=new FileReader();r.onload=e=>{try{const d=JSON.parse(e.target.result);Object.assign(S.toggles,d.t||{});Object.assign(S.sliders,d.s||{});Object.assign(S.selects,d.se||{});Object.assign(S.keybinds,d.k||{});if(d.fp)Object.assign(S.fan.profiles,JSON.parse(JSON.stringify(d.fp)));if(d.fan)S.fan.profile=d.fan;notify('✅ Importado','#10b981');render(S.page);}catch(e){notify('❌ Error','#ef4444');}};r.readAsText(f);}
 
 // ==================== CREAR APP ====================
-function pMakeApp(){return`${hdr('📦','Crear Aplicación','Genera PCTuner.exe con PowerShell')}
-<div class="card p-3 mb-3 border-l-2 border-l-emerald-500/30"><div class="flex items-start gap-2"><span class="text-base">✅</span><div><h4 class="font-bold text-emerald-300 text-[10px] mb-0.5">100% independiente</h4><p class="text-[8px] text-slate-400">La app se abre como ventana propia sin barras de navegador. Se ve como app nativa.</p></div></div></div>
+function pMakeApp(){return`${hdr('📦','Instalar PCTuner Pro','Instalador automático — 1 clic')}
+<div class="card p-4 mb-3 border-l-2 border-l-emerald-500/30 hover-glow"><div class="flex items-start gap-3"><div class="w-12 h-12 bg-gradient-to-br from-emerald-500/15 to-green-500/10 rounded-xl flex items-center justify-center text-2xl border border-emerald-500/10 flex-shrink-0">🚀</div><div><h4 class="font-bold text-emerald-300 text-[11px] mb-1">Instalación Automática</h4><p class="text-[8px] text-slate-400 leading-relaxed">El instalador hace <strong class="text-white">TODO automáticamente</strong>: compila el .exe, crea accesos directos en el Escritorio y Menú Inicio, y abre la app al terminar.</p></div></div></div>
 
-${divider('Paso a Paso')}
-<div class="card p-3 mb-2.5 hover-glow"><div class="flex items-center gap-2 mb-2"><div class="w-9 h-9 bg-gradient-to-br from-violet-500/15 to-purple-500/10 rounded-lg flex items-center justify-center text-lg border border-violet-500/10">⚡</div><div><h4 class="font-bold text-white text-[11px]">Generar PCTuner.exe</h4><p class="text-[7px] text-violet-400 font-semibold">⏱ 2 min · Sin instalar nada · PowerShell nativo</p></div></div>
-<div class="bg-slate-900/50 rounded-lg p-2.5 mb-2.5"><div class="space-y-1.5">
-<div class="flex items-start gap-2"><div class="w-5 h-5 bg-indigo-500/15 rounded-full flex items-center justify-center text-[8px] font-black text-indigo-400 flex-shrink-0 mt-0.5">1</div><div><p class="text-[9px] text-white font-semibold">Descarga los 2 archivos en una carpeta</p><p class="text-[8px] text-slate-500">Crea una carpeta, ej: <code class="mono text-amber-400 bg-amber-500/5 px-1 rounded">C:\\PCTuner</code></p></div></div>
-<div class="flex items-start gap-2"><div class="w-5 h-5 bg-indigo-500/15 rounded-full flex items-center justify-center text-[8px] font-black text-indigo-400 flex-shrink-0 mt-0.5">2</div><div><p class="text-[9px] text-white font-semibold">Clic derecho en Crear_EXE.ps1 → Ejecutar con PowerShell</p><p class="text-[8px] text-slate-500">Se compila automáticamente usando C# nativo de Windows</p></div></div>
-<div class="flex items-start gap-2"><div class="w-5 h-5 bg-emerald-500/15 rounded-full flex items-center justify-center text-[8px] font-black text-emerald-400 flex-shrink-0 mt-0.5">3</div><div><p class="text-[9px] text-white font-semibold">Aparece PCTuner.exe ✅</p><p class="text-[8px] text-slate-500">Doble clic y listo. Se abre como app independiente.</p></div></div>
+${divider('Instalar en 3 pasos')}
+<div class="card p-4 mb-3 hover-glow"><div class="space-y-3">
+<div class="flex items-start gap-3"><div class="w-8 h-8 bg-indigo-500/15 rounded-lg flex items-center justify-center text-sm font-black text-indigo-400 flex-shrink-0">1</div><div><p class="text-[10px] text-white font-bold mb-0.5">Descarga los 2 archivos</p><p class="text-[8px] text-slate-500">Ponlos en la <strong class="text-slate-300">misma carpeta</strong> (cualquiera sirve)</p><div class="flex gap-1.5 mt-1.5"><button onclick="dlPS1()" class="btn btn-v px-3 py-1.5">⬇ Crear_EXE.ps1</button><button onclick="dlIndex()" class="btn btn-p px-3 py-1.5">⬇ index.html</button></div></div></div>
+<div class="flex items-start gap-3"><div class="w-8 h-8 bg-indigo-500/15 rounded-lg flex items-center justify-center text-sm font-black text-indigo-400 flex-shrink-0">2</div><div><p class="text-[10px] text-white font-bold mb-0.5">Clic derecho en Crear_EXE.ps1 → Ejecutar con PowerShell</p><p class="text-[8px] text-slate-500">El instalador se encarga de todo automáticamente</p></div></div>
+<div class="flex items-start gap-3"><div class="w-8 h-8 bg-emerald-500/15 rounded-lg flex items-center justify-center text-sm font-black text-emerald-400 flex-shrink-0">✓</div><div><p class="text-[10px] text-white font-bold mb-0.5">¡Listo! PCTuner se abre solo</p><p class="text-[8px] text-slate-500">Acceso directo en tu Escritorio y Menú Inicio</p></div></div>
 </div></div>
-<div class="flex gap-1.5"><button onclick="dlPS1()" class="btn btn-v px-3 py-1.5">⬇ Crear_EXE.ps1</button><button onclick="dlIndex()" class="btn btn-p px-3 py-1.5">⬇ index.html</button></div></div>
 
-<div class="card p-2.5 mb-2.5 border-l-2 border-l-amber-500/30"><div class="flex items-start gap-2"><span class="text-sm">💡</span><div><p class="text-[8px] text-amber-200/70">Si PowerShell bloquea la ejecución, abre PowerShell como Admin y ejecuta:</p><p class="mono text-[8px] text-amber-400 mt-0.5">Set-ExecutionPolicy RemoteSigned -Scope CurrentUser</p></div></div></div>
+${divider('Qué hace el instalador')}
+<div class="grid grid-cols-2 md:grid-cols-5 gap-1.5 mb-3">${[['📂','Crea carpeta','AppData/PCTuner'],['⚙️','Compila .exe','C# nativo'],['🖥️','Acceso directo','Escritorio'],['📌','Menú Inicio','Windows'],['🚀','Auto-abre','La app']].map(([ic,t,d])=>`<div class="card p-2 text-center"><p class="text-sm">${ic}</p><p class="text-[8px] font-bold text-white mt-0.5">${t}</p><p class="text-[6px] text-slate-600">${d}</p></div>`).join('')}</div>
 
-<div class="card p-3 text-center"><button onclick="dlPS1();setTimeout(()=>dlIndex(),300)" class="btn btn-s px-5 py-2">⬇ Descargar Todo</button><p class="text-[7px] text-slate-700 mt-1.5">Descarga Crear_EXE.ps1 + index.html</p></div>`;}
+<div class="card p-2.5 mb-3 border-l-2 border-l-amber-500/30"><div class="flex items-start gap-2"><span class="text-sm">💡</span><div><p class="text-[8px] text-amber-200/70">Si PowerShell bloquea la ejecución, abre PowerShell como Admin y ejecuta:</p><p class="mono text-[8px] text-amber-400 mt-0.5">Set-ExecutionPolicy RemoteSigned -Scope CurrentUser</p></div></div></div>
+
+<div class="card p-4 text-center hover-glow"><button onclick="dlPS1();setTimeout(()=>dlIndex(),400)" class="btn btn-s px-6 py-2.5 text-[11px]">⬇ Descargar Todo e Instalar</button><p class="text-[7px] text-slate-700 mt-2">Descarga ambos archivos → Ejecuta Crear_EXE.ps1 → Listo</p><p class="text-[6px] text-slate-800 mt-0.5">Sin instalar nada extra · Sin internet después · 100% portable</p></div>`;}
 function dlIndex(){const b=new Blob([document.documentElement.outerHTML],{type:'text/html'});const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download='index.html';document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(u);notify('⬇ index.html descargado','#10b981');}
-function dlPS1(){dl('Crear_EXE.ps1',`$src=@"
-using System;using System.Diagnostics;using System.IO;
-class P{static void Main(){string d=AppDomain.CurrentDomain.BaseDirectory;string h=Path.Combine(d,"index.html");if(!File.Exists(h)){Console.WriteLine("index.html no encontrado");return;}string u="file:///"+h.Replace("\\\\","/");string[]b={"chrome","msedge"};foreach(var x in b){try{Process.Start(new ProcessStartInfo(x){Arguments="--app=\\""+u+"\\" --window-size=1300,850",UseShellExecute=false});return;}catch{}}Process.Start(h);}}
+function dlPS1(){dl('Crear_EXE.ps1',getPS1Content());notify('⬇ Crear_EXE.ps1 descargado','#10b981');}
+function _dlPS1_REMOVED(){return;dl('Crear_EXE.ps1',`# ============================================
+# PCTuner Pro v6 — Instalador Automatico
+# Solo ejecuta este archivo con PowerShell
+# ============================================
+
+Write-Host ""
+Write-Host "  ╔══════════════════════════════════════╗" -ForegroundColor Cyan
+Write-Host "  ║     PCTuner Pro v6 — Instalador      ║" -ForegroundColor Cyan
+Write-Host "  ╚══════════════════════════════════════╝" -ForegroundColor Cyan
+Write-Host ""
+
+# Verificar que index.html existe junto al script
+$scriptDir = $PSScriptRoot
+$htmlFile = Join-Path $scriptDir "index.html"
+
+if (-not (Test-Path $htmlFile)) {
+    Write-Host "  [ERROR] index.html no encontrado!" -ForegroundColor Red
+    Write-Host "  Coloca index.html junto a este archivo." -ForegroundColor Yellow
+    Read-Host "  Presiona Enter para cerrar"
+    exit
+}
+
+Write-Host "  [1/5] Creando carpeta de instalacion..." -ForegroundColor Yellow
+$installDir = Join-Path $env:LOCALAPPDATA "PCTuner"
+if (-not (Test-Path $installDir)) { New-Item -Path $installDir -ItemType Directory -Force | Out-Null }
+
+Write-Host "  [2/5] Copiando archivos..." -ForegroundColor Yellow
+Copy-Item $htmlFile (Join-Path $installDir "index.html") -Force
+
+Write-Host "  [3/5] Compilando PCTuner.exe..." -ForegroundColor Yellow
+
+$exeSrc = @"
+using System;
+using System.Diagnostics;
+using System.IO;
+using System.Runtime.InteropServices;
+
+class PCTuner {
+    [DllImport("kernel32.dll")] static extern IntPtr GetConsoleWindow();
+    [DllImport("user32.dll")] static extern bool ShowWindow(IntPtr h, int s);
+
+    static void Main() {
+        ShowWindow(GetConsoleWindow(), 0);
+        string dir = AppDomain.CurrentDomain.BaseDirectory;
+        string html = Path.Combine(dir, "index.html");
+        if (!File.Exists(html)) { return; }
+        string url = "file:///" + html.Replace("\\\\", "/");
+        string[] browsers = { "chrome", "msedge" };
+        foreach (var b in browsers) {
+            try {
+                var psi = new ProcessStartInfo(b);
+                psi.Arguments = "--app=\\"" + url + "\\" --window-size=1300,850 --disable-extensions --disable-sync --no-first-run --disable-default-apps";
+                psi.UseShellExecute = false;
+                psi.CreateNoWindow = true;
+                Process.Start(psi);
+                return;
+            } catch {}
+        }
+        Process.Start(html);
+    }
+}
 "@
-Add-Type -TypeDefinition $src -OutputAssembly (Join-Path $PSScriptRoot "PCTuner.exe") -OutputType ConsoleApplication
-Write-Host "PCTuner.exe creado!" -ForegroundColor Green
-Read-Host "Presiona Enter para cerrar"`);notify('⬇ Crear_EXE.ps1 descargado','#10b981');}
+
+try {
+    Add-Type -TypeDefinition $exeSrc -OutputAssembly (Join-Path $installDir "PCTuner.exe") -OutputType ConsoleApplication -ErrorAction Stop
+    Write-Host "  [3/5] PCTuner.exe compilado OK!" -ForegroundColor Green
+} catch {
+    Write-Host "  [3/5] Error compilando. Usando launcher alternativo..." -ForegroundColor Yellow
+    $batContent = "@echo off\`nstart /b \\"\\" chrome --app=\\"file:///$($installDir.Replace('\\\\','/'))//index.html\\" --window-size=1300,850 2>nul || start /b \\"\\" msedge --app=\\"file:///$($installDir.Replace('\\\\','/'))//index.html\\" --window-size=1300,850"
+    Set-Content (Join-Path $installDir "PCTuner.bat") $batContent
+}
+
+Write-Host "  [4/5] Creando acceso directo en Escritorio..." -ForegroundColor Yellow
+$desktop = [Environment]::GetFolderPath("Desktop")
+$exePath = Join-Path $installDir "PCTuner.exe"
+if (-not (Test-Path $exePath)) { $exePath = Join-Path $installDir "PCTuner.bat" }
+
+$shell = New-Object -ComObject WScript.Shell
+$shortcut = $shell.CreateShortcut((Join-Path $desktop "PCTuner Pro.lnk"))
+$shortcut.TargetPath = $exePath
+$shortcut.WorkingDirectory = $installDir
+$shortcut.Description = "PCTuner Pro v6 — Optimizador de PC"
+$shortcut.Save()
+
+# Tambien crear en Menu Inicio
+Write-Host "  [5/5] Creando acceso en Menu Inicio..." -ForegroundColor Yellow
+$startMenu = Join-Path $env:APPDATA "Microsoft\\Windows\\Start Menu\\Programs"
+$shortcut2 = $shell.CreateShortcut((Join-Path $startMenu "PCTuner Pro.lnk"))
+$shortcut2.TargetPath = $exePath
+$shortcut2.WorkingDirectory = $installDir
+$shortcut2.Description = "PCTuner Pro v6"
+$shortcut2.Save()
+
+Write-Host ""
+Write-Host "  ╔══════════════════════════════════════╗" -ForegroundColor Green
+Write-Host "  ║  ✅ INSTALACION COMPLETADA!           ║" -ForegroundColor Green
+Write-Host "  ║                                      ║" -ForegroundColor Green
+Write-Host "  ║  📂 Ubicacion:                        ║" -ForegroundColor Green
+Write-Host "  ║     $($installDir.PadRight(33))║" -ForegroundColor Cyan
+Write-Host "  ║                                      ║" -ForegroundColor Green
+Write-Host "  ║  🖥️ Acceso directo en Escritorio      ║" -ForegroundColor Green
+Write-Host "  ║  📌 Acceso en Menu Inicio             ║" -ForegroundColor Green
+Write-Host "  ╚══════════════════════════════════════╝" -ForegroundColor Green
+Write-Host ""
+
+# Auto-ejecutar la app
+Write-Host "  Abriendo PCTuner Pro..." -ForegroundColor Cyan
+Start-Process $exePath -WorkingDirectory $installDir
+
+Write-Host ""
+Write-Host "  Ya puedes cerrar esta ventana." -ForegroundColor DarkGray
+Start-Sleep -Seconds 3
+`);notify('⬇ Crear_EXE.ps1 descargado','#10b981');}
 
 // ==================== ABOUT / DONATE / CREDITS ====================
 function pAbout(){const h=S.hw;return`${hdr('ℹ️','Acerca de','Hardware detectado')}<div class="card p-4 text-center mb-3 fade-up"><div class="w-12 h-12 bg-gradient-to-br from-indigo-500 to-violet-600 rounded-xl flex items-center justify-center text-lg font-black text-white mx-auto mb-2">PC</div><h2 class="text-base font-black text-white">PCTuner Pro v6.0</h2><p class="text-[10px] text-slate-400">por <span class="credit-gradient font-bold cursor-pointer" onclick="go('credits')">mueblesito</span></p></div>${divider('Sistema')}<div class="grid md:grid-cols-2 gap-2 mb-3"><div class="card p-3">${[['OS',h.os+' '+(h.osVer||'')],['Arch',h.arch||'—'],['Marca',h.brand||'—'],['Cores',h.cores+' threads'],['RAM',h.ram?h.ram+' GB':'—'],['Clase CPU',h.cpuClass||'—']].map(([k,v])=>`<div class="flex justify-between mb-0.5"><span class="text-[8px] text-slate-500">${k}</span><span class="text-[8px] text-white mono">${v}</span></div>`).join('')}</div><div class="card p-3">${[['GPU',(h.gpuClean||h.gpu||'—').substring(0,30)],['GPU Marca',h.gpuBrand||'—'],['Tier',h.gpuTier||'—'],['Browser',h.browser||'—'],['Pantalla',h.screenW+'×'+h.screenH],['DPR',h.dpr+'x']].map(([k,v])=>`<div class="flex justify-between mb-0.5"><span class="text-[8px] text-slate-500">${k}</span><span class="text-[8px] text-white mono">${v}</span></div>`).join('')}</div></div>${h.battery?`<div class="card p-3 mb-3"><div class="flex items-center gap-2"><span class="text-lg">${h.charging?'🔌':'🔋'}</span><div><p class="text-[9px] font-bold ${h.batteryLevel>20?'text-emerald-400':'text-red-400'}">${h.batteryLevel}%${h.charging?' Cargando':''}</p><div class="w-32 h-1.5 bg-slate-800/50 rounded-full overflow-hidden mt-0.5"><div class="h-full rounded-full ${h.batteryLevel>50?'bg-emerald-500':'bg-amber-500'}" style="width:${h.batteryLevel}%"></div></div></div></div></div>`:''}<div class="card p-2.5"><p class="text-[7px] text-slate-600 mono break-all">${h.userAgent||''}</p></div>`;}
